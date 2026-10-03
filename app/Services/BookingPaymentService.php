@@ -47,7 +47,7 @@ class BookingPaymentService
 
         $intent = $this->intents->create([
             'amount' => $appointment->price_cents,
-            'currency' => config('cashier.currency', 'eur'),
+            'currency' => strtolower($appointment->service->currency),
             'description' => $appointment->service->name.' – '.$appointment->starts_at->isoFormat('D MMMM YYYY à H\hi'),
             'receipt_email' => $appointment->customer_email,
             'metadata' => ['appointment_id' => $appointment->id],

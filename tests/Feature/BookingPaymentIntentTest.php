@@ -86,3 +86,19 @@ it('crée un intent de rendez-vous et le mémorise au premier passage', function
 
     expect($appointment->fresh()->stripe_payment_intent_id)->toBe('pi_premier');
 });
+
+it('facture le rendez-vous dans la devise de la prestation', function () {
+    $appointment = appointmentWithIntent(null);
+
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('reusable')->once()->andReturn(null);
+        $mock->shouldReceive('create')
+            ->once()
+            ->withArgs(fn (array $params) => $params['currency'] === 'eur')
+            ->andReturn(fakeBookingIntent('pi_eur', 'requires_payment_method', 7000));
+    });
+
+    config(['cashier.currency' => 'usd']);
+
+    app(BookingPaymentService::class)->createPaymentIntent($appointment);
+});

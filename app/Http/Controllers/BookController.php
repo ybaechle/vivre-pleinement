@@ -73,7 +73,7 @@ class BookController extends Controller
             'customer_last_name' => $validated['last_name'],
             'customer_email' => $validated['email'],
             'amount_cents' => $product->price_cents,
-            'currency' => $product->currency ?? 'EUR',
+            'currency' => $product->currency,
         ]);
 
         return redirect()->route('book.pay', $order->token);

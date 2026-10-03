@@ -41,7 +41,7 @@ class CoursePaymentService
 
         $intent = $this->intents->create([
             'amount' => $enrollment->course->price_cents,
-            'currency' => strtolower($enrollment->course->currency ?? config('cashier.currency', 'eur')),
+            'currency' => strtolower($enrollment->course->currency),
             'customer' => $this->resolveStripeCustomerId($enrollment->student),
             'description' => 'Formation : '.$enrollment->course->title,
             'receipt_email' => $enrollment->student->email,

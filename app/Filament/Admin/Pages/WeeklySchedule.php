@@ -277,12 +277,12 @@ class WeeklySchedule extends Page
                     ->required(),
             ])
             ->action(function (array $data) use ($key): void {
-                $ranges = $this->data['days'][$key]['ranges'] ?? [];
+                $source = $this->data['days'][$key] ?? [];
 
                 foreach ($data['targets'] as $target) {
                     $this->data['days'][self::dayKey((int) $target)] = [
-                        'is_open' => true,
-                        'ranges' => self::rekey($ranges),
+                        'is_open' => (bool) ($source['is_open'] ?? false),
+                        'ranges' => self::rekey($source['ranges'] ?? []),
                     ];
                 }
 
@@ -399,7 +399,7 @@ class WeeklySchedule extends Page
     /**
      * @return Builder<Availability>
      */
-    private function scopedQuery(?int $serviceId)
+    private function scopedQuery(?int $serviceId): Builder
     {
         return Availability::query()->when(
             $serviceId === null,

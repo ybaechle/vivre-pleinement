@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Videos\Schemas;
 use App\Enums\VideoStatus;
 use App\Models\Category;
 use App\Models\Video;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
@@ -189,7 +190,13 @@ class VideoForm
                                 ->collapsible()
                                 ->collapsed()
                                 ->reorderableWithButtons()
-                                ->orderColumn('start_seconds')
+                                ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                    $starts = array_map(fn (array $chapter): int => (int) ($chapter['start_seconds'] ?? 0), $value ?? []);
+
+                                    if ($starts !== [] && min($starts) !== 0) {
+                                        $fail('Le premier chapitre doit commencer à 0 seconde.');
+                                    }
+                                })
                                 ->addActionLabel('Ajouter un chapitre')
                                 ->defaultItems(0)
                                 ->columnSpanFull(),

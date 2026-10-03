@@ -216,7 +216,10 @@ class Video extends Model
      */
     public function chaptersForSchema(): array
     {
-        $chapters = $this->chapters ?? [];
+        $chapters = collect($this->chapters ?? [])
+            ->sortBy(fn (array $chapter): int => (int) ($chapter['start_seconds'] ?? 0))
+            ->values()
+            ->all();
         if (empty($chapters)) {
             return [];
         }

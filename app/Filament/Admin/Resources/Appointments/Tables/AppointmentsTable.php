@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
@@ -158,9 +157,7 @@ class AppointmentsTable
                         ->requiresConfirmation()
                         ->modalDescription('Le client sera marqué comme absent et recevra un email l\'invitant à reprendre rendez-vous.')
                         ->action(function (Appointment $record): void {
-                            $record->update(['status' => AppointmentStatus::NoShow]);
-
-                            Mail::to($record->customer_email)->send(new AppointmentNoShow($record));
+                            app(AppointmentLifecycleService::class)->markNoShow($record);
 
                             Notification::make()->success()->title('Client marqué absent')->send();
                         }),

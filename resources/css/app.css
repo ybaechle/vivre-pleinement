@@ -85,12 +85,9 @@
     /* ════════════════════════════════════════════════════════════
        Délais partagés (départs désynchronisés des animations en boucle)
        ════════════════════════════════════════════════════════════ */
-    .delay-n1  { animation-delay:  -1s; }
-    .delay-n15 { animation-delay:  -1.5s; }
     .delay-n2  { animation-delay:  -2s; }
     .delay-n3  { animation-delay:  -3s; }
     .delay-n5  { animation-delay:  -5s; }
-    .delay-n7  { animation-delay:  -7s; }
     .delay-n8  { animation-delay:  -8s; }
     .delay-n45 { animation-delay: -45s; }
     .delay-n70 { animation-delay: -70s; }
@@ -133,51 +130,24 @@
         50%      { transform: translate(35px, -10px); }
         75%      { transform: translate(20px, -28px); }
     }
-    @keyframes bird-path-up-left {
-        0%, 100% { transform: translate(0, 0); }
-        25%      { transform: translate(-18px, -22px); }
-        50%      { transform: translate(-35px, -10px); }
-        75%      { transform: translate(-20px, -28px); }
-    }
-    @keyframes bird-path-hover {
-        0%, 100% { transform: translate(0, 0); }
-        33%      { transform: translate(8px, -10px); }
-        66%      { transform: translate(-6px, -4px); }
-    }
-    .bird-up-r, .bird-up-l, .bird-hover {
+    .bird-up-r {
+        animation-name: bird-path-up-right;
         animation-iteration-count: infinite;
         animation-timing-function: ease-in-out;
     }
-    .bird-up-r  { animation-name: bird-path-up-right; }
-    .bird-up-l  { animation-name: bird-path-up-left; }
-    .bird-hover { animation-name: bird-path-hover; }
 
-    .bird-p-11 { animation-duration: 11s; }
     .bird-p-15 { animation-duration: 15s; }
-    .bird-p-17 { animation-duration: 17s; }
-    .bird-p-19 { animation-duration: 19s; }
-    .bird-p-21 { animation-duration: 21s; }
 
     /* Une keyframe par angle initial : deux transforms parallèles ne se cumulent pas. */
-    @keyframes bird-flap-r0   { 0%,100% { transform: rotate(0deg)    translateY(0); }  25% { transform: rotate(5deg)   translateY(-3px); } 50% { transform: rotate(-2deg)  translateY(2px); } 75% { transform: rotate(4deg)   translateY(-2px); } }
-    @keyframes bird-flap-rm5  { 0%,100% { transform: rotate(-5deg)   translateY(0); }  25% { transform: rotate(0deg)   translateY(-3px); } 50% { transform: rotate(-7deg)  translateY(2px); } 75% { transform: rotate(-1deg)  translateY(-2px); } }
     @keyframes bird-flap-rm10 { 0%,100% { transform: rotate(-10deg)  translateY(0); }  25% { transform: rotate(-5deg)  translateY(-3px); } 50% { transform: rotate(-12deg) translateY(2px); } 75% { transform: rotate(-6deg)  translateY(-2px); } }
-    @keyframes bird-flap-rp8  { 0%,100% { transform: rotate(8deg)    translateY(0); }  25% { transform: rotate(13deg)  translateY(-3px); } 50% { transform: rotate(6deg)   translateY(2px); } 75% { transform: rotate(12deg)  translateY(-2px); } }
 
-    .bird-flap-r0, .bird-flap-rm5, .bird-flap-rm10, .bird-flap-rp8 {
+    .bird-flap-rm10 {
+        animation-name: bird-flap-rm10;
         animation-iteration-count: infinite;
         animation-timing-function: ease-in-out;
     }
-    .bird-flap-r0   { animation-name: bird-flap-r0; }
-    .bird-flap-rm5  { animation-name: bird-flap-rm5; }
-    .bird-flap-rm10 { animation-name: bird-flap-rm10; }
-    .bird-flap-rp8  { animation-name: bird-flap-rp8; }
 
-    .bird-f-28 { animation-duration: 2.8s; }
     .bird-f-34 { animation-duration: 3.4s; }
-    .bird-f-36 { animation-duration: 3.6s; }
-    .bird-f-41 { animation-duration: 4.1s; }
-    .bird-f-43 { animation-duration: 4.3s; }
 
     /* ════════════════════════════════════════════════════════════
        Oiseaux sprite - .bird-fly traverse le ciel, .bird bat des ailes
@@ -329,8 +299,7 @@
        ════════════════════════════════════════════════════════════ */
     @media (prefers-reduced-motion: reduce) {
         .cloud-l, .cloud-r, .cloud-sway,
-        .bird-up-r, .bird-up-l, .bird-hover,
-        .bird-flap-r0, .bird-flap-rm5, .bird-flap-rm10, .bird-flap-rp8,
+        .bird-up-r, .bird-flap-rm10,
         .bird, .bird-fly,
         .dandelion-seed, .dandelion-stems,
         .scroll-hint { animation: none; }

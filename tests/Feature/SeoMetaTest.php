@@ -228,3 +228,10 @@ it('ignores a stale migrated seo_schema_json and renders a clean Article schema'
         ->and($html)->not->toContain('"name":"Laura B."')
         ->and($html)->toContain('"@id":"'.route('blog.show', 'schema-obsolete').'"');
 });
+
+it('lists the latest articles in the blog ItemList, and omits it when nothing is previewed', function () {
+    Post::factory()->create(['status' => 'published', 'title' => 'Premier article']);
+
+    expect($this->get('/blog')->getContent())->toContain('"@type":"ItemList"')->toContain('Premier article');
+    expect($this->get('/blog?sort=oldest')->getContent())->not->toContain('"@type":"ItemList"');
+});

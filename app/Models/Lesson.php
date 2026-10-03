@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'module_id',
@@ -32,6 +33,17 @@ class Lesson extends Model
         'position' => 0,
         'is_free_preview' => false,
     ];
+
+    /**
+     * Le slug n'est pas saisi dans l'admin : le suffixe aléatoire garantit
+     * l'unicité entre deux leçons de même titre.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Lesson $lesson): void {
+            $lesson->slug ??= Str::slug($lesson->title).'-'.Str::lower(Str::random(5));
+        });
+    }
 
     protected function casts(): array
     {

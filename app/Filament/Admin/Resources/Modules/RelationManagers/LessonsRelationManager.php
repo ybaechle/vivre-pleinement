@@ -6,8 +6,8 @@ use App\Support\VideoEmbed;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -16,7 +16,6 @@ use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class LessonsRelationManager extends RelationManager
 {
@@ -36,12 +35,6 @@ class LessonsRelationManager extends RelationManager
                     ->placeholder('Ex. : La respiration apaisante')
                     ->required()
                     ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function (string $state, callable $set, $record): void {
-                        if (! $record) {
-                            $set('slug', Str::slug($state).'-'.Str::lower(Str::random(5)));
-                        }
-                    })
                     ->columnSpanFull(),
 
                 TextInput::make('video_id')
@@ -58,13 +51,7 @@ class LessonsRelationManager extends RelationManager
                     })
                     ->columnSpanFull(),
 
-                Select::make('video_provider')
-                    ->options([
-                        'youtube' => 'YouTube',
-                        'vimeo' => 'Vimeo',
-                    ])
-                    ->dehydrated()
-                    ->hidden(),
+                Hidden::make('video_provider'),
 
                 RichEditor::make('content')
                     ->label('Texte de la leçon')

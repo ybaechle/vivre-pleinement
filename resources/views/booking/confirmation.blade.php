@@ -35,8 +35,9 @@
 
 @section('title', 'Rendez-vous confirmé · Vivre Pleinement')
 
+@section('robots', 'noindex,nofollow')
+
 @push('head')
-    <meta name="robots" content="noindex,nofollow">
     @if ($isProcessingPayment)
         <meta http-equiv="refresh" content="6">
     @endif

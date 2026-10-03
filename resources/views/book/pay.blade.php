@@ -9,9 +9,7 @@
 
 @section('title', 'Paiement · '.$order->product->name)
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-@endpush
+@section('robots', 'noindex,nofollow')
 
 @section('body')
     @include('layouts.partials.navbar')

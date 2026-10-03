@@ -2,10 +2,8 @@
 
 @section('title', 'Réserver votre heure de coaching · Vivre Pleinement')
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-    <meta name="description" content="Choisissez le créneau de l'heure de coaching incluse dans votre commande.">
-@endpush
+@section('robots', 'noindex,nofollow')
+@section('description', 'Choisissez le créneau de l\'heure de coaching incluse dans votre commande.')
 
 @section('body')
     @include('layouts.partials.navbar')

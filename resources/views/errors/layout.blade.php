@@ -2,9 +2,7 @@
 
 @section('title', ($code ?? 'Erreur').' · '.($title ?? 'Une erreur est survenue').' | Laura Baechlé')
 
-@push('head')
-    <meta name="robots" content="noindex, follow">
-@endpush
+@section('robots', 'noindex, follow')
 
 @section('body')
     @include('layouts.partials.navbar')

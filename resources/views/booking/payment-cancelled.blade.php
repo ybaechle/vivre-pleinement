@@ -2,9 +2,7 @@
 
 @section('title', 'Paiement annulé · Vivre Pleinement')
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-@endpush
+@section('robots', 'noindex,nofollow')
 
 @section('body')
     @include('layouts.partials.navbar')

@@ -9,10 +9,8 @@
 
 @section('title', 'Commande · '.$product->name)
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-    <meta name="description" content="Finalisez votre commande du livre en quelques secondes.">
-@endpush
+@section('robots', 'noindex,nofollow')
+@section('description', 'Finalisez votre commande du livre en quelques secondes.')
 
 @section('body')
     @include('layouts.partials.navbar')

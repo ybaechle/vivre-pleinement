@@ -2,8 +2,9 @@
 
 @section('title', 'Merci · '.$course->title)
 
+@section('robots', 'noindex,nofollow')
+
 @push('head')
-    <meta name="robots" content="noindex,nofollow">
     @unless ($hasAccess)
         <meta http-equiv="refresh" content="5">
     @endunless

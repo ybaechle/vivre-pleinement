@@ -2,9 +2,7 @@
 
 @section('title', 'Inscription confirmée · Vivre Pleinement')
 
-@push('head')
-    <meta name="robots" content="noindex, follow">
-@endpush
+@section('robots', 'noindex, follow')
 
 @section('body')
     @include('layouts.partials.navbar')

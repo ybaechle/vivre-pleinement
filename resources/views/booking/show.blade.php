@@ -6,11 +6,9 @@
     use Illuminate\Support\Number;
 @endphp
 
-@push('head')
-    <meta name="description" content="Réservez « {{ $service->name }} » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.">
-    <link rel="canonical" href="{{ route('booking.show', $service->slug) }}">
-    <meta name="robots" content="noindex,follow">
-@endpush
+@section('robots', 'noindex,follow')
+@section('description', 'Réservez « '.$service->name.' » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.')
+@section('canonical', route('booking.show', $service->slug))
 
 @section('body')
     @include('layouts.partials.navbar')

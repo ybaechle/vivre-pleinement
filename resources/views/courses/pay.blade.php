@@ -6,9 +6,7 @@
     use Illuminate\Support\Number;
 @endphp
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-@endpush
+@section('robots', 'noindex,nofollow')
 
 @section('body')
     @include('layouts.partials.navbar')

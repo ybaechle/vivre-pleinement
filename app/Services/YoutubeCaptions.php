@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
+use Throwable;
 
 /**
  * Récupère les sous-titres d'une chaîne YouTube via l'API officielle.
@@ -172,7 +175,13 @@ class YoutubeCaptions
         return Http::withToken($this->accessToken())
             ->connectTimeout(5)
             ->timeout(30)
-            ->retry(2, 500, throw: false)
+            ->retry(
+                2,
+                500,
+                // Une erreur 4xx (quota, droits) se reproduirait : la retenter consommerait du quota.
+                fn (Throwable $e): bool => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()),
+                throw: false,
+            )
             ->acceptJson();
     }
 }

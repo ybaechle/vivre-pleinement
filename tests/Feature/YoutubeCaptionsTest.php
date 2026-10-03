@@ -193,3 +193,16 @@ it('reports a failed video and exits in failure instead of claiming success', fu
 
     Exceptions::assertReported(RuntimeException::class);
 });
+
+it('does not retry a quota or permission error', function () {
+    Sleep::fake();
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['access_token' => 'tok', 'expires_in' => 3600]),
+        '*/captions?*' => Http::response(['error' => 'quotaExceeded'], 403),
+    ]);
+
+    expect(fn () => YoutubeCaptions::fromConfig()->listTracks('abc123'))->toThrow(RuntimeException::class);
+
+    Http::assertSentCount(2);
+});

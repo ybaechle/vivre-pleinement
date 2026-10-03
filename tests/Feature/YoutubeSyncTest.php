@@ -2,7 +2,9 @@
 
 use App\Models\Video;
 use App\Services\YoutubeSync;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Sleep;
 
 function fakeYoutubeApi(array $videoItems): void
 {
@@ -194,3 +196,12 @@ it('removes a short that was previously stored by marking it missing', function 
 it('throws when the api is not configured', function () {
     (new YoutubeSync(null, null))->sync();
 })->throws(RuntimeException::class);
+
+it('does not retry a client error from the youtube api', function () {
+    Sleep::fake();
+    Http::fake(['*/youtube/v3/channels*' => Http::response(['error' => 'quotaExceeded'], 403)]);
+
+    expect(fn () => (new YoutubeSync('test-key', 'UC_channel'))->sync())->toThrow(RequestException::class);
+
+    Http::assertSentCount(1);
+});

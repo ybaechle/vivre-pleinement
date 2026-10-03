@@ -4,13 +4,16 @@ namespace App\Services;
 
 use App\Enums\VideoStatus;
 use App\Models\Video;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
+use Throwable;
 
 class YoutubeSync
 {
@@ -274,7 +277,12 @@ class YoutubeSync
 
     private function client(): PendingRequest
     {
-        return Http::connectTimeout(5)->timeout(15)->retry(2, 250)->acceptJson()->throw();
+        return Http::connectTimeout(5)
+            ->timeout(15)
+            // Une erreur 4xx (quota, chaîne absente) se reproduirait : la retenter consommerait du quota.
+            ->retry(2, 250, fn (Throwable $e): bool => $e instanceof ConnectionException || ($e instanceof RequestException && $e->response->serverError()))
+            ->acceptJson()
+            ->throw();
     }
 
     /**

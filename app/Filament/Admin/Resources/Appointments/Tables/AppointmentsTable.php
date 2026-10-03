@@ -249,9 +249,14 @@ class AppointmentsTable
             ])
             ->action(function (Appointment $record, array $data): void {
                 $previousStart = $record->starts_at->copy();
+                $newStart = CarbonImmutable::parse($data['starts_at']);
+
+                if ($newStart->equalTo($previousStart)) {
+                    return;
+                }
 
                 $moved = app(AppointmentSlotService::class)
-                    ->move($record, CarbonImmutable::parse($data['starts_at']));
+                    ->move($record, $newStart);
 
                 if (! $moved) {
                     Notification::make()

@@ -71,6 +71,19 @@ it('moves an appointment and notifies the client when an admin reschedules', fun
     Mail::assertQueued(AppointmentRescheduled::class, 1);
 });
 
+it('does not email the client when the admin keeps the current slot', function () {
+    $appointment = adminAppointment();
+
+    Livewire::test(ListAppointments::class)
+        ->callAction(TestAction::make('reschedule')->table($appointment), data: [
+            'date' => $appointment->starts_at->toDateString(),
+            'starts_at' => $appointment->starts_at->toDateTimeString(),
+        ])
+        ->assertHasNoActionErrors();
+
+    Mail::assertNothingQueued();
+});
+
 it('still reschedules an appointment whose service has been deleted', function () {
     $appointment = adminAppointment();
     $appointment->service->delete();

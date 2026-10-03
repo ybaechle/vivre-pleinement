@@ -5,6 +5,7 @@ use App\Enums\CommentStatus;
 use App\Enums\CourseStatus;
 use App\Enums\EnrollmentStatus;
 use App\Enums\PostStatus;
+use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Resources\Appointments\AppointmentResource;
 use App\Filament\Admin\Resources\Comments\CommentResource;
 use App\Filament\Admin\Resources\Courses\CourseResource;
@@ -17,7 +18,9 @@ use App\Models\Comment;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Post;
+use App\Models\User;
 use App\Models\Video;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
 
@@ -79,4 +82,13 @@ it('keeps the courses navigation free of a permanent draft badge', function () {
     Course::factory()->create(['status' => CourseStatus::Draft]);
 
     expect(CourseResource::getNavigationBadge())->toBeNull();
+});
+
+it('keeps the video stats widget on the video list only', function () {
+    $this->actingAs(User::factory()->create());
+    Filament::setCurrentPanel('admin');
+
+    expect((new Dashboard)->getWidgets())
+        ->toContain(StatsOverview::class)
+        ->not->toContain(VideoStatsOverview::class);
 });

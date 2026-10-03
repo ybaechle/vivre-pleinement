@@ -3,10 +3,6 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Admin\Pages\Dashboard;
-use App\Filament\Admin\Widgets\CourseSalesStats;
-use App\Filament\Admin\Widgets\LatestPosts;
-use App\Filament\Admin\Widgets\StatsOverview;
-use App\Filament\Admin\Widgets\UpcomingAppointments;
 use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Http\Middleware\Authenticate;
@@ -67,12 +63,6 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\Filament\Admin\Widgets')
-            ->widgets([
-                StatsOverview::class,
-                CourseSalesStats::class,
-                UpcomingAppointments::class,
-                LatestPosts::class,
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

@@ -11,6 +11,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  */
 class VideoStatsOverview extends StatsOverviewWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $heading = 'État des vidéos';
 
     protected ?string $pollingInterval = null;

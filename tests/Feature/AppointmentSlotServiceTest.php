@@ -84,11 +84,14 @@ it('never offers a slot already gone when no notice is required', function () {
 });
 
 it('excludes dates beyond the booking horizon', function () {
-    $service = serviceWithAvailability(CarbonImmutable::now()->dayOfWeek, '09:00', '12:00', ['max_advance_days' => 7]);
-
-    $farDate = CarbonImmutable::now()->addDays(30)->startOfDay();
+    $farDate = CarbonImmutable::now()->addDays(28)->startOfDay();
+    $service = serviceWithAvailability($farDate->dayOfWeek, '09:00', '12:00', ['max_advance_days' => 7]);
 
     expect(app(AppointmentSlotService::class)->slotsForDate($service, $farDate))->toBeEmpty();
+
+    $service->update(['max_advance_days' => 60]);
+
+    expect(app(AppointmentSlotService::class)->slotsForDate($service, $farDate))->not->toBeEmpty();
 });
 
 it('excludes slots overlapping an existing appointment', function () {

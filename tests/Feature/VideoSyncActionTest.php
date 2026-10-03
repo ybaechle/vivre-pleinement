@@ -5,11 +5,8 @@ use App\Jobs\SyncYoutubeVideosJob;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());

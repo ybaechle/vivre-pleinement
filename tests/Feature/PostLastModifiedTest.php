@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-
-uses(LazilyRefreshDatabase::class);
 
 it('falls back to published_at when only touched by the migration import', function () {
     $post = Post::factory()->create(['published_at' => Carbon::parse('2019-06-21 20:30:00')]);

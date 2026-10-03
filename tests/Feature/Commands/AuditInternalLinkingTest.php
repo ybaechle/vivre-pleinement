@@ -3,9 +3,6 @@
 use App\Enums\PostStatus;
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('reports a healthy blog with no linking problems', function () {
     $pillar = Post::factory()->create(['status' => PostStatus::Published]);

@@ -4,10 +4,7 @@ use App\Livewire\PostSearch;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 it('searches across title, excerpt and content', function () {
     Post::factory()->create(['title' => 'Vaincre l\'anxiété', 'excerpt' => 'x', 'content' => 'y']);

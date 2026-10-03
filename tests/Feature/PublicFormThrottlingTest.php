@@ -1,11 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();

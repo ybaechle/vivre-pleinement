@@ -4,9 +4,6 @@ use App\Enums\PostStatus;
 use App\Models\Category;
 use App\Models\Post;
 use Database\Seeders\ActArticleSeeder;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Category::firstOrCreate(

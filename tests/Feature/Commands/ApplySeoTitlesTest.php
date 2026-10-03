@@ -2,9 +2,6 @@
 
 use App\Console\Commands\Videos\ApplySeoTitles;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('rewrites a YouTube title and locks the field against sync', function () {
     $video = Video::factory()->create([

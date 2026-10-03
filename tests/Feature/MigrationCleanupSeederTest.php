@@ -4,9 +4,6 @@ use App\Console\Commands\CleanCommentContent;
 use App\Models\Comment;
 use App\Models\Post;
 use Database\Seeders\MigrationCleanupSeeder;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('exposes a static clean() method matching the sibling cleanup commands', function () {
     expect(CleanCommentContent::clean('<p>Bonjour</p>'))->toBe('Bonjour');

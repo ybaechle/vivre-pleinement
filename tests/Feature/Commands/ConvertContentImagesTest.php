@@ -1,10 +1,7 @@
 <?php
 
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Storage;
-
-uses(LazilyRefreshDatabase::class);
 
 function fakeBlogImage(string $name, int $width = 2000): void
 {

@@ -18,11 +18,8 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function widgetPollingInterval(object $widget): ?string
 {

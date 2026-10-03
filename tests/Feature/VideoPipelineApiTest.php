@@ -3,9 +3,6 @@
 use App\Models\Category;
 use App\Models\Video;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config(['services.automation.token' => 'secret-token']);

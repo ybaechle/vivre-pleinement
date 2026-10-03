@@ -1,10 +1,11 @@
 <?php
 
 use App\Support\Weekdays;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
 use Tests\TestCase;
 
-pest()->extend(TestCase::class)->in('Feature');
+pest()->extend(TestCase::class)->use(LazilyRefreshDatabase::class)->in('Feature');
 
 /**
  * Horodatage de formulaire chiffré, antidaté pour franchir le délai minimum

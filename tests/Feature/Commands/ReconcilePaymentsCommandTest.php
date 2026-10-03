@@ -12,12 +12,9 @@ use App\Models\Student;
 use App\Services\BookPaymentService;
 use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();

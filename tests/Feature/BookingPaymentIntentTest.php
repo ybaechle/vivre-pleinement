@@ -4,10 +4,7 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Services\BookingPaymentService;
 use App\Services\StripePaymentIntents;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 function appointmentWithIntent(?string $intentId, int $priceCents = 7000): Appointment
 {

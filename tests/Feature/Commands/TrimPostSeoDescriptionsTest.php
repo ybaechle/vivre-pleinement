@@ -2,9 +2,6 @@
 
 use App\Console\Commands\TrimPostSeoDescriptions;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('trims an overlong meta description', function () {
     $post = Post::factory()->create([

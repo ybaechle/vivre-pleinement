@@ -2,9 +2,6 @@
 
 use App\Models\Category;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('renders a long video page with its related videos', function () {
     $category = Category::factory()->create();

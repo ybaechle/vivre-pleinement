@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Redirect;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('rewrites a relative target onto the site domain', function () {
     Redirect::factory()->create([

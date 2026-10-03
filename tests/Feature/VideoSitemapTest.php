@@ -3,12 +3,9 @@
 use App\Http\Controllers\SitemapController;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-
-uses(LazilyRefreshDatabase::class);
 
 it('does not load the heavy transcript/intro columns for the video sitemap', function () {
     Video::factory()->create([

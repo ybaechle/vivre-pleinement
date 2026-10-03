@@ -2,10 +2,7 @@
 
 use App\Models\Post;
 use App\Support\IndexNow;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(LazilyRefreshDatabase::class);
 
 it('pings the IndexNow API when a key is configured', function () {
     $this->withoutDefer();

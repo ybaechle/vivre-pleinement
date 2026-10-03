@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('prepends the definition opening and seeds the FAQ', function () {
     $post = Post::factory()->create(['slug' => 'etre-casanier', 'status' => 'published', 'content' => '<p>Contenu existant.</p>']);

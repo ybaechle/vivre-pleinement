@@ -8,11 +8,8 @@ use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Models\BookOrder;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Prestation payante ouverte tous les jours, pour que le calendrier propose

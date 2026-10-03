@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Comment;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('sanitizes paragraph tags, line breaks and repeated spaces from comment content', function () {
     $comment = Comment::factory()->create([

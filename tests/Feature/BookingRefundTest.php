@@ -9,11 +9,8 @@ use App\Services\BookingPaymentService;
 use App\Services\StripePaymentIntents;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function paidAppointment(string $intentId = 'pi_appointment_refund'): Appointment
 {

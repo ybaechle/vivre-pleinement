@@ -9,10 +9,7 @@ use App\Models\Appointment;
 use App\Models\AppointmentService;
 use App\Support\Settings;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Settings::flush();

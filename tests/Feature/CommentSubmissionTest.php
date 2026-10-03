@@ -5,11 +5,8 @@ use App\Mail\NewCommentNotification;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();

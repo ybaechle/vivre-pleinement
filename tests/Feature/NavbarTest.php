@@ -2,9 +2,6 @@
 
 use App\Models\Course;
 use App\Models\Student;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('expose l\'accompagnement dans le menu principal', function () {
     $this->get(route('home'))

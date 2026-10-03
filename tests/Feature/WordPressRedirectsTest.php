@@ -3,10 +3,7 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Redirect;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
-
-uses(LazilyRefreshDatabase::class);
 
 it('generates a 301 redirect for every published post from its old WordPress URL', function () {
     Post::factory()->create(['slug' => 'burn-out', 'status' => 'published']);

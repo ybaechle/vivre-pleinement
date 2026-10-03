@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\Student;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Une session volée doit mourir avec le mot de passe qu'elle a servi à ouvrir :

@@ -2,9 +2,6 @@
 
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('applies seo metadata, prepends the intro section and attaches tags to a targeted article', function () {
     $post = Post::factory()->create([

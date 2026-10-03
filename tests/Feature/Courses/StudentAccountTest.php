@@ -2,11 +2,8 @@
 
 use App\Models\Student;
 use App\Notifications\StudentVerifyEmail;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
-
-uses(LazilyRefreshDatabase::class);
 
 it('affiche la page Mon compte', function () {
     $student = Student::factory()->create();

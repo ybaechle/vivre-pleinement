@@ -4,11 +4,8 @@ use App\Mail\ContactMessage;
 use App\Models\Post;
 use App\Support\SubmissionStamp;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();

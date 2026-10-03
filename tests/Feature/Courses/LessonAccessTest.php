@@ -5,9 +5,6 @@ use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\Module;
 use App\Models\Student;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * @return array{0: Course, 1: Lesson}

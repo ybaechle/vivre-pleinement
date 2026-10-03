@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Course;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('liste uniquement les formations publiées dans le catalogue', function () {
     $published = Course::factory()->create(['title' => 'Apaiser son anxiété']);

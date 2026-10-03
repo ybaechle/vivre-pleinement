@@ -7,9 +7,6 @@ use App\Models\Availability;
 use App\Models\DateOverride;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Returns the next occurrence of a given weekday (Carbon dayOfWeek, 0=Sun),

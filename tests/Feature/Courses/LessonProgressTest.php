@@ -7,11 +7,8 @@ use App\Models\Lesson;
 use App\Models\Module;
 use App\Models\Student;
 use App\Support\CourseProgress;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * @return array{0: Course, 1: array<int, Lesson>, 2: Student}

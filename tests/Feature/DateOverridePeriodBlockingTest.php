@@ -5,10 +5,7 @@ use App\Models\DateOverride;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());

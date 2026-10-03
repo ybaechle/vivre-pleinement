@@ -11,11 +11,8 @@ use App\Models\AppointmentService;
 use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function serviceWithDailyAvailability(): AppointmentService
 {

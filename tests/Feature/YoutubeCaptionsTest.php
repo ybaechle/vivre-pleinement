@@ -2,11 +2,8 @@
 
 use App\Models\Video;
 use App\Services\YoutubeCaptions;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config()->set('services.youtube.oauth_client_id', 'cid');

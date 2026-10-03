@@ -2,9 +2,6 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('rewrites legacy root links that match an existing post', function () {
     Post::factory()->create(['slug' => 'burn-out-cible', 'status' => 'published']);

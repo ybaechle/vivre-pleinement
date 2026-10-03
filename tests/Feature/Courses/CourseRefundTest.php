@@ -8,11 +8,8 @@ use App\Models\Student;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function activeEnrollment(string $intentId = 'pi_refund_test'): Enrollment
 {

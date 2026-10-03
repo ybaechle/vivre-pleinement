@@ -4,12 +4,9 @@ use App\Models\Student;
 use App\Notifications\StudentVerifyEmail;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
-
-uses(LazilyRefreshDatabase::class);
 
 it('met en file d\'attente la notification de vérification d\'e-mail', function () {
     expect(new StudentVerifyEmail)->toBeInstanceOf(ShouldQueue::class);

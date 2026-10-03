@@ -2,10 +2,7 @@
 
 use App\Models\Setting;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(fn () => Settings::flush());
 

@@ -4,11 +4,8 @@ use App\Enums\BookOrderStatus;
 use App\Mail\BookOrderConfirmation;
 use App\Mail\BookOrderNotification;
 use App\Models\BookOrder;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
-
-uses(LazilyRefreshDatabase::class);
 
 function bookPaymentWebhook(BookOrder $order, string $intentId = 'pi_book_test', int $amount = 3700): void
 {

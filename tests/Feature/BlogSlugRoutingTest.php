@@ -3,9 +3,6 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('shows an article whose slug merely starts with a reserved word', function () {
     $post = Post::factory()->create(['slug' => 'rss-feed-review']);

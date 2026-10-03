@@ -12,9 +12,6 @@ use App\Mail\ContactMessage;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 function renderableAppointment(array $attributes = []): Appointment
 {

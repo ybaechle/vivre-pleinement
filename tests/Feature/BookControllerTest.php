@@ -3,11 +3,8 @@
 use App\Enums\BookOrderStatus;
 use App\Models\BookOrder;
 use App\Models\Product;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Disque simulé : sans cela, chaque exécution laisse un faux PDF dans

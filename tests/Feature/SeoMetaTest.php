@@ -2,9 +2,6 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Compte les balises <meta name="description"> et renvoie le content de la

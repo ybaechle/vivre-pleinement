@@ -4,10 +4,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Support\InternalLinking;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
-uses(LazilyRefreshDatabase::class);
 
 it('suggests posts from the same category cluster', function () {
     $phobies = Category::factory()->create();

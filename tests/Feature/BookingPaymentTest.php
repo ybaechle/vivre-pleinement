@@ -12,14 +12,11 @@ use App\Models\Availability;
 use App\Services\BookingPaymentService;
 use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
 use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 function payableService(int $priceCents = 7000): AppointmentService
 {

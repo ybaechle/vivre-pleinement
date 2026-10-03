@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Course;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('emits a Course JSON-LD with a priced Offer on the course page', function () {
     $course = Course::factory()->create([

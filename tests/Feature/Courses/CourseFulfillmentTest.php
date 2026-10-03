@@ -7,11 +7,8 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Services\StripePaymentIntents;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
-
-uses(LazilyRefreshDatabase::class);
 
 function pendingEnrollment(): Enrollment
 {

@@ -4,7 +4,6 @@ namespace App\Livewire\Student;
 
 use App\Models\Course;
 use App\Models\Lesson;
-use App\Support\CourseProgress;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
@@ -17,8 +16,6 @@ class LessonPlayer extends Component
     public Lesson $lesson;
 
     public bool $completed = false;
-
-    public int $progress = 0;
 
     public function mount(Course $course, Lesson $lesson): void
     {
@@ -75,7 +72,7 @@ class LessonPlayer extends Component
             ->values();
     }
 
-    public function nextLesson(): ?Lesson
+    private function nextLesson(): ?Lesson
     {
         $lessons = $this->lessons;
         $index = $lessons->search(fn (Lesson $lesson) => $lesson->id === $this->lesson->id);
@@ -83,7 +80,7 @@ class LessonPlayer extends Component
         return $index === false ? null : $lessons->get($index + 1);
     }
 
-    public function previousLesson(): ?Lesson
+    private function previousLesson(): ?Lesson
     {
         $lessons = $this->lessons;
         $index = $lessons->search(fn (Lesson $lesson) => $lesson->id === $this->lesson->id);
@@ -99,10 +96,6 @@ class LessonPlayer extends Component
             ->where('lesson_id', $this->lesson->id)
             ->whereNotNull('completed_at')
             ->exists();
-
-        $this->progress = $student !== null
-            ? CourseProgress::percent($student, $this->course)
-            : 0;
     }
 
     public function render(): View

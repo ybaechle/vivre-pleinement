@@ -26,7 +26,6 @@ function appointmentAt(CarbonImmutable $start, array $attributes = []): Appointm
 
     return Appointment::factory()->create(array_merge([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'starts_at' => $start,
         'ends_at' => $start->addMinutes(30),
         'status' => AppointmentStatus::Confirmed,

@@ -5,7 +5,6 @@ use App\Enums\PaymentStatus;
 use App\Livewire\BookingCalendar;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Models\BookOrder;
 use App\Services\AppointmentLifecycleService;
 use Carbon\CarbonImmutable;
@@ -25,9 +24,7 @@ function coachingService(): AppointmentService
         'requires_confirmation' => false,
     ]);
 
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }

@@ -23,9 +23,7 @@ function bookableService(array $attributes = []): AppointmentService
         'is_active' => true,
     ], $attributes));
 
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }

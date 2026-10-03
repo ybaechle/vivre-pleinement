@@ -1,9 +1,11 @@
 <?php
 
+use App\Models\Availability;
 use App\Support\Weekdays;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
 use Laravel\Cashier\Events\WebhookReceived;
+use Stripe\PaymentIntent;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)->use(LazilyRefreshDatabase::class)->in('Feature');
@@ -56,4 +58,30 @@ function chargeRefundedWebhook(?string $paymentIntentId, bool $fullyRefunded = t
             'refunded' => $fullyRefunded,
         ]],
     ]));
+}
+
+/**
+ * Ouvre l'agenda tous les jours de la semaine, avec les horaires par défaut
+ * de la factory sauf précision.
+ *
+ * @param  array<string, mixed>  $attributes
+ */
+function openEveryDay(array $attributes = []): void
+{
+    foreach (range(0, 6) as $dayOfWeek) {
+        Availability::factory()->dayOfWeek($dayOfWeek)->create($attributes);
+    }
+}
+
+/**
+ * PaymentIntent tel que le renverrait l'API Stripe.
+ */
+function stripeIntent(string $id, string $status, int $amount): PaymentIntent
+{
+    return PaymentIntent::constructFrom([
+        'id' => $id,
+        'status' => $status,
+        'amount' => $amount,
+        'client_secret' => $id.'_secret',
+    ]);
 }

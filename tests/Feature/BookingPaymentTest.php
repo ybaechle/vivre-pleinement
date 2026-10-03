@@ -8,7 +8,6 @@ use App\Mail\AppointmentNotification;
 use App\Mail\AppointmentSlotUnavailable;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Services\BookingPaymentService;
 use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
@@ -25,9 +24,7 @@ function payableService(int $priceCents = 7000): AppointmentService
         'price_cents' => $priceCents,
         'min_notice_hours' => 12,
     ]);
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }
@@ -58,7 +55,6 @@ it('renders the payment page with a client secret for a payable appointment', fu
     $start = CarbonImmutable::now()->addDays(3)->setTime(10, 0);
     $appointment = Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'status' => AppointmentStatus::Pending,
         'payment_status' => PaymentStatus::Unpaid,
         'price_cents' => 7000,
@@ -82,7 +78,6 @@ it('returns a 503 instead of a raw 500 when Stripe is unavailable', function () 
     $service = payableService();
     $appointment = Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'status' => AppointmentStatus::Pending,
         'payment_status' => PaymentStatus::Unpaid,
         'price_cents' => 7000,
@@ -101,7 +96,6 @@ it('redirects the payment page to confirmation if already paid', function () {
     $service = payableService();
     $appointment = Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'payment_status' => PaymentStatus::Paid,
         'status' => AppointmentStatus::Confirmed,
     ]);

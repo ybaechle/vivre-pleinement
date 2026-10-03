@@ -7,16 +7,6 @@ use Stripe\Exception\InvalidRequestException;
 use Stripe\PaymentIntent;
 use Stripe\StripeClient;
 
-function stripeIntent(string $id, string $status, int $amount): PaymentIntent
-{
-    return PaymentIntent::constructFrom([
-        'id' => $id,
-        'status' => $status,
-        'amount' => $amount,
-        'client_secret' => $id.'_secret',
-    ]);
-}
-
 it('ne cherche rien quand aucun intent n\'est encore rattaché', function () {
     $intents = $this->partialMock(StripePaymentIntents::class, function ($mock) {
         $mock->shouldNotReceive('retrieve');

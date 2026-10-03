@@ -7,7 +7,6 @@ use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Testing\TestAction;
@@ -26,17 +25,10 @@ function adminAppointment(?CarbonImmutable $start = null): Appointment
     $start ??= CarbonImmutable::now()->addDays(4)->setTime(10, 0);
     $service = AppointmentService::factory()->create(['duration_minutes' => 30]);
 
-    foreach (range(0, 6) as $dayOfWeek) {
-        Availability::factory()->create([
-            'day_of_week' => $dayOfWeek,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-        ]);
-    }
+    openEveryDay(['start_time' => '08:00', 'end_time' => '20:00']);
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'starts_at' => $start,
         'ends_at' => $start->addMinutes(30),
         'status' => AppointmentStatus::Confirmed,

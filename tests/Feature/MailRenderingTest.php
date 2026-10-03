@@ -19,7 +19,6 @@ function renderableAppointment(array $attributes = []): Appointment
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
     ] + $attributes);
 }
 

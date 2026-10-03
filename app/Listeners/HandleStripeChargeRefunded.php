@@ -44,7 +44,11 @@ class HandleStripeChargeRefunded implements ShouldQueue
         $charge = $event->payload['data']['object'] ?? [];
         $paymentIntentId = is_string($charge['payment_intent'] ?? null) ? $charge['payment_intent'] : null;
 
-        if ($paymentIntentId === null) {
+        /**
+         * Stripe émet aussi charge.refunded pour un remboursement partiel
+         * (geste commercial) : seul un remboursement total révoque l'achat.
+         */
+        if ($paymentIntentId === null || ($charge['refunded'] ?? false) !== true) {
             return;
         }
 

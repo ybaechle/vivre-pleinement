@@ -20,17 +20,6 @@ function bookPaymentWebhook(BookOrder $order, string $intentId = 'pi_book_test',
     ]));
 }
 
-function bookRefundWebhook(string $intentId = 'pi_book_test'): void
-{
-    event(new WebhookReceived([
-        'type' => 'charge.refunded',
-        'data' => ['object' => [
-            'id' => 'ch_book_test',
-            'payment_intent' => $intentId,
-        ]],
-    ]));
-}
-
 it('marque la commande payée sur payment_intent.succeeded', function () {
     Mail::fake();
     $order = BookOrder::factory()->create();
@@ -91,7 +80,7 @@ it('ignore un webhook dont la commande est inconnue', function () {
 it('révoque le téléchargement sur charge.refunded', function () {
     $order = BookOrder::factory()->paid()->create(['stripe_payment_intent_id' => 'pi_book_test']);
 
-    bookRefundWebhook();
+    chargeRefundedWebhook('pi_book_test');
 
     $order->refresh();
 
@@ -102,7 +91,7 @@ it('révoque le téléchargement sur charge.refunded', function () {
 it('ne touche pas à une commande jamais payée lors d\'un remboursement', function () {
     $order = BookOrder::factory()->create(['stripe_payment_intent_id' => 'pi_book_test']);
 
-    bookRefundWebhook();
+    chargeRefundedWebhook('pi_book_test');
 
     expect($order->fresh()->status)->toBe(BookOrderStatus::Pending);
 });
@@ -110,7 +99,7 @@ it('ne touche pas à une commande jamais payée lors d\'un remboursement', funct
 it('ignore un remboursement dont le PaymentIntent est inconnu', function () {
     $order = BookOrder::factory()->paid()->create(['stripe_payment_intent_id' => 'pi_book_test']);
 
-    bookRefundWebhook('pi_inconnu');
+    chargeRefundedWebhook('pi_inconnu');
 
     expect($order->fresh()->status)->toBe(BookOrderStatus::Paid);
 });

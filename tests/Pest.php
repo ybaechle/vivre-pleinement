@@ -3,6 +3,7 @@
 use App\Support\Weekdays;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Crypt;
+use Laravel\Cashier\Events\WebhookReceived;
 use Tests\TestCase;
 
 pest()->extend(TestCase::class)->use(LazilyRefreshDatabase::class)->in('Feature');
@@ -39,4 +40,20 @@ function scheduleFormState(array $openDays, ?int $serviceId = null): array
         'appointment_service_id' => $serviceId,
         'days' => $days,
     ];
+}
+
+/**
+ * Simule le webhook Stripe `charge.refunded`. `$fullyRefunded = false`
+ * représente un remboursement partiel, que Stripe signale aussi par cet événement.
+ */
+function chargeRefundedWebhook(?string $paymentIntentId, bool $fullyRefunded = true): void
+{
+    event(new WebhookReceived([
+        'type' => 'charge.refunded',
+        'data' => ['object' => [
+            'id' => 'ch_test_refund',
+            'payment_intent' => $paymentIntentId,
+            'refunded' => $fullyRefunded,
+        ]],
+    ]));
 }

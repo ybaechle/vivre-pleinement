@@ -37,6 +37,8 @@ class YoutubeSync
      * Les Shorts (durée <= 60s) sont ignorés : ils ne sont jamais stockés. Le
      * paramètre $maxResults borne le nombre d'éléments parcourus dans la
      * playlist d'uploads (garde-fou), pas le nombre de vidéos conservées.
+     * Une vidéo supprimée dans l'admin le reste : elle n'est ni mise à jour ni
+     * restaurée.
      *
      * @return array{created: int, updated: int, missing: int, total: int}
      */
@@ -45,7 +47,7 @@ class YoutubeSync
         $this->ensureConfigured();
 
         $uploadsPlaylistId = $this->fetchUploadsPlaylistId();
-        $videoIds = $this->fetchPlaylistVideoIds($uploadsPlaylistId, $maxResults);
+        [$videoIds, $isComplete] = $this->fetchPlaylistVideoIds($uploadsPlaylistId, $maxResults);
 
         if (empty($videoIds)) {
             $missing = $this->markMissingVideos(collect());
@@ -69,16 +71,20 @@ class YoutubeSync
             /** @var Video|null $video */
             $video = $existingByYtId->get($data['id']);
 
-            if ($video) {
-                $this->updateVideo($video, $data);
-                $updated++;
-            } else {
+            if ($video === null) {
                 $this->createVideo($data);
                 $created++;
+            } elseif (! $video->trashed()) {
+                $this->updateVideo($video, $data);
+                $updated++;
             }
         }
 
-        $missing = $this->markMissingVideos($fetchedIds);
+        /**
+         * Une playlist tronquée par $maxResults ne dit rien des vidéos plus
+         * anciennes : les marquer manquantes les retirerait du site à tort.
+         */
+        $missing = $isComplete ? $this->markMissingVideos($fetchedIds) : 0;
 
         return [
             'created' => $created,
@@ -131,10 +137,6 @@ class YoutubeSync
         }
 
         $video->update($attributes);
-
-        if ($video->trashed()) {
-            $video->restore();
-        }
     }
 
     /**
@@ -193,7 +195,9 @@ class YoutubeSync
     }
 
     /**
-     * @return list<string>
+     * Renvoie les identifiants parcourus, et si la playlist l'a été en entier.
+     *
+     * @return array{0: list<string>, 1: bool}
      */
     private function fetchPlaylistVideoIds(string $playlistId, int $maxResults): array
     {
@@ -220,15 +224,12 @@ class YoutubeSync
                 if ($id) {
                     $ids[] = $id;
                 }
-                if (count($ids) >= $maxResults) {
-                    break 2;
-                }
             }
 
             $pageToken = $payload['nextPageToken'] ?? null;
-        } while ($pageToken);
+        } while ($pageToken && count($ids) < $maxResults);
 
-        return $ids;
+        return [$ids, $pageToken === null];
     }
 
     /**

@@ -99,6 +99,47 @@ it('marks videos no longer returned by the api as missing', function () {
         ->and(Video::query()->where('youtube_id', 'gone')->firstOrFail()->is_missing)->toBeTrue();
 });
 
+it('leaves a video deleted from the admin deleted', function () {
+    $video = Video::factory()->create(['youtube_id' => 'abc123']);
+    $video->delete();
+
+    fakeYoutubeApi([[
+        'id' => 'abc123',
+        'snippet' => ['title' => 'Titre YouTube', 'publishedAt' => '2025-01-15T10:00:00Z'],
+        'contentDetails' => ['duration' => 'PT10M'],
+        'statistics' => ['viewCount' => '5000'],
+    ]]);
+
+    $result = (new YoutubeSync('test-key', 'UC_channel'))->sync();
+
+    expect($result)->toMatchArray(['created' => 0, 'updated' => 0])
+        ->and($video->fresh()->trashed())->toBeTrue();
+});
+
+it('does not mark older videos missing when the playlist was truncated', function () {
+    $older = Video::factory()->create(['youtube_id' => 'older']);
+
+    Http::fake([
+        '*/youtube/v3/channels*' => Http::response([
+            'items' => [['contentDetails' => ['relatedPlaylists' => ['uploads' => 'UUuploads']]]],
+        ]),
+        '*/youtube/v3/playlistItems*' => Http::response([
+            'items' => [['contentDetails' => ['videoId' => 'recent']]],
+            'nextPageToken' => 'page-2',
+        ]),
+        '*/youtube/v3/videos*' => Http::response(['items' => [[
+            'id' => 'recent',
+            'snippet' => ['title' => 'Récente', 'publishedAt' => '2025-01-15T10:00:00Z'],
+            'contentDetails' => ['duration' => 'PT10M'],
+            'statistics' => [],
+        ]]]),
+    ]);
+
+    (new YoutubeSync('test-key', 'UC_channel'))->sync(maxResults: 1);
+
+    expect($older->fresh()->is_missing)->toBeFalse();
+});
+
 it('ignores shorts and only stores long videos', function () {
     fakeYoutubeApi([
         [

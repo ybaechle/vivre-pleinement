@@ -12,9 +12,7 @@
         "laravel/cashier": "^16.5",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
-        "spatie/laravel-medialibrary": "^11.22",
-        "symfony/css-selector": "^8.0",
-        "symfony/dom-crawler": "^8.0"
+        "spatie/laravel-medialibrary": "^11.22"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

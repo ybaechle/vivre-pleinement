@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class EnrollmentsTable
 {
@@ -45,8 +46,9 @@ class EnrollmentsTable
                     ->money('eur', divideBy: 100)
                     ->sortable()
                     ->summarize(
-                        Sum::make()
+                        Sum::make('total')
                             ->label('Total encaissé')
+                            ->query(fn (QueryBuilder $query): QueryBuilder => $query->where('status', EnrollmentStatus::Active))
                             ->money('eur', divideBy: 100)
                     ),
                 TextColumn::make('purchased_at')

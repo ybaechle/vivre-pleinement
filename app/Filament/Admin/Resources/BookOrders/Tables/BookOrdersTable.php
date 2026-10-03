@@ -15,6 +15,7 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Mail;
 
 class BookOrdersTable
@@ -50,8 +51,9 @@ class BookOrdersTable
                     ->money('eur', divideBy: 100)
                     ->sortable()
                     ->summarize(
-                        Sum::make()
+                        Sum::make('total')
                             ->label('Total encaissé')
+                            ->query(fn (QueryBuilder $query): QueryBuilder => $query->where('status', BookOrderStatus::Paid))
                             ->money('eur', divideBy: 100)
                     ),
                 IconColumn::make('coaching_appointment_id')

@@ -107,3 +107,11 @@ it('refuses a single blocking with only one of its two times', function (array $
     'start only' => [['start_time' => '09:00']],
     'end only' => [['end_time' => '12:00']],
 ]);
+
+it('labels a full-day blocking and does not flag today as past', function () {
+    DateOverride::factory()->create(['date' => today(), 'start_time' => null, 'end_time' => null]);
+
+    Livewire::test(ListDateOverrides::class)
+        ->assertSee('Journée entière')
+        ->assertDontSee('Passé');
+});

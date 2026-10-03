@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AuthenticateStudentSession;
 use App\Http\Middleware\EnsureEnrolled;
 use App\Http\Middleware\EnsureStripeWebhookIsSigned;
 use App\Http\Middleware\HandleRedirects;
@@ -50,8 +49,6 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->append(SecureHeaders::class);
         $middleware->append(HandleRedirects::class);
-
-        $middleware->appendToGroup('web', AuthenticateStudentSession::class);
 
         /**
          * Le webhook Stripe (Cashier, préfixe cashier.path) n'exige pas de CSRF

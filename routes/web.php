@@ -111,7 +111,7 @@ Route::middleware('guest:student')->group(function () {
 });
 
 Route::post('/espace-formation/deconnexion', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth:student')
+    ->middleware(['auth:student', 'auth.session'])
     ->name('student.logout');
 
 /**
@@ -122,7 +122,7 @@ Route::get('/formations', [CourseController::class, 'index'])->name('courses.ind
 /**
  * Achat (élève connecté) — déclaré avant la route catch-all {course:slug}.
  */
-Route::middleware('auth:student')->group(function () {
+Route::middleware(['auth:student', 'auth.session'])->group(function () {
     Route::post('/formations/{course:slug}/acheter', [CourseCheckoutController::class, 'start'])->name('courses.checkout.start');
     Route::get('/formations/{course:slug}/paiement', [CourseCheckoutController::class, 'pay'])->name('courses.checkout.pay');
     Route::get('/formations/{course:slug}/merci', [CourseCheckoutController::class, 'success'])->name('courses.checkout.success');
@@ -133,7 +133,7 @@ Route::get('/formations/{course:slug}', [CourseController::class, 'show'])->name
 /**
  * Espace élève (formations achetées).
  */
-Route::prefix('espace-formation')->name('student.')->middleware('auth:student')->group(function () {
+Route::prefix('espace-formation')->name('student.')->middleware(['auth:student', 'auth.session'])->group(function () {
     /**
      * Vérification d'e-mail (accessible aux comptes non encore vérifiés).
      */

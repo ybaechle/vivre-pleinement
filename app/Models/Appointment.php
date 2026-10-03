@@ -57,6 +57,18 @@ class Appointment extends Model
             $appointment->reference ??= self::generateReference();
             $appointment->token ??= self::generateToken();
         });
+
+        /**
+         * Une séance de coaching offerte avec le livre et annulée reste due :
+         * on libère la commande pour que son lien permette de la reprendre.
+         */
+        static::updated(function (Appointment $appointment): void {
+            if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::Cancelled) {
+                BookOrder::query()
+                    ->where('coaching_appointment_id', $appointment->id)
+                    ->update(['coaching_appointment_id' => null]);
+            }
+        });
     }
 
     protected function casts(): array

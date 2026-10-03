@@ -17,6 +17,7 @@ use App\Support\SiteContact;
 use Carbon\CarbonImmutable;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
@@ -99,7 +100,7 @@ class BookingCalendar extends Component
      * une commande remboursée ou déjà consommée entre-temps ne doit plus
      * ouvrir de rendez-vous gratuit.
      */
-    public function bookOrder(): ?BookOrder
+    private function bookOrder(): ?BookOrder
     {
         if ($this->bookOrderToken === null) {
             return null;
@@ -246,12 +247,17 @@ class BookingCalendar extends Component
          * rendez-vous est créé à 0 € et ne repasse pas par le paiement.
          */
         $bookOrder = $this->bookOrder();
+
+        if ($this->bookOrderToken !== null && $bookOrder === null) {
+            $this->addError('selectedSlot', 'Votre séance offerte a déjà été réservée.');
+
+            return null;
+        }
+
         $isPaid = $bookOrder === null && $service->price_cents > 0;
         $priceCents = $bookOrder !== null ? 0 : $service->price_cents;
 
-        $appointment = $this->slotService()->reserve($service, $start, [
-            'reference' => Appointment::generateReference(),
-            'token' => Appointment::generateToken(),
+        $appointment = $this->reserve($service, $start, $bookOrder, [
             'customer_first_name' => $this->firstName,
             'customer_last_name' => $this->lastName ?: null,
             'customer_email' => $this->email,
@@ -271,14 +277,6 @@ class BookingCalendar extends Component
             return null;
         }
 
-        /**
-         * Rattachement immédiat : c'est cette colonne qui rend le lien de
-         * réservation envoyé par email valable une seule fois.
-         */
-        if ($bookOrder !== null) {
-            $bookOrder->update(['coaching_appointment_id' => $appointment->id]);
-        }
-
         if ($isPaid) {
             return $this->redirect(route('booking.pay', $appointment->token), navigate: false);
         }
@@ -288,6 +286,30 @@ class BookingCalendar extends Component
             ->send(new AppointmentNotification($appointment));
 
         return redirect()->route('booking.confirmation', $appointment->token);
+    }
+
+    /**
+     * Réserve le créneau et, pour une séance offerte, la rattache à la commande
+     * dans la même transaction : la commande verrouillée empêche deux onglets
+     * de consommer le même lien à usage unique.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    private function reserve(AppointmentService $service, CarbonImmutable $start, ?BookOrder $bookOrder, array $attributes): ?Appointment
+    {
+        return DB::transaction(function () use ($service, $start, $bookOrder, $attributes): ?Appointment {
+            if ($bookOrder !== null && BookOrder::query()->whereKey($bookOrder->id)->lockForUpdate()->value('coaching_appointment_id') !== null) {
+                return null;
+            }
+
+            $appointment = $this->slotService()->reserve($service, $start, $attributes);
+
+            if ($appointment !== null && $bookOrder !== null) {
+                $bookOrder->update(['coaching_appointment_id' => $appointment->id]);
+            }
+
+            return $appointment;
+        });
     }
 
     private function reschedule(): mixed

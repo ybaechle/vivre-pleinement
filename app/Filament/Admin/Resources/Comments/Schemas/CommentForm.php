@@ -3,13 +3,17 @@
 namespace App\Filament\Admin\Resources\Comments\Schemas;
 
 use App\Enums\CommentStatus;
+use App\Models\Comment;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class CommentForm
 {
@@ -59,8 +63,13 @@ class CommentForm
                 ->schema([
                     Select::make('parent_id')
                         ->label('Commentaire parent')
-                        ->relationship('parent', 'id')
-                        ->searchable(),
+                        ->relationship(
+                            'parent',
+                            'author_name',
+                            fn (Builder $query, Get $get) => $query->where('post_id', $get('post_id')),
+                        )
+                        ->getOptionLabelFromRecordUsing(fn (Comment $comment): string => $comment->author_name.' : '.Str::limit($comment->content, 60))
+                        ->searchable(['author_name', 'content']),
                 ]),
 
             Section::make('Détails techniques')

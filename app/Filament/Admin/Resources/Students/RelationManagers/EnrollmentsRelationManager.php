@@ -65,6 +65,7 @@ class EnrollmentsRelationManager extends RelationManager
     {
         return Action::make('grantAccess')
             ->label('Offrir une formation')
+            ->hidden(fn (): bool => $this->getOwnerRecord()->isAnonymized())
             ->icon(Heroicon::OutlinedGift)
             ->modalHeading('Offrir l\'accès à une formation')
             ->modalDescription('L\'élève accède immédiatement à la formation. '

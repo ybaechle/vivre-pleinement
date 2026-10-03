@@ -221,11 +221,11 @@ class PostForm
             : 'Ajoutez une description SEO pour maîtriser l\'extrait affiché '
                 .'sous le titre.';
 
-        $url = config('app.url').'/blog/'.($get('slug') ?: 'mon-article');
+        $url = route('blog.show', $get('slug') ?: 'mon-article');
 
         return new HtmlString(sprintf(
-            '<div style="border:1px solid rgb(var(--gray-200));border-radius:.5rem;'
-                .'padding:.9rem 1rem;background:rgb(var(--gray-50))">'
+            '<div style="border:1px solid var(--gray-200);border-radius:.5rem;'
+                .'padding:.9rem 1rem;background:var(--gray-50)">'
                 .'<div style="font-size:.75rem;color:#3c4043">%s</div>'
                 .'<div style="font-size:1.1rem;color:#1a0dab;line-height:1.3;'
                 .'margin:.15rem 0 .2rem">%s</div>'

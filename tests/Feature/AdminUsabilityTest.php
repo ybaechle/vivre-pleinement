@@ -278,3 +278,12 @@ it('keeps emoji out of the interface chrome', function () {
 
     expect($offenders)->toBe([]);
 });
+
+it('does not offer a course to an anonymized student', function () {
+    $student = Student::factory()->create(['anonymized_at' => now()]);
+
+    Livewire::test(EnrollmentsRelationManager::class, [
+        'ownerRecord' => $student,
+        'pageClass' => ViewStudent::class,
+    ])->assertActionHidden(TestAction::make('grantAccess')->table());
+});

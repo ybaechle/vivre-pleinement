@@ -7,6 +7,7 @@ use App\Mail\BookOrderConfirmation;
 use App\Models\BookOrder;
 use App\Models\Product;
 use App\Services\BookPaymentService;
+use App\Services\StripePaymentIntents;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -68,10 +69,8 @@ class BookOrdersTable
                     ->placeholder('–'),
                 TextColumn::make('stripe_payment_intent_id')
                     ->label('Paiement')
-                    ->formatStateUsing(fn (?string $state): string => $state ? 'Ouvrir dans Stripe' : '–')
-                    ->url(fn (BookOrder $record): ?string => $record->stripe_payment_intent_id
-                        ? 'https://dashboard.stripe.com/payments/'.$record->stripe_payment_intent_id
-                        : null, shouldOpenInNewTab: true)
+                    ->formatStateUsing(fn (): string => 'Ouvrir dans Stripe')
+                    ->url(fn (?string $state): ?string => StripePaymentIntents::dashboardUrl($state), shouldOpenInNewTab: true)
                     ->color('primary'),
             ])
             ->filters([

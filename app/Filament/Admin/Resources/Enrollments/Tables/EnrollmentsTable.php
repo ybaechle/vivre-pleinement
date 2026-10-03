@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\CoursePaymentService;
+use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
@@ -58,10 +59,8 @@ class EnrollmentsTable
                     ->placeholder('–'),
                 TextColumn::make('stripe_payment_intent_id')
                     ->label('Paiement')
-                    ->formatStateUsing(fn (?string $state): string => $state ? 'Ouvrir dans Stripe' : '–')
-                    ->url(fn ($record): ?string => $record->stripe_payment_intent_id
-                        ? 'https://dashboard.stripe.com/payments/'.$record->stripe_payment_intent_id
-                        : null, shouldOpenInNewTab: true)
+                    ->formatStateUsing(fn (): string => 'Ouvrir dans Stripe')
+                    ->url(fn (?string $state): ?string => StripePaymentIntents::dashboardUrl($state), shouldOpenInNewTab: true)
                     ->color('primary'),
             ])
             ->filters([

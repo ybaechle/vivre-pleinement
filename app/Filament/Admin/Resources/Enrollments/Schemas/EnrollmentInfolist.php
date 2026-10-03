@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Enrollments\Schemas;
 
-use App\Models\Enrollment;
+use App\Services\StripePaymentIntents;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -37,9 +37,7 @@ class EnrollmentInfolist
                     TextEntry::make('stripe_payment_intent_id')
                         ->label('Paiement Stripe')
                         ->placeholder('Aucun (accès offert)')
-                        ->url(fn (Enrollment $record) => $record->stripe_payment_intent_id
-                            ? 'https://dashboard.stripe.com/payments/'.$record->stripe_payment_intent_id
-                            : null, shouldOpenInNewTab: true),
+                        ->url(fn (?string $state): ?string => StripePaymentIntents::dashboardUrl($state), shouldOpenInNewTab: true),
                 ]),
 
             Section::make('Élève')

@@ -30,3 +30,12 @@ it('totals only the active enrollments', function () {
     Livewire::test(ListEnrollments::class)
         ->assertTableColumnSummarySet('amount_paid_cents', 'total', 14900);
 });
+
+it('links paid rows to Stripe and leaves offered ones without link', function () {
+    $paid = Enrollment::factory()->create(['stripe_payment_intent_id' => 'pi_paye']);
+    Enrollment::factory()->create(['stripe_payment_intent_id' => null]);
+
+    Livewire::test(ListEnrollments::class)
+        ->assertCanSeeTableRecords([$paid])
+        ->assertSee('https://dashboard.stripe.com/payments/pi_paye', false);
+});

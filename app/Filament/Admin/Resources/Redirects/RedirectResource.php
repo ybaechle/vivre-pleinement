@@ -48,11 +48,6 @@ class RedirectResource extends Resource
         return RedirectsTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [

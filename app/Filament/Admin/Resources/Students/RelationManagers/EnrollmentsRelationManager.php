@@ -48,8 +48,7 @@ class EnrollmentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 $this->grantAccessAction(),
-            ])
-            ->filters([]);
+            ]);
     }
 
     public function isReadOnly(): bool

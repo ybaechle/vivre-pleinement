@@ -54,6 +54,11 @@ class StripePaymentIntents
         return $intent;
     }
 
+    public static function dashboardUrl(?string $paymentIntentId): ?string
+    {
+        return $paymentIntentId !== null ? 'https://dashboard.stripe.com/payments/'.$paymentIntentId : null;
+    }
+
     /**
      * Renvoie null uniquement quand Stripe ne connaît pas l'intent : une panne
      * réseau ou une clé invalide doit remonter, sinon l'appelant créerait un

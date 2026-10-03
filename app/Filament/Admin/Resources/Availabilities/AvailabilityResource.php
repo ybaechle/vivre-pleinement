@@ -51,11 +51,6 @@ class AvailabilityResource extends Resource
         return AvailabilitiesTable::configure($table);
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [

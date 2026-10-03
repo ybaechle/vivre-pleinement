@@ -214,7 +214,7 @@ it('rembourse automatiquement un second paiement arrivé sur un rendez-vous déj
         'stripe_payment_intent_id' => 'pi_premier',
     ]);
 
-    $this->mock(StripePaymentIntents::class, function ($mock) {
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
         $mock->shouldReceive('refundQuietly')->once()->with('pi_second')->andReturnTrue();
     });
 

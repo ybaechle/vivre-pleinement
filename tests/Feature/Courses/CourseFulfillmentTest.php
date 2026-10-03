@@ -103,7 +103,7 @@ it('rembourse automatiquement un second paiement arrivé sur une inscription dé
     $enrollment = pendingEnrollment();
     courseWebhook($enrollment->id, 'pi_premier');
 
-    $this->mock(StripePaymentIntents::class, function ($mock) {
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
         $mock->shouldReceive('refundQuietly')->once()->with('pi_second')->andReturnTrue();
     });
 

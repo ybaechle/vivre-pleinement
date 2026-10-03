@@ -108,7 +108,7 @@ class BookingPaymentService
         });
 
         match ($outcome) {
-            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'duplicate' => $this->intents->refundDuplicate($locked, $paymentIntentId, 'un rendez-vous déjà payé'),
             'conflict' => $this->refundAndApologise($locked, $paymentIntentId),
             'fulfilled' => $this->sendConfirmation($locked),
         };
@@ -119,33 +119,6 @@ class BookingPaymentService
         Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment->fresh('service')));
         Mail::to(SiteContact::notifyEmail())
             ->send(new AppointmentNotification($appointment->fresh('service')));
-    }
-
-    /**
-     * Un paiement réussi arrive pour un rendez-vous déjà payé via un intent
-     * différent : le client a payé deux fois (deux onglets avant la
-     * réutilisation d'intent). On rembourse le second débit.
-     */
-    private function refundDuplicatePayment(Appointment $appointment, ?string $paymentIntentId): void
-    {
-        if ($paymentIntentId === null || $paymentIntentId === $appointment->stripe_payment_intent_id) {
-            return;
-        }
-
-        if ($this->intents->refundQuietly($paymentIntentId)) {
-            Log::warning('Second paiement détecté pour un rendez-vous déjà payé : remboursé automatiquement.', [
-                'appointment_id' => $appointment->id,
-                'kept_payment_intent_id' => $appointment->stripe_payment_intent_id,
-                'refunded_payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        Log::error('Second paiement détecté pour un rendez-vous déjà payé mais remboursement impossible.', [
-            'appointment_id' => $appointment->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
     }
 
     /**

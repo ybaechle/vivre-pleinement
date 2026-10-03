@@ -106,7 +106,7 @@ class CoursePaymentService
         });
 
         match ($outcome) {
-            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'duplicate' => $this->intents->refundDuplicate($locked, $paymentIntentId, 'une inscription déjà active'),
             'fulfilled' => $this->sendAccessGranted($locked),
         };
     }
@@ -116,33 +116,6 @@ class CoursePaymentService
         Mail::to($enrollment->student->email)->send(new CourseAccessGranted($enrollment));
         Mail::to(SiteContact::notifyEmail())
             ->send(new CoursePurchaseNotification($enrollment));
-    }
-
-    /**
-     * Un paiement réussi arrive pour une inscription déjà active via un intent
-     * différent : l'élève a payé deux fois (deux onglets avant la réutilisation
-     * d'intent, ou course entre webhooks). On rembourse le second débit.
-     */
-    private function refundDuplicatePayment(Enrollment $enrollment, ?string $paymentIntentId): void
-    {
-        if ($paymentIntentId === null || $paymentIntentId === $enrollment->stripe_payment_intent_id) {
-            return;
-        }
-
-        if ($this->intents->refundQuietly($paymentIntentId)) {
-            Log::warning('Second paiement détecté pour une inscription déjà active : remboursé automatiquement.', [
-                'enrollment_id' => $enrollment->id,
-                'kept_payment_intent_id' => $enrollment->stripe_payment_intent_id,
-                'refunded_payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        Log::error('Second paiement détecté pour une inscription déjà active mais remboursement impossible.', [
-            'enrollment_id' => $enrollment->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Cashier;
 use Stripe\Exception\InvalidRequestException;
@@ -87,6 +88,32 @@ class StripePaymentIntents
     public function refund(string $paymentIntentId): void
     {
         Cashier::stripe()->refunds->create(['payment_intent' => $paymentIntentId]);
+    }
+
+    /**
+     * Un paiement réussi arrive pour un achat déjà réglé via un autre intent :
+     * le client a payé deux fois (deux onglets avant la réutilisation
+     * d'intent, ou course entre webhooks). On rembourse le second débit.
+     */
+    public function refundDuplicate(Model $purchase, ?string $paymentIntentId, string $label): void
+    {
+        if ($paymentIntentId === null || $paymentIntentId === $purchase->stripe_payment_intent_id) {
+            return;
+        }
+
+        $context = [
+            'purchase' => $purchase::class.'#'.$purchase->getKey(),
+            'kept_payment_intent_id' => $purchase->stripe_payment_intent_id,
+            'duplicate_payment_intent_id' => $paymentIntentId,
+        ];
+
+        if ($this->refundQuietly($paymentIntentId)) {
+            Log::warning("Second paiement détecté pour {$label} : remboursé automatiquement.", $context);
+
+            return;
+        }
+
+        Log::error("Second paiement détecté pour {$label} mais remboursement impossible.", $context);
     }
 
     /**

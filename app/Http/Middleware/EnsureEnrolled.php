@@ -17,6 +17,7 @@ class EnsureEnrolled
      */
     public function handle(Request $request, Closure $next): Response
     {
+        /** @var Course $course */
         $course = $request->route('course');
         $lesson = $request->route('lesson');
 
@@ -24,17 +25,11 @@ class EnsureEnrolled
             return $next($request);
         }
 
-        $student = $request->user('student');
-
-        if ($course instanceof Course && $student !== null && $student->hasAccessTo($course)) {
+        if ($request->user('student')->hasAccessTo($course)) {
             return $next($request);
         }
 
-        if ($course instanceof Course) {
-            return redirect()->route('courses.show', $course)
-                ->with('status', "Vous n'avez pas encore accès à cette formation.");
-        }
-
-        return redirect()->route('courses.index');
+        return redirect()->route('courses.show', $course)
+            ->with('status', "Vous n'avez pas encore accès à cette formation.");
     }
 }

@@ -69,7 +69,7 @@ class LessonPlayer extends Component
     public function lessons(): Collection
     {
         return $this->course->modules()
-            ->with(['lessons' => fn ($query) => $query->orderBy('position')])
+            ->with('lessons')
             ->get()
             ->flatMap->lessons
             ->values();

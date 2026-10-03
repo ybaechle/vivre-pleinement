@@ -16,25 +16,21 @@ class CourseController extends Controller
     {
         $student = $request->user('student');
 
-        $course->load(['modules.lessons' => fn ($query) => $query->orderBy('position')]);
-
-        $firstLesson = $course->modules->flatMap->lessons->first();
+        $course->load('modules.lessons');
 
         return view('student.course', [
             'course' => $course,
             'completedLessonIds' => $this->completedLessonIds($student, $course),
             'progress' => CourseProgress::percent($student, $course),
-            'firstLesson' => $firstLesson,
+            'firstLesson' => $course->modules->flatMap->lessons->first(),
         ]);
     }
 
     public function lesson(Request $request, Course $course, Lesson $lesson): View
     {
-        abort_unless($lesson->module->course_id === $course->id, 404);
-
         $student = $request->user('student');
 
-        $course->load(['modules.lessons' => fn ($query) => $query->orderBy('position')]);
+        $course->load('modules.lessons');
 
         return view('student.lesson', [
             'course' => $course,
@@ -47,12 +43,8 @@ class CourseController extends Controller
     /**
      * @return array<int, int>
      */
-    private function completedLessonIds(?Student $student, Course $course): array
+    private function completedLessonIds(Student $student, Course $course): array
     {
-        if ($student === null) {
-            return [];
-        }
-
         return $student->lessonProgress()
             ->whereNotNull('completed_at')
             ->whereIn('lesson_id', $course->lessons()->select('lessons.id'))

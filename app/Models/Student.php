@@ -68,9 +68,6 @@ class Student extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(LessonProgress::class);
     }
 
-    /**
-     * Détermine si l'élève possède une inscription active à la formation.
-     */
     public function hasAccessTo(Course $course): bool
     {
         return $this->enrollments()

@@ -322,9 +322,6 @@ class VideoForm
             .'</div>';
     }
 
-    /**
-     * Action de verrouillage pour les champs sync-sensibles.
-     */
     private static function lockToggleAction(string $field): Action
     {
         return Action::make('lock_'.$field)

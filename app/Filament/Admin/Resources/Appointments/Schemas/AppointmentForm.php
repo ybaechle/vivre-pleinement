@@ -174,7 +174,7 @@ class AppointmentForm
     }
 
     /**
-     * Renseigne l'heure de fin à partir de la durée (et du tampon) de la
+     * Renseigne l'heure de fin à partir de la durée de la
      * prestation choisie.
      */
     protected static function computeEnd(mixed $serviceId, ?string $startsAt, Set $set): void

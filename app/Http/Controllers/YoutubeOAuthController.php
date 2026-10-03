@@ -90,9 +90,6 @@ class YoutubeOAuthController extends Controller
         return response()->view('youtube.oauth.success', ['refreshToken' => $refreshToken]);
     }
 
-    /**
-     * Rend la page d'échec du flux OAuth avec le statut HTTP correspondant.
-     */
     private function failure(string $message, int $status = 400): Response
     {
         return response()->view('youtube.oauth.error', ['message' => $message], $status);

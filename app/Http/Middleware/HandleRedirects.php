@@ -87,8 +87,6 @@ class HandleRedirects
     }
 
     /**
-     * Résout la cible d'une redirection.
-     *
      * Une cible absolue n'est suivie que si elle est en http(s) : sans ce
      * filtre, une entrée mal saisie — ou créée depuis un compte admin compromis
      * — pourrait pointer vers un schéma exotique (javascript:, data:) et

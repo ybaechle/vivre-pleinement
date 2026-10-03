@@ -24,7 +24,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Mail;
 
 #[Signature('mail:preview {--email=preview@vivre-pleinement.test}')]
-#[Description('Envoie chaque mail de l\'application (toutes variantes) à Mailpit pour vérifier leur rendu.')]
+#[Description('Envoie les mails de rendez-vous et de contact (toutes variantes) à Mailpit pour vérifier leur rendu.')]
 class PreviewMailsCommand extends Command
 {
     public function handle(): int

@@ -37,9 +37,6 @@ class SubscribeToNewsletterJob implements ShouldBeUnique, ShouldQueue
         return $this->email;
     }
 
-    /**
-     * Exécute l'inscription à la liste Brevo en arrière-plan.
-     */
     public function handle(BrevoNewsletter $newsletter): void
     {
         $newsletter->subscribeToVideoList($this->email, $this->firstName, $this->redirectionUrl);

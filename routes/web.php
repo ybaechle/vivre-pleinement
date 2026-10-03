@@ -43,14 +43,10 @@ Route::view('/therapie-act', 'therapie-act.index')->name('therapie-act');
 
 /**
  * Les formulaires publics portent un plafond de requêtes au niveau de la route,
- * en plus de la limitation applicative de SubmissionThrottle.
- *
- * SubmissionThrottle est consulté dans le contrôleur, donc après la validation
- * : la règle `email:rfc,dns` déclenchait une résolution DNS sur un domaine
- * choisi par l'appelant à chaque requête, sans plafond. Le middleware
- * `throttle` s'exécute avant la FormRequest et referme ce coin ; réglé plus
- * haut que SubmissionThrottle, il laisse le message d'erreur soigné arriver en
- * premier pour un visiteur normal et ne coupe que les envois massifs.
+ * en plus de SubmissionThrottle : celui-ci n'intervient qu'après la validation,
+ * dont la règle `email:rfc,dns` lance une résolution DNS sur un domaine choisi
+ * par l'appelant. Réglé plus haut que SubmissionThrottle, ce plafond laisse le
+ * message d'erreur soigné arriver en premier et ne coupe que les envois massifs.
  */
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])
@@ -80,12 +76,6 @@ Route::prefix('reservation')->name('booking.')->controller(BookingController::cl
     Route::get('gerer/{appointment:token}/reprogrammer', 'reschedule')->name('reschedule');
     Route::get('{service:slug}', 'show')->name('show');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Espace formation (e-learning)
-|--------------------------------------------------------------------------
-*/
 
 /**
  * Authentification élève (guard « student »).

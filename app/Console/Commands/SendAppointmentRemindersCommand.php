@@ -74,7 +74,7 @@ class SendAppointmentRemindersCommand extends Command
 
     /**
      * Libère les créneaux des réservations payantes restées "Pending/unpaid"
-     * (checkout Stripe abandonné) au-delà du TTL de la session (~30 min).
+     * (paiement abandonné) au-delà de 30 minutes.
      * Claim atomique sur le statut : seul le process qui bascule effectivement
      * le statut de Pending à Cancelled envoie le mail.
      */

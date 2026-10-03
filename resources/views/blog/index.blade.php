@@ -24,15 +24,12 @@
 
 @section('robots', ($hasFilters || $page > 1) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
+@section('og_title', $metaTitle)
+@section('og_description', $metaDesc)
+@section('og_image', $ogImage)
+
 @push('head')
     <link rel="alternate" type="application/rss+xml" title="Vivre Pleinement - Blog" href="{{ route('blog.rss') }}">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $metaTitle }}">
-    <meta property="og:description" content="{{ $metaDesc }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ $ogImage }}">
-    <meta name="twitter:card" content="summary_large_image">
 
     @if (! $hasFilters && $page === 1)
         @php

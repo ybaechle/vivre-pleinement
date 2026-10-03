@@ -102,6 +102,37 @@ it('uses the seo_description for the article og:description', function () {
         ->assertSee('property="og:description" content="Description SEO courte et nette."', false);
 });
 
+it('emits a single set of Open Graph tags describing the article', function () {
+    Post::factory()->create(['slug' => 'toc', 'status' => 'published', 'title' => 'Comprendre les TOC', 'seo_title' => null]);
+
+    $html = $this->get('/blog/toc')->assertOk()->getContent();
+
+    expect(substr_count($html, 'property="og:type"'))->toBe(1)
+        ->and(substr_count($html, 'property="og:title"'))->toBe(1)
+        ->and(substr_count($html, 'property="og:image"'))->toBe(1)
+        ->and($html)->toContain('property="og:type" content="article"')
+        ->and($html)->toContain('property="og:title" content="Comprendre les TOC"');
+});
+
+it('links the breadcrumb to the first category of a multi-category article', function () {
+    $post = Post::factory()->create(['slug' => 'toc', 'status' => 'published']);
+    $first = Category::factory()->create(['slug' => 'premiere']);
+    $second = Category::factory()->create(['slug' => 'seconde']);
+    $post->categories()->attach([$first->id, $second->id]);
+
+    $this->get('/blog/toc')
+        ->assertOk()
+        ->assertSee(route('blog.category', 'premiere'), false)
+        ->assertDontSee(route('blog.category', 'seconde'), false);
+});
+
+it('emits a single set of Open Graph tags on the blog index', function () {
+    $html = $this->get('/blog')->assertOk()->getContent();
+
+    expect(substr_count($html, 'property="og:title"'))->toBe(1)
+        ->and(substr_count($html, 'name="twitter:card"'))->toBe(1);
+});
+
 it('emits exactly one canonical on the blog index, stripped of filter query strings', function () {
     $html = $this->get('/blog?sort=oldest')->assertOk()->getContent();
 

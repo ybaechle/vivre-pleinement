@@ -21,18 +21,17 @@
 @if ($post->seo_robots)
     @section('robots', $post->seo_robots)
 @endif
+@section('og_type', 'article')
+@section('og_title', $post->seo_title ?: $post->title)
+@section('og_description', $post->seo_description ?: $post->excerpt)
+@if ($cover)
+    @section('og_image', $cover)
+@endif
 
 @push('head')
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="{{ $post->seo_title ?: $post->title }}">
-    <meta property="og:description" content="{{ $post->seo_description ?: $post->excerpt }}">
-    <meta property="og:url" content="{{ route('blog.show', $post->slug) }}">
-    @if ($cover)
-        <meta property="og:image" content="{{ $cover }}">
-    @endif
     <meta property="article:published_time" content="{{ $post->published_at?->toIso8601String() }}">
-    @foreach ($post->categories as $category)
-        <meta property="article:section" content="{{ $category->name }}">
+    @foreach ($post->categories as $postCategory)
+        <meta property="article:section" content="{{ $postCategory->name }}">
     @endforeach
     @foreach ($post->tags as $tag)
         <meta property="article:tag" content="{{ $tag->name }}">

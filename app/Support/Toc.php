@@ -37,6 +37,17 @@ class Toc
                     return $match[0];
                 }
 
+                /**
+                 * Un id déjà posé est conservé : le sommaire doit alors pointer
+                 * vers lui, et non vers un slug que le titre ne porte pas.
+                 */
+                if (preg_match('/(?<![\w-])id=["\']([^"\']+)["\']/i', $attrs, $existing)) {
+                    $seen[$existing[1]] = true;
+                    $items[] = ['level' => $level, 'id' => $existing[1], 'text' => $text];
+
+                    return $match[0];
+                }
+
                 $base = Str::slug($text);
                 $id = $base;
                 $i = 2;
@@ -46,10 +57,6 @@ class Toc
                 $seen[$id] = true;
 
                 $items[] = ['level' => $level, 'id' => $id, 'text' => $text];
-
-                if (preg_match('/\bid=/i', $attrs)) {
-                    return $match[0];
-                }
 
                 return sprintf('<h%d id="%s"%s>%s</h%d>', $level, $id, $attrs, $inner, $level);
             },

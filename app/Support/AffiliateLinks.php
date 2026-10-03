@@ -87,9 +87,15 @@ class AffiliateLinks
         );
     }
 
+    /**
+     * L'attribut est encore encodé (`&amp;`) : la carte le réencode à
+     * l'affichage, il faut donc lui transmettre l'URL brute.
+     */
     private static function extractHref(string $attributes): ?string
     {
-        return preg_match('/\bhref="([^"]*)"/i', $attributes, $m) ? $m[1] : null;
+        return preg_match('/\bhref="([^"]*)"/i', $attributes, $m)
+            ? html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8')
+            : null;
     }
 
     /**

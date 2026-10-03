@@ -40,3 +40,10 @@ it('leaves non-affiliate links untouched', function () {
     $in = '<a href="/blog/autre">voir aussi</a>';
     expect(AffiliateLinks::enhance($in))->toBe($in);
 });
+
+it('keeps every query parameter of an encoded affiliate link', function () {
+    $out = AffiliateLinks::enhance('<a href="https://ruedesplantes.com/p?ref=290&amp;affiliate_banner_id=158">Le complément</a>');
+
+    expect($out)->toContain('href="https://ruedesplantes.com/p?ref=290&amp;affiliate_banner_id=158"')
+        ->and($out)->not->toContain('&amp;amp;');
+});

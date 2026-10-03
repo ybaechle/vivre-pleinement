@@ -4,7 +4,7 @@
 
 @section('student')
     <div class="site-container">
-        <x-student-nav :student="$student" />
+        <x-student-nav />
 
         <div class="mx-auto max-w-2xl">
             <div>

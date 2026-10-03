@@ -167,7 +167,7 @@
             @endif
 
             <div class="flex flex-col gap-12 lg:flex-row lg:gap-12">
-                <div class="prose prose-lg prose-ink max-w-none lg:w-[52rem] lg:shrink-0">
+                <div class="prose prose-lg max-w-none lg:w-[52rem] lg:shrink-0">
                     {!! $toc['html'] !!}
                 </div>
 

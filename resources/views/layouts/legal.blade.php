@@ -26,7 +26,7 @@
 
     <main class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-10">
-            <article class="prose prose-lg prose-ink [&_h2]:text-ink [&_h3]:text-ink max-w-none [&_a]:text-teal-700 [&_a:hover]:text-teal-800 [&_h2]:font-serif [&_h2]:font-medium [&_h2]:tracking-tight [&_h3]:font-serif [&_h3]:font-medium">
+            <article class="prose prose-lg [&_h2]:text-ink [&_h3]:text-ink max-w-none [&_a]:text-teal-700 [&_a:hover]:text-teal-800 [&_h2]:font-serif [&_h2]:font-medium [&_h2]:tracking-tight [&_h3]:font-serif [&_h3]:font-medium">
                 @yield('legal-content')
             </article>
         </div>

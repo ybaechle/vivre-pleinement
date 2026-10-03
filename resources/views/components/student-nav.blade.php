@@ -1,5 +1,3 @@
-@props(['student'])
-
 @php
     $tabs = [
         ['label' => 'Mes formations', 'href' => route('student.dashboard'), 'active' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson')],

@@ -4,7 +4,7 @@
 
 @section('student')
     <div class="site-container">
-        <x-student-nav :student="$student" />
+        <x-student-nav />
 
         <div>
             <h1 class="text-ink font-serif text-3xl font-medium tracking-tight sm:text-4xl">Bonjour {{ $student->name }}</h1>

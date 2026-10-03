@@ -122,7 +122,7 @@
 
         @if ($video->intro)
             <div class="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-10">
-                <div class="prose prose-ink max-w-none text-lg leading-relaxed">
+                <div class="prose max-w-none text-lg leading-relaxed">
                     {!! $video->intro !!}
                 </div>
             </div>
@@ -202,7 +202,7 @@
                 <div class="ring-ink/5 relative mt-4 overflow-hidden rounded-2xl bg-white ring-1">
                     <input type="checkbox" id="transcript-toggle" class="peer sr-only">
 
-                    <div class="prose prose-ink max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
+                    <div class="prose max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
                         {!! $video->transcript !!}
                     </div>
 

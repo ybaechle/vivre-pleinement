@@ -11,9 +11,7 @@
             <p class="text-ink-soft mt-2 text-sm">Retrouvez vos formations et reprenez votre progression.</p>
         </div>
 
-        @if (request()->boolean('verified'))
-            <p class="mt-6 rounded-2xl bg-teal-50 px-4 py-3 text-sm text-teal-800 ring-1 ring-teal-200">Votre adresse e-mail a bien été confirmée. Bienvenue&nbsp;!</p>
-        @elseif (session('status'))
+        @if (session('status'))
             <p class="mt-6 rounded-2xl bg-teal-50 px-4 py-3 text-sm text-teal-800 ring-1 ring-teal-200">{{ session('status') }}</p>
         @endif
 

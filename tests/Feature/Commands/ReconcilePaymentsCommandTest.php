@@ -232,3 +232,16 @@ it('signale une panne Stripe au lieu de sauter la ligne en silence', function ()
         ->withArgs(fn (string $message, array $context) => str_contains($message, 'Rattrapage impossible')
             && $context['payment_intent_id'] === 'pi_panne');
 });
+
+it('n\'interroge plus Stripe pour un panier abandonné depuis plus d\'une semaine', function () {
+    BookOrder::factory()->create([
+        'stripe_payment_intent_id' => 'pi_ancien',
+        'created_at' => CarbonImmutable::now()->subDays(8),
+    ]);
+
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldNotReceive('retrieve');
+    });
+
+    $this->artisan('payments:reconcile')->assertSuccessful();
+});

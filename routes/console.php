@@ -40,3 +40,12 @@ Schedule::command('youtube:fetch-transcripts --since=14')
     ->withoutOverlapping()
     ->onOneServer()
     ->environments(['production']);
+
+/**
+ * Un jeton de réinitialisation expiré ne sert plus à rien mais reste associé
+ * à l'adresse e-mail de l'élève : on ne le garde pas au-delà de son expiration.
+ */
+Schedule::command('auth:clear-resets students')
+    ->daily()
+    ->onOneServer()
+    ->environments(['production']);

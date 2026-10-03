@@ -102,6 +102,19 @@ it('flushes both sitemap caches when a video is saved', function () {
         ->and(Cache::has(SitemapController::VIDEOS_CACHE_KEY))->toBeFalse();
 });
 
+it('keeps the caches when the hourly sync only refreshes the counters', function () {
+    $video = Video::factory()->create();
+    Cache::put('sitemap.urls', ['cached'], now()->addHour());
+
+    $video->update(['view_count' => 9999, 'like_count' => 42, 'synced_at' => now()]);
+
+    expect(Cache::has('sitemap.urls'))->toBeTrue();
+
+    $video->update(['title' => 'Nouveau titre']);
+
+    expect(Cache::has('sitemap.urls'))->toBeFalse();
+});
+
 it('advertises the youtube publication date rather than the last sync', function () {
     $video = Video::factory()->create([
         'youtube_published_at' => Carbon::parse('2025-11-03 18:00:00'),

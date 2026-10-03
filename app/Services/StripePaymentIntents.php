@@ -4,12 +4,13 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Cashier;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\PaymentIntent;
 use Throwable;
 
 /**
- * Cycle de vie d'un PaymentIntent Stripe, partagé par les deux tunnels d'achat
- * (rendez-vous et formations). Ne connaît aucun modèle du domaine : les
+ * Cycle de vie d'un PaymentIntent Stripe, partagé par les trois tunnels d'achat
+ * (rendez-vous, formations et livre). Ne connaît aucun modèle du domaine : les
  * services appelants gardent la responsabilité de ce qu'un paiement signifie
  * chez eux.
  */
@@ -52,12 +53,21 @@ class StripePaymentIntents
         return $intent;
     }
 
+    /**
+     * Renvoie null uniquement quand Stripe ne connaît pas l'intent : une panne
+     * réseau ou une clé invalide doit remonter, sinon l'appelant créerait un
+     * nouvel intent ou sauterait un paiement réellement encaissé.
+     */
     public function retrieve(string $paymentIntentId): ?PaymentIntent
     {
         try {
             return Cashier::stripe()->paymentIntents->retrieve($paymentIntentId);
-        } catch (Throwable) {
-            return null;
+        } catch (InvalidRequestException $exception) {
+            if ($exception->getStripeCode() === 'resource_missing') {
+                return null;
+            }
+
+            throw $exception;
         }
     }
 

@@ -2,7 +2,10 @@
 
 use App\Services\StripePaymentIntents;
 use Illuminate\Support\Facades\Log;
+use Stripe\Exception\ApiConnectionException;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\PaymentIntent;
+use Stripe\StripeClient;
 
 function stripeIntent(string $id, string $status, int $amount): PaymentIntent
 {
@@ -87,3 +90,30 @@ it('confirme un remboursement réussi', function () {
 
     expect($intents->refundQuietly('pi_x'))->toBeTrue();
 });
+
+function stripeClientRetrieving(Closure $retrieve): void
+{
+    $paymentIntents = new class($retrieve)
+    {
+        public function __construct(private Closure $retrieve) {}
+
+        public function retrieve(string $id): PaymentIntent
+        {
+            return ($this->retrieve)($id);
+        }
+    };
+
+    app()->bind(StripeClient::class, fn () => (object) ['paymentIntents' => $paymentIntents]);
+}
+
+it('renvoie null quand Stripe ne connaît pas l\'intent', function () {
+    stripeClientRetrieving(fn () => throw InvalidRequestException::factory('No such payment_intent', 404, null, null, null, 'resource_missing'));
+
+    expect(app(StripePaymentIntents::class)->retrieve('pi_disparu'))->toBeNull();
+});
+
+it('propage une panne Stripe au lieu de la masquer', function () {
+    stripeClientRetrieving(fn () => throw new ApiConnectionException('Stripe injoignable'));
+
+    app(StripePaymentIntents::class)->retrieve('pi_x');
+})->throws(ApiConnectionException::class);

@@ -155,18 +155,18 @@ class ReconcilePaymentsCommand extends Command
         $recovered = 0;
 
         foreach ($records as $record) {
-            $intent = $this->intents->retrieve($record->stripe_payment_intent_id);
-
-            if ($intent === null || $intent->status !== 'succeeded') {
-                continue;
-            }
-
             try {
+                $intent = $this->intents->retrieve($record->stripe_payment_intent_id);
+
+                if ($intent === null || $intent->status !== 'succeeded') {
+                    continue;
+                }
+
                 $fulfill($record, $intent);
             } catch (Throwable $exception) {
                 report($exception);
 
-                Log::error("Rattrapage impossible pour un {$label} payé.", [
+                Log::error("Rattrapage impossible pour un {$label}.", [
                     'id' => $record->getKey(),
                     'payment_intent_id' => $record->stripe_payment_intent_id,
                     'exception' => $exception->getMessage(),

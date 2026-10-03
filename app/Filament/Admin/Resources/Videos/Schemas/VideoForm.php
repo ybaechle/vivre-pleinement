@@ -101,18 +101,8 @@ class VideoForm
 
                     Tab::make('SEO & Contenu éditorial')
                         ->icon(Heroicon::OutlinedSparkles)
-                        ->badge(fn ($record) => match (true) {
-                            $record === null => null,
-                            $record->isEnriched() && $record->hasTranscript() => 'Complet',
-                            $record->isEnriched() || $record->hasTranscript() => 'Partiel',
-                            default => 'À faire',
-                        })
-                        ->badgeColor(fn ($record) => match (true) {
-                            $record === null => 'gray',
-                            $record->isEnriched() && $record->hasTranscript() => 'success',
-                            $record->isEnriched() || $record->hasTranscript() => 'warning',
-                            default => 'danger',
-                        })
+                        ->badge(fn (?Video $record): ?string => $record?->editorialState()->getLabel())
+                        ->badgeColor(fn (?Video $record): string => $record?->editorialState()->getColor() ?? 'gray')
                         ->schema([
                             TextEntry::make('seo_help')
                                 ->hiddenLabel()

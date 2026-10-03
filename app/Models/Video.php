@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\VideoEditorialState;
 use App\Enums\VideoStatus;
 use App\Observers\VideoObserver;
 use App\Support\Duration;
@@ -203,6 +204,40 @@ class Video extends Model
     public function hasTranscript(): bool
     {
         return filled($this->transcript);
+    }
+
+    public function editorialState(): VideoEditorialState
+    {
+        return match (true) {
+            $this->isEnriched() && $this->hasTranscript() => VideoEditorialState::Complete,
+            $this->isEnriched() => VideoEditorialState::MissingTranscript,
+            $this->hasTranscript() => VideoEditorialState::ToEnrich,
+            default => VideoEditorialState::ToDo,
+        };
+    }
+
+    /**
+     * Pendant SQL de isEnriched().
+     *
+     * @param  Builder<Video>  $query
+     */
+    public function scopeEnriched(Builder $query, bool $enriched = true): void
+    {
+        $enriched
+            ? $query->whereNotNull('intro')->where('intro', '!=', '')->whereNotNull('summary')->where('summary', '!=', '')
+            : $query->where(fn (Builder $q) => $q->whereNull('intro')->orWhere('intro', '')->orWhereNull('summary')->orWhere('summary', ''));
+    }
+
+    /**
+     * Pendant SQL de hasTranscript().
+     *
+     * @param  Builder<Video>  $query
+     */
+    public function scopeWithTranscript(Builder $query, bool $withTranscript = true): void
+    {
+        $withTranscript
+            ? $query->whereNotNull('transcript')->where('transcript', '!=', '')
+            : $query->where(fn (Builder $q) => $q->whereNull('transcript')->orWhere('transcript', ''));
     }
 
     /**

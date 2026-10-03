@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\AppointmentServices\Schemas;
 
+use Closure;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,6 +72,11 @@ class AppointmentServiceForm
                         ->numeric()
                         ->step(0.01)
                         ->minValue(0)
+                        ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                            if ($value > 0 && $value < 0.5) {
+                                $fail('Stripe n\'accepte pas de paiement sous 0,50 € : indiquez 0 € pour une prestation gratuite.');
+                            }
+                        })
                         ->suffix('€')
                         ->default(0)
                         ->required()

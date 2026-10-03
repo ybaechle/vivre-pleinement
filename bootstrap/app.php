@@ -64,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
          * Les élèves non connectés sont redirigés vers leur page de connexion ;
          * l'admin Filament gère sa propre redirection sur /espace-pro.
          */
-        $middleware->redirectGuestsTo(function ($request) {
+        $middleware->redirectGuestsTo(function (Request $request): ?string {
             if ($request->is('espace-pro*')) {
                 return null;
             }

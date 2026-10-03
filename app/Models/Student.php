@@ -9,7 +9,6 @@ use Database\Factories\StudentFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -76,7 +75,7 @@ class Student extends Authenticatable implements MustVerifyEmail
     {
         return $this->enrollments()
             ->where('course_id', $course->id)
-            ->where('status', EnrollmentStatus::Active)
+            ->active()
             ->exists();
     }
 
@@ -101,13 +100,5 @@ class Student extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new StudentVerifyEmail);
-    }
-
-    /**
-     * @param  Builder<Student>  $query
-     */
-    public function scopeNotAnonymized(Builder $query): void
-    {
-        $query->whereNull('anonymized_at');
     }
 }

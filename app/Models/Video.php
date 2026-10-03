@@ -49,7 +49,6 @@ class Video extends Model
     use SoftDeletes;
 
     /** Champs qui peuvent être verrouillés contre la sync */
-    public const LOCKABLE_FIELDS = ['title', 'description', 'thumbnail_url', 'slug'];
 
     /**
      * Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short
@@ -189,14 +188,6 @@ class Video extends Model
         }
 
         return Str::limit(trim(strip_tags($source)), $limit);
-    }
-
-    public function hasEditorialContent(): bool
-    {
-        return filled($this->summary)
-            || filled($this->intro)
-            || filled($this->transcript)
-            || ! empty($this->key_takeaways);
     }
 
     /**

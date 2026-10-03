@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Filament\Widgets\StatsOverviewWidget;
@@ -19,13 +18,13 @@ class CourseSalesStats extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $activeSales = Enrollment::query()->where('status', EnrollmentStatus::Active);
+        $activeSales = Enrollment::query()->active();
 
         $revenueCents = (int) (clone $activeSales)->sum('amount_paid_cents');
         $salesLast30Days = (clone $activeSales)->where('purchased_at', '>=', now()->subDays(30))->count();
 
         $bestSeller = Course::query()
-            ->withCount(['enrollments' => fn ($query) => $query->where('status', EnrollmentStatus::Active)])
+            ->withCount(['enrollments' => fn ($query) => $query->active()])
             ->orderByDesc('enrollments_count')
             ->first();
 

@@ -129,7 +129,7 @@ class EnrollmentsRelationManager extends RelationManager
         $student = $this->getOwnerRecord();
 
         $alreadyActive = $student->enrollments()
-            ->where('status', EnrollmentStatus::Active)
+            ->active()
             ->pluck('course_id');
 
         return Course::query()

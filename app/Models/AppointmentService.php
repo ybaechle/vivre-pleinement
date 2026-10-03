@@ -65,14 +65,6 @@ class AppointmentService extends Model
     }
 
     /**
-     * @return HasMany<Availability, $this>
-     */
-    public function availabilities(): HasMany
-    {
-        return $this->hasMany(Availability::class);
-    }
-
-    /**
      * @return HasMany<Appointment, $this>
      */
     public function appointments(): HasMany

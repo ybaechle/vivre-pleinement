@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -58,22 +57,6 @@ class Lesson extends Model
     public function module(): BelongsTo
     {
         return $this->belongsTo(Module::class);
-    }
-
-    /**
-     * @return HasMany<LessonProgress, $this>
-     */
-    public function progress(): HasMany
-    {
-        return $this->hasMany(LessonProgress::class);
-    }
-
-    /**
-     * Récupère la formation parente via le module.
-     */
-    public function course(): ?Course
-    {
-        return $this->module?->course;
     }
 
     public function embedUrl(): ?string

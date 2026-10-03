@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\Courses\Tables;
 
 use App\Enums\CourseStatus;
-use App\Enums\EnrollmentStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteBulkAction;
@@ -52,7 +51,7 @@ class CoursesTable
                     ->sortable(),
                 TextColumn::make('enrollments_count')
                     ->label('Ventes')
-                    ->counts(['enrollments' => fn ($query) => $query->where('status', EnrollmentStatus::Active)])
+                    ->counts(['enrollments' => fn ($query) => $query->active()])
                     ->sortable(),
                 TextColumn::make('published_at')
                     ->label('Publiée le')

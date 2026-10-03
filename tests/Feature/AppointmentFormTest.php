@@ -8,6 +8,7 @@ use App\Models\AppointmentService;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -75,4 +76,28 @@ it('rejects an overlapping appointment on the admin form', function () {
         ])
         ->call('create')
         ->assertHasFormErrors(['ends_at']);
+});
+
+it('does not let the stale checkout sweep cancel a pending appointment created by the admin', function () {
+    Mail::fake();
+    $service = AppointmentService::factory()->create(['duration_minutes' => 45]);
+    $start = CarbonImmutable::now()->addDays(7)->setTime(10, 0);
+
+    Livewire::test(CreateAppointment::class)
+        ->fillForm([
+            'appointment_service_id' => $service->id,
+            'starts_at' => $start->format('Y-m-d H:i:s'),
+            'ends_at' => $start->addMinutes(45)->format('Y-m-d H:i:s'),
+            'status' => AppointmentStatus::Pending,
+            'customer_first_name' => 'Camille',
+            'customer_email' => 'camille@example.com',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->travel(1)->hour();
+    $this->artisan('appointments:send-reminders')->assertSuccessful();
+
+    expect(Appointment::query()->firstOrFail()->status)->toBe(AppointmentStatus::Pending);
+    Mail::assertNothingQueued();
 });

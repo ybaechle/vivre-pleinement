@@ -42,12 +42,16 @@ class Appointment extends Model
     use HasFactory;
 
     /**
+     * Seul le tunnel de paiement déclare un rendez-vous impayé : par défaut
+     * (création depuis l'admin), il échappe ainsi au nettoyage des paniers
+     * abandonnés.
+     *
      * @var array<string, mixed>
      */
     protected $attributes = [
         'status' => 'confirmed',
         'price_cents' => 0,
-        'payment_status' => 'unpaid',
+        'payment_status' => 'not_required',
         'channel' => 'video',
     ];
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Admin\Resources\DateOverrides\Pages\CreateDateOverride;
 use App\Filament\Admin\Resources\DateOverrides\Pages\ListDateOverrides;
 use App\Models\DateOverride;
 use App\Models\User;
@@ -78,3 +79,31 @@ it('blocks the current day from the quick action', function () {
         ->whereDate('date', CarbonImmutable::now()->toDateString())
         ->exists())->toBeTrue();
 });
+
+it('refuses a partial closure with only one of its two times', function (array $times) {
+    $from = CarbonImmutable::now()->addDays(10)->startOfDay();
+
+    Livewire::test(ListDateOverrides::class)
+        ->callAction('blockPeriod', array_merge([
+            'from' => $from->toDateString(),
+            'to' => $from->toDateString(),
+        ], $times))
+        ->assertHasFormErrors();
+
+    expect(DateOverride::query()->count())->toBe(0);
+})->with([
+    'start only' => [['start_time' => '09:00']],
+    'end only' => [['end_time' => '12:00']],
+]);
+
+it('refuses a single blocking with only one of its two times', function (array $times) {
+    Livewire::test(CreateDateOverride::class)
+        ->fillForm(array_merge(['date' => CarbonImmutable::now()->addDays(10)->toDateString()], $times))
+        ->call('create')
+        ->assertHasFormErrors();
+
+    expect(DateOverride::query()->count())->toBe(0);
+})->with([
+    'start only' => [['start_time' => '09:00']],
+    'end only' => [['end_time' => '12:00']],
+]);

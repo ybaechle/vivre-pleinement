@@ -62,6 +62,7 @@ class ListDateOverrides extends ListRecords
                 TimePicker::make('start_time')
                     ->label('Heure de début')
                     ->seconds(false)
+                    ->requiredWith('end_time')
                     ->helperText('Laissez vide pour bloquer les journées '
                         .'entières.'),
                 TimePicker::make('end_time')

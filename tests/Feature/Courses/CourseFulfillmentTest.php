@@ -3,6 +3,7 @@
 use App\Enums\EnrollmentStatus;
 use App\Mail\CourseAccessGranted;
 use App\Mail\CoursePurchaseNotification;
+use App\Models\Appointment;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
@@ -119,12 +120,13 @@ it('ignore un webhook d\'un autre type', function () {
 it('ne touche pas aux inscriptions lorsqu\'un webhook concerne un rendez-vous', function () {
     Mail::fake();
     $enrollment = pendingEnrollment();
+    $appointment = Appointment::factory()->create();
 
     event(new WebhookReceived([
         'type' => 'payment_intent.succeeded',
         'data' => ['object' => [
             'id' => 'pi_appointment',
-            'metadata' => ['appointment_id' => 999999],
+            'metadata' => ['appointment_id' => $appointment->id],
         ]],
     ]));
 

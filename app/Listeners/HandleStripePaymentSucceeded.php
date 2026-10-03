@@ -65,11 +65,7 @@ class HandleStripePaymentSucceeded implements ShouldQueue
 
     private function fulfillAppointment(mixed $appointmentId, ?string $paymentIntentId): void
     {
-        $appointment = Appointment::query()->find($appointmentId);
-
-        if ($appointment !== null) {
-            $this->bookingPayments->fulfill($appointment, $paymentIntentId);
-        }
+        $this->bookingPayments->fulfill(Appointment::query()->findOrFail($appointmentId), $paymentIntentId);
     }
 
     /**
@@ -77,16 +73,12 @@ class HandleStripePaymentSucceeded implements ShouldQueue
      */
     private function fulfillEnrollment(mixed $enrollmentId, ?string $paymentIntentId, array $intent): void
     {
-        $enrollment = Enrollment::query()->find($enrollmentId);
-
-        if ($enrollment !== null) {
-            $this->coursePayments->fulfill(
-                $enrollment,
-                $paymentIntentId,
-                is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
-                is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
-            );
-        }
+        $this->coursePayments->fulfill(
+            Enrollment::query()->findOrFail($enrollmentId),
+            $paymentIntentId,
+            is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
+            is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
+        );
     }
 
     /**
@@ -94,16 +86,12 @@ class HandleStripePaymentSucceeded implements ShouldQueue
      */
     private function fulfillBookOrder(mixed $bookOrderId, ?string $paymentIntentId, array $intent): void
     {
-        $order = BookOrder::query()->find($bookOrderId);
-
-        if ($order !== null) {
-            $this->bookPayments->fulfill(
-                $order,
-                $paymentIntentId,
-                is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
-                is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
-            );
-        }
+        $this->bookPayments->fulfill(
+            BookOrder::query()->findOrFail($bookOrderId),
+            $paymentIntentId,
+            is_int($intent['amount_received'] ?? null) ? $intent['amount_received'] : null,
+            is_string($intent['currency'] ?? null) ? $intent['currency'] : null,
+        );
     }
 
     /**

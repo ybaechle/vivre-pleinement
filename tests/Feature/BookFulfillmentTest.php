@@ -4,6 +4,7 @@ use App\Enums\BookOrderStatus;
 use App\Mail\BookOrderConfirmation;
 use App\Mail\BookOrderNotification;
 use App\Models\BookOrder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
 
@@ -62,17 +63,17 @@ it('ignore un webhook dupliqué sans renvoyer les emails', function () {
     Mail::assertQueuedCount(2);
 });
 
-it('ignore un webhook dont la commande est inconnue', function () {
+it('échoue bruyamment sur un paiement dont la commande est introuvable', function () {
     Mail::fake();
     $order = BookOrder::factory()->create();
 
-    event(new WebhookReceived([
+    expect(fn () => event(new WebhookReceived([
         'type' => 'payment_intent.succeeded',
         'data' => ['object' => [
             'id' => 'pi_autre',
             'metadata' => ['book_order_id' => '999999'],
         ]],
-    ]));
+    ])))->toThrow(ModelNotFoundException::class);
 
     expect($order->fresh()->status)->toBe(BookOrderStatus::Pending);
 });

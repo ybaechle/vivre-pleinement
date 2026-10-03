@@ -89,6 +89,15 @@ it('active l\'inscription même si le cours a été supprimé entre le paiement 
     Mail::assertQueued(CourseAccessGranted::class);
 });
 
+it('rend les emails mis en file même si le cours a été supprimé entre-temps', function () {
+    $enrollment = pendingEnrollment();
+    $enrollment->course->delete();
+
+    $queued = unserialize(serialize(new CourseAccessGranted($enrollment->fresh())));
+
+    expect($queued->render())->toContain($enrollment->course->title);
+});
+
 it('rembourse automatiquement un second paiement arrivé sur une inscription déjà active', function () {
     Mail::fake();
     $enrollment = pendingEnrollment();

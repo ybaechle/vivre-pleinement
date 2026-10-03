@@ -71,6 +71,21 @@ it('moves an appointment and notifies the client when an admin reschedules', fun
     Mail::assertQueued(AppointmentRescheduled::class, 1);
 });
 
+it('still reschedules an appointment whose service has been deleted', function () {
+    $appointment = adminAppointment();
+    $appointment->service->delete();
+    $newStart = CarbonImmutable::now()->addDays(6)->setTime(15, 0);
+
+    Livewire::test(ListAppointments::class)
+        ->callAction(TestAction::make('reschedule')->table($appointment), data: [
+            'date' => $newStart->toDateString(),
+            'starts_at' => $newStart->toDateTimeString(),
+        ])
+        ->assertHasNoActionErrors();
+
+    expect($appointment->fresh()->starts_at->equalTo($newStart))->toBeTrue();
+});
+
 it('marks a past confirmed appointment as no-show and emails the client', function () {
     $past = CarbonImmutable::now()->subDay()->setTime(10, 0);
     $appointment = adminAppointment($past);

@@ -92,11 +92,14 @@ class Appointment extends Model
     }
 
     /**
+     * Inclut la prestation supprimée : les rendez-vous déjà pris restent
+     * consultables, déplaçables et notifiables.
+     *
      * @return BelongsTo<AppointmentService, $this>
      */
     public function service(): BelongsTo
     {
-        return $this->belongsTo(AppointmentService::class, 'appointment_service_id');
+        return $this->belongsTo(AppointmentService::class, 'appointment_service_id')->withTrashed();
     }
 
     /**

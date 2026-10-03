@@ -71,9 +71,7 @@ class CoursePaymentService
      * empêcher deux workers de traiter le même webhook en double (deux mails de
      * bienvenue). Le montant et la devise enregistrés viennent du payload
      * Stripe : c'est ce qui a réellement été payé, pas le prix courant du
-     * cours. Le cours est chargé withTrashed : un cours supprimé entre le
-     * paiement et le webhook ne doit pas faire échouer le job, l'élève ayant
-     * déjà payé.
+     * cours.
      *
      * Seules la vérification et la mise à jour du statut sont verrouillées :
      * l'appel réseau Stripe (remboursement) et l'envoi des mails se font après
@@ -94,7 +92,7 @@ class CoursePaymentService
                 return ['duplicate', $locked];
             }
 
-            $locked->loadMissing(['student', 'course' => fn ($query) => $query->withTrashed()]);
+            $locked->loadMissing(['student', 'course']);
 
             $locked->update([
                 'status' => EnrollmentStatus::Active,
@@ -115,12 +113,9 @@ class CoursePaymentService
 
     private function sendAccessGranted(Enrollment $enrollment): void
     {
-        $fresh = $enrollment->fresh(['student']);
-        $fresh->setRelation('course', $enrollment->course);
-
-        Mail::to($enrollment->student->email)->send(new CourseAccessGranted($fresh));
+        Mail::to($enrollment->student->email)->send(new CourseAccessGranted($enrollment));
         Mail::to(SiteContact::notifyEmail())
-            ->send(new CoursePurchaseNotification($fresh));
+            ->send(new CoursePurchaseNotification($enrollment));
     }
 
     /**

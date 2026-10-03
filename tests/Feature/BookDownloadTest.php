@@ -30,6 +30,16 @@ it('sert le fichier à une commande payée via un lien signé', function () {
         ->assertDownload('livre.pdf');
 });
 
+it('sert encore le fichier quand le produit a été retiré du catalogue', function () {
+    $order = BookOrder::factory()->paid()->create();
+    attachDownloadable($order);
+    $order->product->delete();
+
+    $this->get($order->downloadUrl())
+        ->assertOk()
+        ->assertDownload('livre.pdf');
+});
+
 it('refuse le téléchargement à une commande non payée', function () {
     $order = BookOrder::factory()->create();
     attachDownloadable($order);

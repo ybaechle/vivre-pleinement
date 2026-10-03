@@ -46,9 +46,9 @@ class CoursesTable
                     ->label('Statut')
                     ->badge()
                     ->sortable(),
-                TextColumn::make('price')
+                TextColumn::make('price_cents')
                     ->label('Prix')
-                    ->money('eur')
+                    ->money('EUR', divideBy: 100)
                     ->sortable(),
                 TextColumn::make('enrollments_count')
                     ->label('Ventes')

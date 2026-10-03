@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Filament\Admin\Resources\Posts\PostResource;
 use App\Models\Post;
 use Filament\Actions\Action;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
@@ -47,7 +48,7 @@ class LatestPosts extends TableWidget
                 Action::make('edit')
                     ->label('Modifier')
                     ->icon('heroicon-o-pencil-square')
-                    ->url(fn ($record) => route('filament.admin.resources.posts.edit', $record)),
+                    ->url(fn ($record) => PostResource::getUrl('edit', ['record' => $record])),
             ]);
     }
 }

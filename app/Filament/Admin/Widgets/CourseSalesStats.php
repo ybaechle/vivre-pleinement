@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Filament\Admin\Resources\Enrollments\EnrollmentResource;
 use App\Models\Course;
 use App\Models\Enrollment;
 use Filament\Widgets\StatsOverviewWidget;
@@ -33,7 +34,7 @@ class CourseSalesStats extends StatsOverviewWidget
                 ->description('Ventes confirmées')
                 ->descriptionIcon('heroicon-m-banknotes')
                 ->color('success')
-                ->url(route('filament.admin.resources.enrollments.index')),
+                ->url(EnrollmentResource::getUrl()),
 
             Stat::make('Ventes (30 derniers jours)', $salesLast30Days)
                 ->description('Nouvelles inscriptions')

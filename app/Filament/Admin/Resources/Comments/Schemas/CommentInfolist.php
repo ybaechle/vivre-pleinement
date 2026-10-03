@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Comments\Schemas;
 
+use App\Filament\Admin\Resources\Posts\PostResource;
 use App\Models\Comment;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -31,7 +32,7 @@ class CommentInfolist
                         ->label('Sous l\'article')
                         ->placeholder('Article supprimé')
                         ->url(fn (Comment $record) => $record->post
-                            ? route('filament.admin.resources.posts.edit', $record->post)
+                            ? PostResource::getUrl('edit', ['record' => $record->post])
                             : null)
                         ->columnSpan(2),
 

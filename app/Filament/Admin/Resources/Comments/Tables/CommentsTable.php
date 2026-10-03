@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Comments\Tables;
 
 use App\Enums\CommentStatus;
+use App\Filament\Admin\Resources\Posts\PostResource;
 use App\Models\Comment;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -48,7 +49,7 @@ class CommentsTable
                     ->label('Article')
                     ->limit(40)
                     ->url(fn (Comment $record) => $record->post
-                        ? route('filament.admin.resources.posts.edit', $record->post)
+                        ? PostResource::getUrl('edit', ['record' => $record->post])
                         : null)
                     ->color('primary'),
 

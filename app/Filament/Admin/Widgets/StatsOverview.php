@@ -5,6 +5,10 @@ namespace App\Filament\Admin\Widgets;
 use App\Enums\AppointmentStatus;
 use App\Enums\CommentStatus;
 use App\Enums\PostStatus;
+use App\Filament\Admin\Resources\Appointments\AppointmentResource;
+use App\Filament\Admin\Resources\Comments\CommentResource;
+use App\Filament\Admin\Resources\Posts\PostResource;
+use App\Filament\Admin\Resources\Products\ProductResource;
 use App\Models\Appointment;
 use App\Models\Comment;
 use App\Models\Post;
@@ -58,7 +62,7 @@ class StatsOverview extends StatsOverviewWidget
                 ? 'heroicon-m-exclamation-triangle'
                 : 'heroicon-m-calendar-days')
             ->color($pending > 0 ? 'warning' : 'success')
-            ->url(route('filament.admin.resources.appointments.index'));
+            ->url(AppointmentResource::getUrl());
     }
 
     private function pendingComments(): Stat
@@ -73,7 +77,7 @@ class StatsOverview extends StatsOverviewWidget
                 ? 'heroicon-m-chat-bubble-left-right'
                 : 'heroicon-m-check-circle')
             ->color($pending > 0 ? 'warning' : 'gray')
-            ->url(route('filament.admin.resources.comments.index'));
+            ->url(CommentResource::getUrl());
     }
 
     private function posts(): Stat
@@ -87,7 +91,7 @@ class StatsOverview extends StatsOverviewWidget
                 : 'Aucun brouillon en attente')
             ->descriptionIcon('heroicon-m-document-text')
             ->color('success')
-            ->url(route('filament.admin.resources.posts.index'));
+            ->url(PostResource::getUrl());
     }
 
     private function products(): Stat
@@ -98,6 +102,6 @@ class StatsOverview extends StatsOverviewWidget
             ->description('Visibles sur la boutique')
             ->descriptionIcon('heroicon-m-shopping-bag')
             ->color('primary')
-            ->url(route('filament.admin.resources.products.index'));
+            ->url(ProductResource::getUrl());
     }
 }

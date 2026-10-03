@@ -147,6 +147,31 @@ it('offers a course to a student and opens the access straight away', function (
     Mail::assertQueued(CourseAccessGranted::class);
 });
 
+it('reopens a refunded enrollment when the course is offered again', function () {
+    $student = Student::factory()->create();
+    $course = Course::factory()->create();
+    Enrollment::factory()->create([
+        'student_id' => $student->id,
+        'course_id' => $course->id,
+        'status' => EnrollmentStatus::Refunded,
+        'stripe_payment_intent_id' => 'pi_rembourse',
+    ]);
+
+    Livewire::test(EnrollmentsRelationManager::class, [
+        'ownerRecord' => $student,
+        'pageClass' => ViewStudent::class,
+    ])
+        ->callAction(TestAction::make('grantAccess')->table(), [
+            'course_id' => $course->id,
+            'notify' => false,
+        ])
+        ->assertHasNoActionErrors();
+
+    expect($student->enrollments()->count())->toBe(1)
+        ->and($student->fresh()->hasAccessTo($course))->toBeTrue()
+        ->and($student->enrollments()->first()->stripe_payment_intent_id)->toBeNull();
+});
+
 it('never offers a course the student already has access to', function () {
     $student = Student::factory()->create();
     $owned = Course::factory()->create();

@@ -18,11 +18,15 @@ class CourseController extends Controller
 
         $course->load('modules.lessons');
 
+        $lessons = $course->modules->flatMap->lessons;
+        $completedLessonIds = $this->completedLessonIds($student, $course);
+
         return view('student.course', [
             'course' => $course,
-            'completedLessonIds' => $this->completedLessonIds($student, $course),
+            'completedLessonIds' => $completedLessonIds,
             'progress' => CourseProgress::percent($student, $course),
-            'firstLesson' => $course->modules->flatMap->lessons->first(),
+            'resumeLesson' => $lessons->first(fn (Lesson $lesson): bool => ! in_array($lesson->id, $completedLessonIds, true))
+                ?? $lessons->first(),
         ]);
     }
 

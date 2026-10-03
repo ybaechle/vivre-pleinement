@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Modules\RelationManagers;
 
+use App\Models\Lesson;
 use App\Support\VideoEmbed;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -100,7 +101,7 @@ class LessonsRelationManager extends RelationManager
                     ->state(fn ($record): bool => filled($record->video_id)),
                 TextColumn::make('duration_seconds')
                     ->label('Durée')
-                    ->formatStateUsing(fn (?int $state): string => $state ? gmdate('i:s', $state) : '–')
+                    ->formatStateUsing(fn (Lesson $record): string => $record->durationFormatted() ?? '–')
                     ->color('gray'),
             ])
             ->headerActions([

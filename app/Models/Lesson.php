@@ -59,6 +59,19 @@ class Lesson extends Model
         return $this->belongsTo(Module::class);
     }
 
+    /**
+     * Durée au format minutes:secondes, avec les heures au-delà d'une heure
+     * (gmdate('i:s') seul afficherait 3 700 s comme « 01:40 »).
+     */
+    public function durationFormatted(): ?string
+    {
+        if (! $this->duration_seconds) {
+            return null;
+        }
+
+        return gmdate($this->duration_seconds >= 3600 ? 'G:i:s' : 'i:s', $this->duration_seconds);
+    }
+
     public function embedUrl(): ?string
     {
         if ($this->video_id === null) {

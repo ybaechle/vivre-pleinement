@@ -99,3 +99,19 @@ it('404 sur une leçon d\'une autre formation, même avec une inscription valide
         ->get(route('student.lesson', [$course, $otherLesson]))
         ->assertNotFound();
 });
+
+it('reprend la formation à la première leçon non terminée et affiche les durées longues', function () {
+    $course = Course::factory()->create();
+    $module = Module::factory()->create(['course_id' => $course->id]);
+    $done = Lesson::factory()->create(['module_id' => $module->id, 'position' => 1]);
+    $next = Lesson::factory()->create(['module_id' => $module->id, 'position' => 2, 'duration_seconds' => 3700]);
+    $student = Student::factory()->create();
+    Enrollment::factory()->create(['student_id' => $student->id, 'course_id' => $course->id]);
+    $student->lessonProgress()->create(['lesson_id' => $done->id, 'completed_at' => now()]);
+
+    $this->actingAs($student, 'student')
+        ->get(route('student.course', $course))
+        ->assertOk()
+        ->assertSeeInOrder([route('student.lesson', [$course, $next]), 'Reprendre la formation'], false)
+        ->assertSee('1:01:40');
+});

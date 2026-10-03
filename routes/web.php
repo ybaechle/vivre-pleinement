@@ -74,7 +74,6 @@ Route::prefix('reservation')->name('booking.')->controller(BookingController::cl
     Route::get('/', 'index')->name('index');
     Route::get('confirmation/{appointment:token}', 'confirmation')->name('confirmation');
     Route::get('confirmation/{appointment:token}/agenda.ics', 'ics')->name('ics');
-    Route::get('paiement-annule/{appointment:token}', 'paymentCancelled')->name('paymentCancelled');
     Route::get('payer/{appointment:token}', 'pay')->name('pay');
     Route::get('gerer/{appointment:token}', 'manage')->name('manage');
     Route::post('gerer/{appointment:token}/annuler', 'cancel')->name('cancel');

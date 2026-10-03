@@ -76,17 +76,6 @@ class BookingController extends Controller
     }
 
     /**
-     * Paiement abandonné : on conserve le rendez-vous (impayé) mais on en
-     * informe le visiteur.
-     */
-    public function paymentCancelled(Appointment $appointment): View
-    {
-        $appointment->load('service');
-
-        return view('booking.payment-cancelled', ['appointment' => $appointment]);
-    }
-
-    /**
      * Page d'autogestion (via le token secret) : consulter, annuler ou
      * reprogrammer le rendez-vous.
      */

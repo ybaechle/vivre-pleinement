@@ -23,7 +23,7 @@ class AppointmentServiceFactory extends Factory
             'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1, 100000),
             'description' => fake()->sentence(),
             'duration_minutes' => fake()->randomElement([30, 45, 60]),
-            'price_cents' => fake()->randomElement([0, 5000, 8000]),
+            'price_cents' => 0,
             'currency' => 'EUR',
             'buffer_minutes' => 0,
             'min_notice_hours' => 12,
@@ -32,10 +32,5 @@ class AppointmentServiceFactory extends Factory
             'is_active' => true,
             'sort_order' => 0,
         ];
-    }
-
-    public function requiresConfirmation(): static
-    {
-        return $this->state(fn () => ['requires_confirmation' => true]);
     }
 }

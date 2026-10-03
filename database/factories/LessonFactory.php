@@ -31,9 +31,4 @@ class LessonFactory extends Factory
             'is_free_preview' => false,
         ];
     }
-
-    public function freePreview(): static
-    {
-        return $this->state(fn () => ['is_free_preview' => true]);
-    }
 }

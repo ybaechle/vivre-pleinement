@@ -34,9 +34,4 @@ class AvailabilityFactory extends Factory
     {
         return $this->state(fn () => ['appointment_service_id' => $service->id]);
     }
-
-    public function inactive(): static
-    {
-        return $this->state(fn () => ['is_active' => false]);
-    }
 }

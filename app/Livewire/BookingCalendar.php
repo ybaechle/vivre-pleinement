@@ -15,6 +15,7 @@ use App\Services\AppointmentSlotService;
 use App\Support\Settings;
 use App\Support\SiteContact;
 use Carbon\CarbonImmutable;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
@@ -169,23 +170,10 @@ class BookingCalendar extends Component
             ->all();
     }
 
-    /**
-     * Parse défensivement la date sélectionnée : une propriété publique
-     * Livewire reste modifiable côté client, donc une valeur qui n'est pas
-     * une date ne doit jamais faire planter le rendu.
-     */
     #[Computed]
     public function selectedDateStart(): ?CarbonImmutable
     {
-        if (! $this->selectedDate) {
-            return null;
-        }
-
-        try {
-            return CarbonImmutable::parse($this->selectedDate);
-        } catch (\Throwable) {
-            return null;
-        }
+        return $this->parseClientDate($this->selectedDate);
     }
 
     public function previousMonth(): void
@@ -399,21 +387,27 @@ class BookingCalendar extends Component
         return app(AppointmentSlotService::class);
     }
 
-    /**
-     * Parse défensivement le créneau sélectionné : une propriété publique
-     * Livewire reste modifiable côté client (wire:model / $set), donc une
-     * valeur qui n'est pas une date ne doit jamais faire planter le rendu.
-     */
     #[Computed]
     public function selectedSlotStart(): ?CarbonImmutable
     {
-        if (! $this->selectedSlot) {
+        return $this->parseClientDate($this->selectedSlot);
+    }
+
+    /**
+     * Une propriété publique Livewire reste modifiable côté client : une valeur
+     * qui n'est pas une date ne doit pas faire planter le rendu, et un décalage
+     * horaire choisi par le client (`+00:00`) est ramené au fuseau du site,
+     * sinon Eloquent enregistrerait l'heure murale de ce décalage.
+     */
+    private function parseClientDate(?string $value): ?CarbonImmutable
+    {
+        if (! $value) {
             return null;
         }
 
         try {
-            return CarbonImmutable::parse($this->selectedSlot);
-        } catch (\Throwable) {
+            return CarbonImmutable::parse($value)->setTimezone(config('app.timezone'));
+        } catch (InvalidFormatException) {
             return null;
         }
     }

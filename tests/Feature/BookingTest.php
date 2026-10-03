@@ -202,6 +202,23 @@ it('rejects a non-date selectedSlot as a validation error instead of a 500', fun
     expect(Appointment::query()->count())->toBe(0);
 });
 
+it('stores the slot in the site timezone whatever offset the client sends', function () {
+    Mail::fake();
+    $service = bookableService(['requires_confirmation' => false]);
+    $slot = futureSlot();
+
+    Livewire::test(BookingCalendar::class, ['service' => $service])
+        ->set('selectedSlot', $slot->utc()->toIso8601String())
+        ->set('firstName', 'Camille')
+        ->set('email', 'camille@gmail.com')
+        ->set('consent', true)
+        ->call('book')
+        ->assertRedirect();
+
+    expect(Appointment::query()->firstOrFail()->starts_at->format('Y-m-d H:i'))
+        ->toBe($slot->format('Y-m-d H:i'));
+});
+
 it('rejects an unavailable slot', function () {
     Mail::fake();
     $service = bookableService();

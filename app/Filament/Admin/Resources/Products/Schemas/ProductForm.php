@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Products\Schemas;
 
+use App\Support\SlugFromTitle;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -12,7 +13,6 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Str;
 
 class ProductForm
 {
@@ -30,11 +30,7 @@ class ProductForm
                                 ->label('Nom')
                                 ->required()
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function (string $state, callable $set, $record) {
-                                    if (! $record) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
+                                ->afterStateUpdated(SlugFromTitle::onCreate())
                                 ->columnSpanFull(),
 
                             TextInput::make('slug')

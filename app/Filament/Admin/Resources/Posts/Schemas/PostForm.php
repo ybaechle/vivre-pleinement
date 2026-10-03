@@ -6,6 +6,7 @@ use App\Enums\PostStatus;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Support\SlugFromTitle;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -42,11 +43,7 @@ class PostForm
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function (string $state, callable $set, $record) {
-                                    if (! $record) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
+                                ->afterStateUpdated(SlugFromTitle::onCreate())
                                 ->extraAttributes(['class' => 'text-xl'])
                                 ->columnSpanFull(),
 

@@ -116,7 +116,8 @@ class HandleStripePaymentSucceeded implements ShouldQueue
         report($exception);
 
         Log::critical('Échec définitif du traitement de payment_intent.succeeded : paiement capté mais rendez-vous/inscription non fulfillé.', [
-            'payload' => $event->payload,
+            'event_id' => $event->payload['id'] ?? null,
+            'payment_intent' => $event->payload['data']['object']['id'] ?? null,
             'exception' => $exception->getMessage(),
         ]);
     }

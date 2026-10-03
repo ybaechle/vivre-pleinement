@@ -3,6 +3,7 @@
 use App\Jobs\SubscribeToNewsletterJob;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -117,4 +118,15 @@ it('renders the confirmation page', function () {
     $this->get(route('newsletter.confirmed'))
         ->assertOk()
         ->assertSee('Inscription confirmée');
+});
+
+it('logs a definitive Brevo failure without the visitor email', function () {
+    Log::spy();
+
+    (new SubscribeToNewsletterJob('camille@gmail.com', 'Camille', 'https://example.com'))
+        ->failed(new RuntimeException('Brevo indisponible'));
+
+    Log::shouldHaveReceived('error')->once()->withArgs(
+        fn (string $message, array $context) => ! str_contains(json_encode($context), 'camille@gmail.com'),
+    );
 });

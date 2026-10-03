@@ -85,8 +85,9 @@ class HandleStripeChargeRefunded implements ShouldQueue
     {
         report($exception);
 
-        Log::critical('Échec définitif du traitement de charge.refunded : accès formation potentiellement non révoqué.', [
-            'payload' => $event->payload,
+        Log::critical('Échec définitif du traitement de charge.refunded : achat potentiellement non révoqué.', [
+            'event_id' => $event->payload['id'] ?? null,
+            'payment_intent' => $event->payload['data']['object']['payment_intent'] ?? null,
             'exception' => $exception->getMessage(),
         ]);
     }

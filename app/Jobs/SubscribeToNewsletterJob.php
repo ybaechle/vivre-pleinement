@@ -52,7 +52,6 @@ class SubscribeToNewsletterJob implements ShouldBeUnique, ShouldQueue
     public function failed(Throwable $exception): void
     {
         Log::error('Inscription newsletter Brevo définitivement échouée.', [
-            'email' => $this->email,
             'exception' => $exception->getMessage(),
         ]);
     }

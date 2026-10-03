@@ -150,7 +150,7 @@ Route::prefix('espace-formation')->name('student.')->middleware(['auth:student',
     Route::get('/compte', [StudentAccountController::class, 'edit'])->name('account.edit');
     Route::patch('/compte/profil', [StudentAccountController::class, 'updateProfile'])->name('account.profile');
     Route::put('/compte/mot-de-passe', [StudentAccountController::class, 'updatePassword'])->name('account.password');
-    Route::delete('/compte', [StudentDashboardController::class, 'destroy'])->name('account.destroy');
+    Route::delete('/compte', [StudentAccountController::class, 'destroy'])->name('account.destroy');
 
     /**
      * Contenu réservé aux comptes vérifiés.

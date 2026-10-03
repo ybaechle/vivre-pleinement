@@ -137,3 +137,11 @@ it('cancels through the lifecycle when the admin switches the status in the form
     expect($appointment->fresh()->cancelled_at)->not->toBeNull();
     Mail::assertQueued(AppointmentCancelled::class, fn ($mail) => $mail->hasTo($appointment->customer_email));
 });
+
+it('accepts the phone formats the public booking form lets through', function (string $phone) {
+    $appointment = Appointment::factory()->create(['customer_phone' => $phone]);
+
+    Livewire::test(EditAppointment::class, ['record' => $appointment->getRouteKey()])
+        ->call('save')
+        ->assertHasNoFormErrors(['customer_phone']);
+})->with(['+33 (0)1 55 68 15 18', '06 99 22 63 00', '0523028267']);

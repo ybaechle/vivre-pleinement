@@ -126,7 +126,9 @@ class AppointmentForm
 
                     TextInput::make('customer_phone')
                         ->label('Téléphone')
-                        ->tel(),
+                        ->tel()
+                        // Le formulaire public accepte « +33 (0)1 … » : l'admin doit pouvoir réenregistrer ces fiches.
+                        ->telRegex('/^[+()\d\s.\/-]{6,30}$/'),
 
                     Textarea::make('notes')
                         ->label('Message / notes')

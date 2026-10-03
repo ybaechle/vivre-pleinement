@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @php
+    use App\Support\Duration;
     use Illuminate\Support\Str;
 
     $category = $video->categories->first();
@@ -153,9 +154,7 @@
                                rel="noopener noreferrer"
                                class="flex items-center gap-4 px-5 py-3 text-sm transition hover:bg-teal-50">
                                 <span class="font-mono text-xs font-medium text-teal-700 tabular-nums">
-                                    {{ $video->durationFormatted() && $chapter['startOffset'] >= 3600
-                                        ? sprintf('%d:%02d:%02d', intdiv($chapter['startOffset'], 3600), intdiv($chapter['startOffset'] % 3600, 60), $chapter['startOffset'] % 60)
-                                        : sprintf('%d:%02d', intdiv($chapter['startOffset'], 60), $chapter['startOffset'] % 60) }}
+                                    {{ Duration::clock($chapter['startOffset']) }}
                                 </span>
                                 <span class="text-ink">{{ $chapter['name'] }}</span>
                             </a>

@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Videos\Schemas;
 use App\Enums\VideoStatus;
 use App\Models\Category;
 use App\Models\Video;
+use App\Support\Duration;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
@@ -185,7 +186,7 @@ class VideoForm
                                 ])
                                 ->columns(2)
                                 ->itemLabel(fn (array $state): ?string => isset($state['start_seconds'], $state['title'])
-                                    ? sprintf('%s – %s', self::formatSeconds((int) $state['start_seconds']), $state['title'])
+                                    ? sprintf('%s – %s', Duration::clock((int) $state['start_seconds']), $state['title'])
                                     : null)
                                 ->collapsible()
                                 ->collapsed()
@@ -356,16 +357,5 @@ class VideoForm
                 }
                 $record->update(['sync_locked_fields' => $locked]);
             });
-    }
-
-    private static function formatSeconds(int $seconds): string
-    {
-        $h = intdiv($seconds, 3600);
-        $m = intdiv($seconds % 3600, 60);
-        $s = $seconds % 60;
-
-        return $h > 0
-            ? sprintf('%d:%02d:%02d', $h, $m, $s)
-            : sprintf('%d:%02d', $m, $s);
     }
 }

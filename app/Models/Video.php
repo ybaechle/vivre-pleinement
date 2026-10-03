@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\VideoStatus;
 use App\Observers\VideoObserver;
+use App\Support\Duration;
 use Database\Factories\VideoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -275,12 +276,6 @@ class Video extends Model
             return null;
         }
 
-        $h = intdiv($this->duration_seconds, 3600);
-        $m = intdiv($this->duration_seconds % 3600, 60);
-        $s = $this->duration_seconds % 60;
-
-        return $h > 0
-            ? sprintf('%d:%02d:%02d', $h, $m, $s)
-            : sprintf('%d:%02d', $m, $s);
+        return Duration::clock($this->duration_seconds);
     }
 }

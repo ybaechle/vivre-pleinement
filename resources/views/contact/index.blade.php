@@ -64,9 +64,9 @@
                         </p>
                     @endif
 
-                    @if ($errors->has('message') && ! $errors->has('first_name'))
+                    @if ($errors->hasAny(['throttle', 'ts']))
                         <p class="bg-rose-soft/40 text-ink ring-rose-soft mb-6 rounded-2xl px-4 py-3 text-sm ring-1">
-                            {{ $errors->first('message') }}
+                            {{ $errors->first('throttle') ?: $errors->first('ts') }}
                         </p>
                     @endif
 

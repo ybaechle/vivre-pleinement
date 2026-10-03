@@ -142,7 +142,7 @@
                         <label for="nl_email" class="sr-only">Votre email</label>
                         <input type="email" id="nl_email" name="email" value="{{ old('email') }}" required placeholder="Votre adresse email" autocomplete="email" class="bg-cream-100/70 text-ink placeholder:text-ink-muted w-full rounded-2xl border-0 px-5 py-3.5 text-sm focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-hidden">
                         @error('first_name')<p class="text-xs text-rose-700">{{ $message }}</p>@enderror
-                        <p data-newsletter-error role="alert" aria-live="polite" class="text-xs text-rose-700" @unless ($errors->has('email')) hidden @endunless>@error('email'){{ $message }}@enderror</p>
+                        <p data-newsletter-error role="alert" aria-live="polite" class="text-xs text-rose-700" @unless ($errors->hasAny(['email', 'ts'])) hidden @endunless>{{ $errors->first('email') ?: $errors->first('ts') }}</p>
                         <button type="submit" class="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60">
                             Recevoir la vidéo
                         </button>

@@ -139,3 +139,13 @@ it('fails the audit when a category has no pillar', function () {
 
     $this->artisan('seo:maillage')->assertExitCode(1);
 });
+
+it('refreshes the similar block of an article outside the cluster of a new publication', function () {
+    $post = Post::factory()->create(['status' => 'published']);
+    $post->categories()->attach(Category::factory()->create());
+    InternalLinking::similar($post);
+
+    $newcomer = Post::factory()->create(['status' => 'published', 'published_at' => now()]);
+
+    expect(InternalLinking::similar($post)->pluck('id'))->toContain($newcomer->id);
+});

@@ -23,7 +23,6 @@ class YoutubeCaptions
     private ?string $accessToken = null;
 
     public function __construct(
-        private readonly ?string $apiKey,
         private readonly ?string $clientId,
         private readonly ?string $clientSecret,
         private readonly ?string $refreshToken,
@@ -32,7 +31,6 @@ class YoutubeCaptions
     public static function fromConfig(): self
     {
         return new self(
-            apiKey: config('services.youtube.api_key'),
             clientId: config('services.youtube.oauth_client_id'),
             clientSecret: config('services.youtube.oauth_client_secret'),
             refreshToken: config('services.youtube.oauth_refresh_token'),

@@ -48,13 +48,4 @@ class BookOffers
             ->where('is_active', true)
             ->first();
     }
-
-    /**
-     * Prix affichable d'une offre, ou le repli fourni quand le produit
-     * n'existe pas encore en base.
-     */
-    public function price(string $slug, float $fallback): float
-    {
-        return $this->find($slug)?->price ?? $fallback;
-    }
 }

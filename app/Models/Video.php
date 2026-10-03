@@ -257,13 +257,13 @@ class Video extends Model
         return 'https://www.youtube-nocookie.com/embed/'.$this->youtube_id;
     }
 
-    public function thumbnail(string $size = 'maxres'): string
+    public function thumbnail(): string
     {
         if ($this->thumbnail_url) {
             return $this->thumbnail_url;
         }
 
-        return "https://i.ytimg.com/vi/{$this->youtube_id}/{$size}default.jpg";
+        return "https://i.ytimg.com/vi/{$this->youtube_id}/maxresdefault.jpg";
     }
 
     public function durationFormatted(): ?string

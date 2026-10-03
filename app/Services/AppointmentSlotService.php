@@ -172,7 +172,7 @@ class AppointmentSlotService
                 }
 
                 foreach ($overrides as $override) {
-                    if ($this->overlapsOverride($slot, $override, $slot['start'])) {
+                    if ($this->overlapsOverride($slot['start'], $slot['end'], $override)) {
                         return true;
                     }
                 }
@@ -213,14 +213,7 @@ class AppointmentSlotService
             ->get();
 
         foreach ($overrides as $override) {
-            if ($override->isFullDay()) {
-                return false;
-            }
-
-            $blockStart = $this->applyTime($date, $override->start_time);
-            $blockEnd = $this->applyTime($date, $override->end_time);
-
-            if ($start->lessThan($blockEnd) && $end->greaterThan($blockStart)) {
+            if ($this->overlapsOverride($start, $end, $override)) {
                 return false;
             }
         }
@@ -382,16 +375,14 @@ class AppointmentSlotService
         return $slots;
     }
 
-    private function overlapsOverride(array $slot, DateOverride $override, CarbonImmutable $date): bool
+    private function overlapsOverride(CarbonImmutable $start, CarbonImmutable $end, DateOverride $override): bool
     {
         if ($override->isFullDay()) {
             return true;
         }
 
-        $blockStart = $this->applyTime($date, $override->start_time);
-        $blockEnd = $this->applyTime($date, $override->end_time);
-
-        return $slot['start']->lessThan($blockEnd) && $slot['end']->greaterThan($blockStart);
+        return $start->lessThan($this->applyTime($start, $override->end_time))
+            && $end->greaterThan($this->applyTime($start, $override->start_time));
     }
 
     private function applyTime(CarbonImmutable $date, string $time): CarbonImmutable

@@ -3,9 +3,7 @@
 namespace App\Filament\Admin\Resources\Posts\Schemas;
 
 use App\Enums\PostStatus;
-use App\Models\Category;
 use App\Models\Post;
-use App\Models\Tag;
 use App\Support\SlugFromTitle;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -22,6 +20,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -102,16 +101,15 @@ class PostForm
 
                             Select::make('categories')
                                 ->label('Catégories')
-                                ->relationship('categories', 'name')
+                                ->relationship('categories', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
-                                ->native(false)
-                                ->options(fn () => Category::orderBy('name')->pluck('name', 'id')),
+                                ->native(false),
 
                             Select::make('tags')
                                 ->label('Étiquettes')
-                                ->relationship('tags', 'name')
+                                ->relationship('tags', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
@@ -119,8 +117,7 @@ class PostForm
                                 ->createOptionForm([
                                     TextInput::make('name')->required(),
                                     TextInput::make('slug')->required(),
-                                ])
-                                ->options(fn () => Tag::orderBy('name')->pluck('name', 'id')),
+                                ]),
 
                             Toggle::make('comments_enabled')
                                 ->label('Commentaires ouverts')

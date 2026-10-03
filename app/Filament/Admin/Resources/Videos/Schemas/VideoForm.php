@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\Videos\Schemas;
 
 use App\Enums\VideoStatus;
-use App\Models\Category;
 use App\Models\Video;
 use App\Support\Duration;
 use Closure;
@@ -23,6 +22,7 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentAttributeBag;
 
@@ -242,8 +242,7 @@ class VideoForm
 
                             CheckboxList::make('categories')
                                 ->label('Catégories')
-                                ->relationship('categories', 'name')
-                                ->options(fn () => Category::orderBy('name')->pluck('name', 'id'))
+                                ->relationship('categories', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->columns(2)
                                 ->columnSpanFull(),
 

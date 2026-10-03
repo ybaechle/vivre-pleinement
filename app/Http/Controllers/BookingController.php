@@ -19,7 +19,7 @@ class BookingController extends Controller
 {
     public function index(AppointmentSlotService $slots): View
     {
-        $services = AppointmentService::query()->active()->orderBy('sort_order')->get();
+        $services = AppointmentService::query()->active()->get();
         $primaryService = $services->first();
 
         return view('booking.index', [

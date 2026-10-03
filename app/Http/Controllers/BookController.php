@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StartBookOrderFormRequest;
 use App\Models\AppointmentService;
 use App\Models\BookOrder;
 use App\Models\Product;
@@ -42,24 +43,10 @@ class BookController extends Controller
      * Crée la commande puis redirige vers le paiement. Le montant est figé
      * depuis le produit, jamais depuis la requête.
      */
-    public function start(Request $request, string $offer): RedirectResponse
+    public function start(StartBookOrderFormRequest $request, string $offer): RedirectResponse
     {
         $product = $this->resolveOffer($offer);
-
-        $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:80'],
-            'last_name' => ['required', 'string', 'max:80'],
-            'email' => ['required', 'email:rfc,dns', 'max:160'],
-            'consent' => ['accepted'],
-            'website' => ['prohibited'],
-        ], [
-            'first_name.required' => 'Votre prénom est requis.',
-            'last_name.required' => 'Votre nom est requis.',
-            'email.required' => 'Votre email est requis.',
-            'email.email' => 'Cet email n\'est pas valide.',
-            'consent.accepted' => 'Vous devez accepter le traitement de vos données.',
-            'website.prohibited' => 'Erreur de soumission.',
-        ]);
+        $validated = $request->validated();
 
         if ($this->isRateLimited($request)) {
             return back()
@@ -155,7 +142,7 @@ class BookController extends Controller
             return redirect()->route('booking.confirmation', $order->coachingAppointment->token);
         }
 
-        $service = AppointmentService::query()->where('is_active', true)->firstOrFail();
+        $service = AppointmentService::query()->active()->firstOrFail();
 
         return view('book.coaching', [
             'order' => $order,

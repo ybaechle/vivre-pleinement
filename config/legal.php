@@ -17,7 +17,6 @@ return [
         'name' => 'Vivre Pleinement',
         'domain' => env('LEGAL_SITE_DOMAIN', 'vivre-pleinement.fr'),
         'url' => env('APP_URL', 'https://vivre-pleinement.fr'),
-        'tagline' => 'Accompagnement spécialisé dans les troubles anxieux',
     ],
 
     'editor' => [
@@ -54,7 +53,6 @@ return [
     ],
 
     'cnil' => [
-        'website' => 'https://www.cnil.fr',
         'complaint_url' => 'https://www.cnil.fr/fr/plaintes',
     ],
 

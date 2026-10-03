@@ -3,7 +3,6 @@
     $contactEmail = \App\Support\SiteContact::email();
     $controller = config('legal.data_controller');
     $cnil = config('legal.cnil');
-    $site = config('legal.site');
 
     $title = 'Politique de confidentialité';
     $intro = "Nous attachons une grande importance au respect de votre vie privée. Cette politique décrit comment nous collectons, utilisons et protégeons vos données personnelles, conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679) et à la loi Informatique et Libertés modifiée.";

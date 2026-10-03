@@ -172,6 +172,32 @@ it('serves an ics calendar file for the appointment', function () {
         ->assertSee($appointment->reference, escape: false);
 });
 
+it('describes a phone appointment as such, with its real status, in the ics file', function () {
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => bookableService()->id,
+        'channel' => AppointmentChannel::Phone,
+        'status' => AppointmentStatus::Pending,
+    ]);
+
+    $this->get(route('booking.ics', $appointment->token))
+        ->assertOk()
+        ->assertSee('Rendez-vous par téléphone', escape: false)
+        ->assertDontSee('visioconférence', escape: false)
+        ->assertSee('STATUS:TENTATIVE', escape: false);
+});
+
+it('tells a phone client they will be called on the confirmation page', function () {
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => bookableService()->id,
+        'channel' => AppointmentChannel::Phone,
+    ]);
+
+    $this->get(route('booking.confirmation', $appointment->token))
+        ->assertOk()
+        ->assertSee('vous appelle au numéro indiqué', escape: false)
+        ->assertDontSee('Le lien de visioconférence vous est transmis', escape: false);
+});
+
 it('requires consent', function () {
     $service = bookableService();
     $slot = futureSlot();

@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @php
+    use App\Enums\AppointmentChannel;
     use Carbon\CarbonImmutable;
     use Illuminate\Support\Number;
 
@@ -31,7 +32,7 @@
                     <p class="text-ink font-serif text-xl font-medium">{{ Number::currency($appointment->price_cents / 100, in: 'EUR', locale: 'fr') }}</p>
                 </div>
                 <p class="text-ink-soft mt-1 text-sm">
-                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min, en visioconférence
+                    {{ $start->isoFormat('dddd D MMMM YYYY à H\hi') }} · {{ $appointment->service->duration_minutes }} min, {{ mb_strtolower($appointment->channel->getLabel()) }}
                 </p>
             </div>
 
@@ -79,7 +80,7 @@
                     </li>
                     <li class="inline-flex items-center gap-1.5">
                         <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>
-                        Lien visio envoyé après paiement
+                        {{ $appointment->channel === AppointmentChannel::Phone ? 'Appel au numéro indiqué' : 'Lien visio envoyé après paiement' }}
                     </li>
                 </ul>
             </form>

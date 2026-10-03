@@ -1,6 +1,7 @@
 @extends('layouts.site')
 
 @php
+    use App\Enums\AppointmentChannel;
     use App\Enums\AppointmentStatus;
     use App\Enums\PaymentStatus;
     use Carbon\CarbonImmutable;
@@ -29,7 +30,7 @@
         'action' => 'TEMPLATE',
         'text' => 'RDV - '.$appointment->service->name,
         'dates' => $gcalStart.'/'.$gcalEnd,
-        'details' => 'Rendez-vous en visioconférence avec Laura Baechlé. Référence : '.$appointment->reference,
+        'details' => 'Rendez-vous '.mb_strtolower($appointment->channel->getLabel()).' avec Laura Baechlé. Référence : '.$appointment->reference,
     ]);
 @endphp
 
@@ -120,7 +121,11 @@
                     </li>
                     <li class="flex items-center gap-3">
                         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 font-serif text-lg font-medium text-teal-700">2</span>
-                        Le lien de visioconférence vous est transmis avant le rendez-vous.
+                        @if ($appointment->channel === AppointmentChannel::Phone)
+                            Laura vous appelle au numéro indiqué à l'heure du rendez-vous.
+                        @else
+                            Le lien de visioconférence vous est transmis avant le rendez-vous.
+                        @endif
                     </li>
                     <li class="flex items-center gap-3">
                         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 font-serif text-lg font-medium text-teal-700">3</span>

@@ -62,22 +62,20 @@ class AppointmentForm
                         ->helperText('Calculée automatiquement selon la prestation. Ajustez si besoin.')
                         ->rule(function (Get $get, ?Appointment $record) {
                             return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
-                                $serviceId = $get('appointment_service_id');
                                 $startsAt = $get('starts_at');
 
-                                if (! $serviceId || ! $startsAt || ! $value) {
+                                if (! $startsAt || ! $value) {
                                     return;
                                 }
 
                                 $hasOverlap = app(AppointmentSlotService::class)->hasOverlap(
-                                    (int) $serviceId,
                                     Carbon::parse($startsAt),
                                     Carbon::parse($value),
                                     $record?->id,
                                 );
 
                                 if ($hasOverlap) {
-                                    $fail('Ce créneau chevauche un autre rendez-vous déjà réservé pour cette prestation.');
+                                    $fail('Ce créneau chevauche un autre rendez-vous déjà réservé.');
                                 }
                             };
                         }),

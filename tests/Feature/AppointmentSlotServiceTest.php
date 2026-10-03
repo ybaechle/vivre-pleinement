@@ -109,6 +109,25 @@ it('excludes slots overlapping an existing appointment', function () {
         ->and($slots)->toHaveCount(5);
 });
 
+it('excludes slots already booked for another service, the agenda being shared', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
+    $otherService = AppointmentService::factory()->create();
+
+    $start = $day->setTime(9, 0);
+    Appointment::factory()->create([
+        'appointment_service_id' => $otherService->id,
+        'starts_at' => $start,
+        'ends_at' => $start->addMinutes(30),
+        'status' => AppointmentStatus::Confirmed,
+    ]);
+
+    $slotService = app(AppointmentSlotService::class);
+
+    expect($slotService->slotsForDate($service, $day)->pluck('label'))->not->toContain('09:00')
+        ->and($slotService->reserve($service, $start, ['customer_first_name' => 'Camille', 'customer_email' => 'camille@example.com']))->toBeNull();
+});
+
 it('keeps slots when the overlapping appointment is cancelled', function () {
     $day = nextWeekday(3);
     $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');

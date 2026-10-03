@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Http\Requests\Concerns\ChecksSubmissionDelay;
+use App\Support\SiteContact;
+use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -17,7 +19,20 @@ class CommentFormRequest extends FormRequest
     {
         return [
             'author_name' => ['required', 'string', 'max:80'],
-            'author_email' => ['required', 'email:rfc,dns', 'max:160'],
+            'author_email' => [
+                'required',
+                'email:rfc,dns',
+                'max:160',
+                /**
+                 * Le badge « Auteure » est attribué sur cette adresse : un
+                 * visiteur ne doit pas pouvoir l'obtenir en la saisissant.
+                 */
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (mb_strtolower(trim((string) $value)) === mb_strtolower(trim(SiteContact::email()))) {
+                        $fail('Cette adresse est réservée à l\'auteure du site.');
+                    }
+                },
+            ],
             'content' => ['required', 'string', 'min:5', 'max:5000'],
             'consent' => ['accepted'],
             'website' => ['nullable', 'prohibited'],

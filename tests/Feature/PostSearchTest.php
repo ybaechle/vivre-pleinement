@@ -29,6 +29,19 @@ it('shows the featured post only on the unfiltered default view', function () {
         ->assertViewHas('featured', fn ($f) => $f === null);
 });
 
+it('never lists an article twice across the pages of the default view', function () {
+    foreach (range(1, 11) as $day) {
+        Post::factory()->create(['published_at' => now()->subDays($day)]);
+    }
+
+    $component = Livewire::test(PostSearch::class);
+    $firstPage = $component->viewData('posts')->pluck('id')->push($component->viewData('featured')->id);
+    $secondPage = $component->call('gotoPage', 2)->viewData('posts')->pluck('id');
+
+    expect($firstPage->intersect($secondPage))->toBeEmpty()
+        ->and($firstPage->merge($secondPage)->unique())->toHaveCount(11);
+});
+
 it('hides the featured post when sorting by oldest', function () {
     Post::factory()->count(3)->create();
 

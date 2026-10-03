@@ -49,7 +49,7 @@ it('renders the cancelled mail for both recipients', function () {
     $appointment = renderableAppointment();
 
     (new AppointmentCancelled($appointment))->assertSeeInHtml('Reprendre rendez-vous');
-    (new AppointmentCancelled($appointment, forAdmin: true))->assertSeeInHtml('annulé par le client');
+    (new AppointmentCancelled($appointment, forAdmin: true))->assertSeeInHtml('Le rendez-vous suivant a été annulé.');
 });
 
 it('renders the rescheduled mail with both slots for both recipients', function () {

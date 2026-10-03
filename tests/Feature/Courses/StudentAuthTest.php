@@ -123,3 +123,17 @@ it('redirige un visiteur non connecté vers la connexion élève', function () {
     $this->get(route('student.dashboard'))
         ->assertRedirect(route('student.login'));
 });
+
+it('ignore un paramètre course mal formé sur la page d\'inscription', function () {
+    $this->get(route('student.register', ['course' => ['x']]))->assertOk();
+});
+
+it('refuse une inscription dont le paramètre course est mal formé', function () {
+    $this->post(route('student.register.store'), [
+        'name' => 'Camille',
+        'email' => 'camille@example.com',
+        'password' => 'mot-de-passe-solide',
+        'password_confirmation' => 'mot-de-passe-solide',
+        'course' => ['x'],
+    ])->assertSessionHasErrors('course');
+});

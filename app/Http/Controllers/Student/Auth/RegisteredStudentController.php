@@ -16,14 +16,16 @@ class RegisteredStudentController extends Controller
 {
     public function create(Request $request): View
     {
+        $course = $request->query('course');
+
         return view('student.auth.register', [
-            'intendedCourse' => $request->query('course'),
+            'intendedCourse' => is_string($course) ? $course : null,
         ]);
     }
 
     public function store(RegisterStudentFormRequest $request): RedirectResponse
     {
-        $student = Student::create($request->validated());
+        $student = Student::create($request->safe()->except('course'));
 
         event(new Registered($student));
 
@@ -39,9 +41,9 @@ class RegisteredStudentController extends Controller
      * vérification, n'importe quelle valeur atterrirait dans l'URL de
      * redirection.
      */
-    private function intendedUrl(Request $request): string
+    private function intendedUrl(RegisterStudentFormRequest $request): string
     {
-        $courseSlug = $request->string('course')->trim()->value();
+        $courseSlug = trim((string) $request->validated('course'));
 
         if ($courseSlug !== '' && Course::query()->published()->where('slug', $courseSlug)->exists()) {
             return route('courses.show', $courseSlug);

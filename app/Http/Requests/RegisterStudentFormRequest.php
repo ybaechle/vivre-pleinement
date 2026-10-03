@@ -17,6 +17,7 @@ class RegisterStudentFormRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:students,email'],
             'password' => ['required', 'confirmed', Password::defaults()],
+            'course' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

@@ -3,6 +3,7 @@
 use App\Models\Post;
 use App\Support\IndexNow;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 it('pings the IndexNow API when a key is configured', function () {
     $this->withoutDefer();
@@ -60,4 +61,15 @@ it('defers the ping instead of blocking the save', function () {
     Post::factory()->create(['status' => 'published', 'published_at' => now()->subDay()]);
 
     Http::assertNothingSent();
+});
+
+it('logs a ping that IndexNow rejects', function () {
+    $this->withoutDefer();
+    config(['services.indexnow.key' => 'test-key-123']);
+    Http::fake(['api.indexnow.org/*' => Http::response('', 403)]);
+    Log::spy();
+
+    IndexNow::ping(url('/blog/test'));
+
+    Log::shouldHaveReceived('warning')->once()->withArgs(fn (string $message) => $message === 'IndexNow ping failed');
 });

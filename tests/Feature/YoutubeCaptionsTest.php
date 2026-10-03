@@ -2,6 +2,7 @@
 
 use App\Models\Video;
 use App\Services\YoutubeCaptions;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
 
@@ -176,4 +177,19 @@ it('surfaces a RuntimeException instead of an uncaught RequestException when cap
 
     expect(fn () => $captions->listTracks('abc123'))
         ->toThrow(RuntimeException::class, 'Échec du listing des sous-titres');
+});
+
+it('reports a failed video and exits in failure instead of claiming success', function () {
+    Sleep::fake();
+    Exceptions::fake();
+    Video::factory()->create(['youtube_id' => 'boom', 'duration_seconds' => 600, 'transcript' => null]);
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['access_token' => 'tok', 'expires_in' => 3600]),
+        '*/captions?*' => Http::response(['error' => 'forbidden'], 403),
+    ]);
+
+    $this->artisan('youtube:fetch-transcripts')->assertFailed();
+
+    Exceptions::assertReported(RuntimeException::class);
 });

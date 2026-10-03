@@ -4,10 +4,10 @@ namespace App\Console\Commands\Videos;
 
 use App\Models\Video;
 use App\Services\YoutubeCaptions;
+use App\Support\TranscriptChunks;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -89,9 +89,10 @@ class FetchTranscripts extends Command
                     'transcript' => '<p>'.e($text).'</p>',
                     'transcript_formatted_at' => null,
                 ]);
-                $this->line("  ✓ #{$video->id} « {$video->title} » ({$this->wordCount($text)} mots)");
+                $this->line("  ✓ #{$video->id} « {$video->title} » (".TranscriptChunks::wordCount($text).' mots)');
                 $fetched++;
             } catch (Throwable $e) {
+                report($e);
                 $this->warn("  ✗ #{$video->id} : ".$e->getMessage());
                 $failed++;
             }
@@ -100,7 +101,7 @@ class FetchTranscripts extends Command
         $this->newLine();
         $this->info("Terminé : {$fetched} récupérée(s), {$skipped} sans sous-titre, {$failed} en échec.");
 
-        return self::SUCCESS;
+        return $failed === 0 ? self::SUCCESS : self::FAILURE;
     }
 
     /**
@@ -144,10 +145,5 @@ class FetchTranscripts extends Command
         $text = (string) preg_replace('/[\s\p{Z}]+/u', ' ', $text);
 
         return trim($text);
-    }
-
-    private function wordCount(string $text): int
-    {
-        return Str::wordCount(strip_tags($text));
     }
 }

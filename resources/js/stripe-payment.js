@@ -1,9 +1,12 @@
 import { loadStripe } from '@stripe/stripe-js';
 
+const LOAD_ERROR = 'Le module de paiement n’a pas pu se charger. Rechargez la page ou réessayez dans quelques instants.';
+
 /**
- * Paiement intégré (Stripe Payment Element) sur la page /reservation/payer.
- * Ne s'active que si le conteneur #payment-form est présent ; configuration et
- * appearance (charte teal) lues depuis ses attributs data-*.
+ * Paiement intégré (Stripe Payment Element) des pages de paiement : rendez-vous,
+ * livre et formations. Ne s'active que si le conteneur #payment-form est
+ * présent ; configuration et appearance (charte teal) lues depuis ses
+ * attributs data-*.
  */
 async function initStripePayment() {
     const form = document.getElementById('payment-form');
@@ -12,7 +15,26 @@ async function initStripePayment() {
     const { stripeKey, clientSecret, returnUrl, amountLabel } = form.dataset;
     if (!stripeKey || !clientSecret) return;
 
-    const stripe = await loadStripe(stripeKey);
+    const errorBox = document.getElementById('payment-error');
+
+    const showError = (message) => {
+        if (!errorBox) return;
+        errorBox.textContent = message;
+        errorBox.classList.remove('hidden');
+    };
+
+    let stripe;
+    try {
+        stripe = await loadStripe(stripeKey);
+    } catch (error) {
+        console.error(error);
+    }
+
+    if (!stripe) {
+        document.getElementById('payment-skeleton')?.remove();
+        showError(LOAD_ERROR);
+        return;
+    }
 
     const appearance = {
         theme: 'flat',
@@ -80,8 +102,12 @@ async function initStripePayment() {
         document.getElementById('payment-skeleton')?.remove();
     });
 
+    paymentElement.on('loaderror', () => {
+        document.getElementById('payment-skeleton')?.remove();
+        showError(LOAD_ERROR);
+    });
+
     const submitButton = document.getElementById('payment-submit');
-    const errorBox = document.getElementById('payment-error');
     const buttonLabel = document.getElementById('payment-submit-label');
     const buttonSpinner = document.getElementById('payment-submit-spinner');
 
@@ -94,24 +120,24 @@ async function initStripePayment() {
         }
     };
 
-    const showError = (message) => {
-        if (!errorBox) return;
-        errorBox.textContent = message;
-        errorBox.classList.remove('hidden');
-    };
-
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         errorBox?.classList.add('hidden');
         setLoading(true);
 
-        const { error } = await stripe.confirmPayment({
-            elements,
-            confirmParams: { return_url: returnUrl },
-        });
+        try {
+            const { error } = await stripe.confirmPayment({
+                elements,
+                confirmParams: { return_url: returnUrl },
+            });
 
-        if (error) {
-            showError(error.message || 'Le paiement a échoué. Vérifiez vos informations et réessayez.');
+            if (error) {
+                showError(error.message || 'Le paiement a échoué. Vérifiez vos informations et réessayez.');
+                setLoading(false);
+            }
+        } catch (error) {
+            console.error(error);
+            showError('Le paiement n’a pas pu être envoyé. Vérifiez votre connexion et réessayez.');
             setLoading(false);
         }
     });

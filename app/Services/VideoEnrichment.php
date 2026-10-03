@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\Video;
+use App\Support\TranscriptChunks;
 use Illuminate\Support\Arr;
 
 /**
@@ -16,9 +17,6 @@ use Illuminate\Support\Arr;
  */
 class VideoEnrichment
 {
-    /** Balises autorisées dans l'intro. */
-    private const INTRO_ALLOWED_TAGS = '<p><br><em><strong>';
-
     /**
      * @param  array<string, mixed>  $row
      * @return array{
@@ -79,10 +77,7 @@ class VideoEnrichment
     {
         $attributes = [];
 
-        $intro = trim(strip_tags(
-            (string) ($row['intro'] ?? ''),
-            self::INTRO_ALLOWED_TAGS,
-        ));
+        $intro = TranscriptChunks::sanitize((string) ($row['intro'] ?? ''));
         if ($intro !== '') {
             $attributes['intro'] = $intro;
         }

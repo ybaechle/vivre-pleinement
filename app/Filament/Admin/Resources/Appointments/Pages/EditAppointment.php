@@ -31,6 +31,6 @@ class EditAppointment extends EditRecord
         return Notification::make()
             ->success()
             ->title('Rendez-vous enregistré')
-            ->body('Tes modifications ont bien été sauvegardées.');
+            ->body('Vos modifications ont bien été sauvegardées.');
     }
 }

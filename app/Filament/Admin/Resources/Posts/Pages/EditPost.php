@@ -68,7 +68,7 @@ class EditPost extends EditRecord
         return Notification::make()
             ->success()
             ->title('Article enregistré')
-            ->body('Tes modifications ont bien été sauvegardées.');
+            ->body('Vos modifications ont bien été sauvegardées.');
     }
 
     /**

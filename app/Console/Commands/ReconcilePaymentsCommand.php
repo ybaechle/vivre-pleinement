@@ -39,6 +39,13 @@ use Throwable;
 #[Description('Finalise les paiements confirmés par Stripe dont le webhook ne nous est jamais parvenu.')]
 class ReconcilePaymentsCommand extends Command
 {
+    /**
+     * Stripe renvoie un webhook en échec pendant trois jours : au-delà d'une
+     * semaine, un panier abandonné n'a plus rien à rattraper et l'interroger à
+     * chaque passage ne ferait qu'épuiser le quota d'API.
+     */
+    private const LOOKBACK_DAYS = 7;
+
     public function __construct(
         private StripePaymentIntents $intents,
         private BookingPaymentService $bookingPayments,
@@ -54,11 +61,12 @@ class ReconcilePaymentsCommand extends Command
          * On laisse au webhook le temps d'arriver : sans ce délai, la commande
          * doublerait le chemin normal sur des paiements de quelques secondes.
          */
-        $before = CarbonImmutable::now()->subMinutes((int) $this->option('minutes'));
+        $now = CarbonImmutable::now();
+        $window = [$now->subDays(self::LOOKBACK_DAYS), $now->subMinutes((int) $this->option('minutes'))];
 
-        $recovered = $this->reconcileAppointments($before)
-            + $this->reconcileEnrollments($before)
-            + $this->reconcileBookOrders($before);
+        $recovered = $this->reconcileAppointments($window)
+            + $this->reconcileEnrollments($window)
+            + $this->reconcileBookOrders($window);
 
         $this->info($recovered === 0
             ? 'Aucun paiement en souffrance.'
@@ -67,12 +75,15 @@ class ReconcilePaymentsCommand extends Command
         return self::SUCCESS;
     }
 
-    private function reconcileAppointments(CarbonImmutable $before): int
+    /**
+     * @param  array{0: CarbonImmutable, 1: CarbonImmutable}  $window
+     */
+    private function reconcileAppointments(array $window): int
     {
         $pending = Appointment::query()
             ->where('payment_status', PaymentStatus::Unpaid)
             ->whereNotNull('stripe_payment_intent_id')
-            ->where('created_at', '<=', $before)
+            ->whereBetween('created_at', $window)
             ->get();
 
         return $this->recover(
@@ -85,12 +96,15 @@ class ReconcilePaymentsCommand extends Command
         );
     }
 
-    private function reconcileEnrollments(CarbonImmutable $before): int
+    /**
+     * @param  array{0: CarbonImmutable, 1: CarbonImmutable}  $window
+     */
+    private function reconcileEnrollments(array $window): int
     {
         $pending = Enrollment::query()
             ->where('status', EnrollmentStatus::Pending)
             ->whereNotNull('stripe_payment_intent_id')
-            ->where('created_at', '<=', $before)
+            ->whereBetween('created_at', $window)
             ->get();
 
         return $this->recover(
@@ -105,12 +119,15 @@ class ReconcilePaymentsCommand extends Command
         );
     }
 
-    private function reconcileBookOrders(CarbonImmutable $before): int
+    /**
+     * @param  array{0: CarbonImmutable, 1: CarbonImmutable}  $window
+     */
+    private function reconcileBookOrders(array $window): int
     {
         $pending = BookOrder::query()
             ->where('status', BookOrderStatus::Pending)
             ->whereNotNull('stripe_payment_intent_id')
-            ->where('created_at', '<=', $before)
+            ->whereBetween('created_at', $window)
             ->get();
 
         return $this->recover(
@@ -155,18 +172,18 @@ class ReconcilePaymentsCommand extends Command
         $recovered = 0;
 
         foreach ($records as $record) {
-            $intent = $this->intents->retrieve($record->stripe_payment_intent_id);
-
-            if ($intent === null || $intent->status !== 'succeeded') {
-                continue;
-            }
-
             try {
+                $intent = $this->intents->retrieve($record->stripe_payment_intent_id);
+
+                if ($intent === null || $intent->status !== 'succeeded') {
+                    continue;
+                }
+
                 $fulfill($record, $intent);
             } catch (Throwable $exception) {
                 report($exception);
 
-                Log::error("Rattrapage impossible pour un {$label} payé.", [
+                Log::error("Rattrapage impossible pour un {$label}.", [
                     'id' => $record->getKey(),
                     'payment_intent_id' => $record->stripe_payment_intent_id,
                     'exception' => $exception->getMessage(),

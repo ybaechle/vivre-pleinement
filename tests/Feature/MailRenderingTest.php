@@ -12,9 +12,6 @@ use App\Mail\ContactMessage;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 function renderableAppointment(array $attributes = []): Appointment
 {
@@ -22,7 +19,6 @@ function renderableAppointment(array $attributes = []): Appointment
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
     ] + $attributes);
 }
 
@@ -52,7 +48,7 @@ it('renders the cancelled mail for both recipients', function () {
     $appointment = renderableAppointment();
 
     (new AppointmentCancelled($appointment))->assertSeeInHtml('Reprendre rendez-vous');
-    (new AppointmentCancelled($appointment, forAdmin: true))->assertSeeInHtml('annulé par le client');
+    (new AppointmentCancelled($appointment, forAdmin: true))->assertSeeInHtml('Le rendez-vous suivant a été annulé.');
 });
 
 it('renders the rescheduled mail with both slots for both recipients', function () {

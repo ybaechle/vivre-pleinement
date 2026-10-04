@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'module_id',
@@ -33,6 +33,17 @@ class Lesson extends Model
         'is_free_preview' => false,
     ];
 
+    /**
+     * Le slug n'est pas saisi dans l'admin : le suffixe aléatoire garantit
+     * l'unicité entre deux leçons de même titre.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (Lesson $lesson): void {
+            $lesson->slug ??= Str::slug($lesson->title).'-'.Str::lower(Str::random(5));
+        });
+    }
+
     protected function casts(): array
     {
         return [
@@ -49,19 +60,16 @@ class Lesson extends Model
     }
 
     /**
-     * @return HasMany<LessonProgress, $this>
+     * Durée au format minutes:secondes, avec les heures au-delà d'une heure
+     * (gmdate('i:s') seul afficherait 3 700 s comme « 01:40 »).
      */
-    public function progress(): HasMany
+    public function durationFormatted(): ?string
     {
-        return $this->hasMany(LessonProgress::class);
-    }
+        if (! $this->duration_seconds) {
+            return null;
+        }
 
-    /**
-     * Récupère la formation parente via le module.
-     */
-    public function course(): ?Course
-    {
-        return $this->module?->course;
+        return gmdate($this->duration_seconds >= 3600 ? 'G:i:s' : 'i:s', $this->duration_seconds);
     }
 
     public function embedUrl(): ?string

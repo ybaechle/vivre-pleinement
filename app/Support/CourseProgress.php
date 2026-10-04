@@ -10,28 +10,6 @@ use Illuminate\Support\Collection;
 
 class CourseProgress
 {
-    /**
-     * Nombre total de leçons d'une formation.
-     */
-    public static function total(Course $course): int
-    {
-        return $course->lessons()->count();
-    }
-
-    /**
-     * Nombre de leçons terminées par l'élève pour cette formation.
-     */
-    public static function completed(Student $student, Course $course): int
-    {
-        return $student->lessonProgress()
-            ->whereNotNull('completed_at')
-            ->whereIn('lesson_id', $course->lessons()->select('lessons.id'))
-            ->count();
-    }
-
-    /**
-     * Pourcentage de progression (0-100), arrondi à l'entier.
-     */
     public static function percent(Student $student, Course $course): int
     {
         $total = self::total($course);
@@ -87,5 +65,18 @@ class CourseProgress
 
             return [$courseId => $percent];
         });
+    }
+
+    private static function total(Course $course): int
+    {
+        return $course->lessons()->count();
+    }
+
+    private static function completed(Student $student, Course $course): int
+    {
+        return $student->lessonProgress()
+            ->whereNotNull('completed_at')
+            ->whereIn('lesson_id', $course->lessons()->select('lessons.id'))
+            ->count();
     }
 }

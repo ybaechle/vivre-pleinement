@@ -4,10 +4,7 @@ use App\Livewire\PostSearch;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 it('searches across title, excerpt and content', function () {
     Post::factory()->create(['title' => 'Vaincre l\'anxiété', 'excerpt' => 'x', 'content' => 'y']);
@@ -30,6 +27,19 @@ it('shows the featured post only on the unfiltered default view', function () {
         ->assertViewHas('featured', fn ($f) => $f !== null)
         ->set('search', 'x')
         ->assertViewHas('featured', fn ($f) => $f === null);
+});
+
+it('never lists an article twice across the pages of the default view', function () {
+    foreach (range(1, 11) as $day) {
+        Post::factory()->create(['published_at' => now()->subDays($day)]);
+    }
+
+    $component = Livewire::test(PostSearch::class);
+    $firstPage = $component->viewData('posts')->pluck('id')->push($component->viewData('featured')->id);
+    $secondPage = $component->call('gotoPage', 2)->viewData('posts')->pluck('id');
+
+    expect($firstPage->intersect($secondPage))->toBeEmpty()
+        ->and($firstPage->merge($secondPage)->unique())->toHaveCount(11);
 });
 
 it('hides the featured post when sorting by oldest', function () {

@@ -34,9 +34,6 @@ class SyncYoutubeVideosJob implements ShouldQueue
      */
     public int $timeout = 300;
 
-    /**
-     * Exécute la synchronisation des vidéos YouTube en arrière-plan.
-     */
     public function handle(): void
     {
         $result = YoutubeSync::fromConfig()->sync();

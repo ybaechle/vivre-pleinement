@@ -1,10 +1,7 @@
 <?php
 
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\File;
-
-uses(LazilyRefreshDatabase::class);
 
 afterEach(function () {
     File::deleteDirectory(storage_path('app/testing-transcripts'));

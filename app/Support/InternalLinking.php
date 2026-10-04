@@ -5,7 +5,6 @@ namespace App\Support;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -28,7 +27,7 @@ class InternalLinking
     /**
      * Articles similaires : même cluster (catégorie) en priorité, classés par
      * nombre de tags partagés puis par fraîcheur. Complète avec les articles
-     * récents de la catégorie pour toujours remplir le bloc.
+     * les plus récents du blog pour toujours remplir le bloc.
      *
      * Le cache ne stocke que les IDs ordonnés (des scalaires) : sérialiser des
      * modèles Eloquent dans le cache est fragile (classes incomplètes, données
@@ -79,42 +78,16 @@ class InternalLinking
     }
 
     /**
-     * Vide le cache de maillage de tous les articles publiés du/des cluster(s)
-     * de l'article donné (lui inclus). Appelé quand un article est édité ou
-     * qu'un pilier change, car cela affecte le bloc « similaires » de tous les
-     * articles voisins, pas seulement de celui qui a changé.
+     * Vide le cache de maillage de tous les articles. Un article modifié peut
+     * entrer dans le bloc « similaires » de n'importe quel autre (complément
+     * par les plus récents), et ses catégories ne sont synchronisées par
+     * l'admin qu'après l'événement saved : un vidage ciblé sur le cluster
+     * raterait des clés. Les écritures étant rares (admin), le vidage large
+     * est le compromis sûr.
      */
-    public static function flushCluster(Post $post): void
+    public static function flush(): void
     {
-        $categoryIds = $post->categories()->pluck('categories.id');
-
-        $postIds = Post::query()
-            ->when(
-                $categoryIds->isNotEmpty(),
-                fn ($query) => $query->whereHas('categories', fn ($categoryQuery) => $categoryQuery->whereIn('categories.id', $categoryIds)),
-                fn ($query) => $query->whereKey($post->id),
-            )
-            ->pluck('id')
-            ->push($post->id)
-            ->unique();
-
-        self::forgetAll($postIds);
-    }
-
-    /**
-     * Vide le cache de maillage de tous les articles publiés d'une catégorie.
-     */
-    public static function flushCategory(Category $category): void
-    {
-        self::forgetAll($category->posts()->pluck('posts.id'));
-    }
-
-    /**
-     * @param  SupportCollection<int, int>  $postIds
-     */
-    private static function forgetAll(SupportCollection $postIds): void
-    {
-        foreach ($postIds as $id) {
+        foreach (Post::withTrashed()->pluck('id') as $id) {
             Cache::forget(self::cacheKey('similar', $id));
             Cache::forget(self::cacheKey('pillar', $id));
         }

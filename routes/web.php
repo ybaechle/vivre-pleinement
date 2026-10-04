@@ -43,14 +43,10 @@ Route::view('/therapie-act', 'therapie-act.index')->name('therapie-act');
 
 /**
  * Les formulaires publics portent un plafond de requêtes au niveau de la route,
- * en plus de la limitation applicative de SubmissionThrottle.
- *
- * SubmissionThrottle est consulté dans le contrôleur, donc après la validation
- * : la règle `email:rfc,dns` déclenchait une résolution DNS sur un domaine
- * choisi par l'appelant à chaque requête, sans plafond. Le middleware
- * `throttle` s'exécute avant la FormRequest et referme ce coin ; réglé plus
- * haut que SubmissionThrottle, il laisse le message d'erreur soigné arriver en
- * premier pour un visiteur normal et ne coupe que les envois massifs.
+ * en plus de SubmissionThrottle : celui-ci n'intervient qu'après la validation,
+ * dont la règle `email:rfc,dns` lance une résolution DNS sur un domaine choisi
+ * par l'appelant. Réglé plus haut que SubmissionThrottle, ce plafond laisse le
+ * message d'erreur soigné arriver en premier et ne coupe que les envois massifs.
  */
 Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'send'])
@@ -74,19 +70,12 @@ Route::prefix('reservation')->name('booking.')->controller(BookingController::cl
     Route::get('/', 'index')->name('index');
     Route::get('confirmation/{appointment:token}', 'confirmation')->name('confirmation');
     Route::get('confirmation/{appointment:token}/agenda.ics', 'ics')->name('ics');
-    Route::get('paiement-annule/{appointment:token}', 'paymentCancelled')->name('paymentCancelled');
     Route::get('payer/{appointment:token}', 'pay')->name('pay');
     Route::get('gerer/{appointment:token}', 'manage')->name('manage');
     Route::post('gerer/{appointment:token}/annuler', 'cancel')->name('cancel');
     Route::get('gerer/{appointment:token}/reprogrammer', 'reschedule')->name('reschedule');
     Route::get('{service:slug}', 'show')->name('show');
 });
-
-/*
-|--------------------------------------------------------------------------
-| Espace formation (e-learning)
-|--------------------------------------------------------------------------
-*/
 
 /**
  * Authentification élève (guard « student »).
@@ -111,7 +100,7 @@ Route::middleware('guest:student')->group(function () {
 });
 
 Route::post('/espace-formation/deconnexion', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth:student')
+    ->middleware(['auth:student', 'auth.session'])
     ->name('student.logout');
 
 /**
@@ -122,7 +111,7 @@ Route::get('/formations', [CourseController::class, 'index'])->name('courses.ind
 /**
  * Achat (élève connecté) — déclaré avant la route catch-all {course:slug}.
  */
-Route::middleware('auth:student')->group(function () {
+Route::middleware(['auth:student', 'auth.session'])->group(function () {
     Route::post('/formations/{course:slug}/acheter', [CourseCheckoutController::class, 'start'])->name('courses.checkout.start');
     Route::get('/formations/{course:slug}/paiement', [CourseCheckoutController::class, 'pay'])->name('courses.checkout.pay');
     Route::get('/formations/{course:slug}/merci', [CourseCheckoutController::class, 'success'])->name('courses.checkout.success');
@@ -133,7 +122,7 @@ Route::get('/formations/{course:slug}', [CourseController::class, 'show'])->name
 /**
  * Espace élève (formations achetées).
  */
-Route::prefix('espace-formation')->name('student.')->middleware('auth:student')->group(function () {
+Route::prefix('espace-formation')->name('student.')->middleware(['auth:student', 'auth.session'])->group(function () {
     /**
      * Vérification d'e-mail (accessible aux comptes non encore vérifiés).
      */
@@ -151,7 +140,7 @@ Route::prefix('espace-formation')->name('student.')->middleware('auth:student')-
     Route::get('/compte', [StudentAccountController::class, 'edit'])->name('account.edit');
     Route::patch('/compte/profil', [StudentAccountController::class, 'updateProfile'])->name('account.profile');
     Route::put('/compte/mot-de-passe', [StudentAccountController::class, 'updatePassword'])->name('account.password');
-    Route::delete('/compte', [StudentDashboardController::class, 'destroy'])->name('account.destroy');
+    Route::delete('/compte', [StudentAccountController::class, 'destroy'])->name('account.destroy');
 
     /**
      * Contenu réservé aux comptes vérifiés.

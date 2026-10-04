@@ -8,21 +8,15 @@ use App\Mail\AppointmentConfirmation;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function serviceWithDailyAvailability(): AppointmentService
 {
     $service = AppointmentService::factory()->create(['duration_minutes' => 30, 'min_notice_hours' => 12]);
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }
@@ -33,7 +27,6 @@ function futureAppointment(AppointmentService $service, ?CarbonImmutable $start 
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'starts_at' => $start,
         'ends_at' => $start->addMinutes(30),
         'status' => AppointmentStatus::Confirmed,
@@ -70,7 +63,6 @@ it('refuses to cancel a past appointment', function () {
     $past = CarbonImmutable::now()->subDay()->setTime(10, 0);
     $appointment = Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'starts_at' => $past,
         'ends_at' => $past->addMinutes(30),
         'status' => AppointmentStatus::Confirmed,
@@ -89,7 +81,6 @@ it('refuses to reserve a slot already taken (atomic guard)', function () {
 
     $second = app(AppointmentSlotService::class)->reserve($service, $start, [
         'reference' => Appointment::generateReference(),
-        'token' => Appointment::generateToken(),
         'customer_first_name' => 'Autre',
         'customer_email' => 'autre@gmail.com',
         'status' => AppointmentStatus::Confirmed,

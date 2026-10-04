@@ -141,11 +141,7 @@ class VideoPipelineController extends Controller
 
         $isNewVideo = blank($video->summary);
 
-        $result = $enrichment->apply(
-            $video,
-            $request->validated(),
-            onlyMissing: true,
-        );
+        $result = $enrichment->apply($video, $request->validated());
 
         return response()->json([
             'id' => $video->id,

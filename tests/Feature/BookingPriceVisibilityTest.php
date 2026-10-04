@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\AppointmentService;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('displays the session price and duration in the booking hero', function () {
     AppointmentService::factory()->create([

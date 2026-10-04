@@ -27,7 +27,7 @@ class CourseController extends Controller
 
         $course->load([
             'media',
-            'modules.lessons' => fn ($query) => $query->orderBy('position'),
+            'modules.lessons',
         ]);
 
         $student = auth('student')->user();

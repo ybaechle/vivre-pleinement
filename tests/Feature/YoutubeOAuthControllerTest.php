@@ -1,10 +1,7 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config([

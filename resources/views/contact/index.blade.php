@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     $email = \App\Support\SiteContact::email();
@@ -19,13 +19,7 @@
 @section('description', "Une question, une demande d'accompagnement ? Contactez Laura Baechlé via le formulaire, par email, par téléphone ou sur les réseaux sociaux.")
 @section('canonical', route('contact'))
 
-@section('body')
-    <a href="#main" class="focus:bg-ink sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white">
-        Aller au contenu
-    </a>
-
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -55,7 +49,6 @@
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
             <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
-                {{-- Formulaire --}}
                 <div class="lg:col-span-7">
                     <div class="ring-ink/5 rounded-4xl bg-white p-6 shadow-sm ring-1 sm:p-10">
                     @if (session('status'))
@@ -64,9 +57,9 @@
                         </p>
                     @endif
 
-                    @if ($errors->has('message') && ! $errors->has('first_name'))
+                    @if ($errors->hasAny(['throttle', 'ts']))
                         <p class="bg-rose-soft/40 text-ink ring-rose-soft mb-6 rounded-2xl px-4 py-3 text-sm ring-1">
-                            {{ $errors->first('message') }}
+                            {{ $errors->first('throttle') ?: $errors->first('ts') }}
                         </p>
                     @endif
 
@@ -74,7 +67,6 @@
                         @csrf
                         <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
-                        {{-- Honeypot --}}
                         <div aria-hidden="true" class="absolute top-auto -left-[9999px] size-px overflow-hidden">
                             <label for="website">Site web (ne pas remplir)</label>
                             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -132,7 +124,6 @@
                 </div>
                 </div>
 
-                {{-- Coordonnées + réseaux --}}
                 <aside class="space-y-6 lg:col-span-5">
                     <div class="text-cream-100 rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-6 sm:p-8">
                         <h2 class="font-serif text-2xl font-medium text-white">Autres moyens</h2>
@@ -185,7 +176,6 @@
                         @endif
                     </div>
 
-                    {{-- Réassurance --}}
                     <ul class="space-y-3 px-1">
                         <li class="text-ink-soft flex items-start gap-3 text-sm">
                             <svg class="mt-0.5 size-5 shrink-0 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -210,6 +200,4 @@
             </div>
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

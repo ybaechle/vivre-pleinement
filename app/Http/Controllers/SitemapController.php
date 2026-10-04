@@ -14,11 +14,6 @@ use Illuminate\Support\Facades\Cache;
 
 class SitemapController extends Controller
 {
-    /**
-     * Clé distincte de l'ancienne `sitemap.videos`, qui contenait une
-     * collection de modèles : au déploiement, l'entrée héritée ne doit pas être
-     * relue comme du XML. Elle expire seule en une heure.
-     */
     public const VIDEOS_CACHE_KEY = 'sitemap.videos.xml';
 
     /**

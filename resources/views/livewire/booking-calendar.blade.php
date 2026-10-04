@@ -30,7 +30,6 @@
     <section class="ring-ink/5 relative rounded-4xl bg-white p-6 shadow-xs ring-1 sm:p-8"
              aria-label="Choisir une date et un horaire">
 
-        {{-- Overlay de chargement --}}
         <div wire:loading.flex wire:target="previousMonth,nextMonth,selectDate"
              class="absolute inset-0 z-10 items-center justify-center rounded-4xl bg-white/60 backdrop-blur-[1px]"
              aria-hidden="true">
@@ -40,7 +39,6 @@
             </svg>
         </div>
 
-        {{-- Navigation mois --}}
         <div class="flex items-center justify-between">
             <button type="button" wire:click="previousMonth" @disabled($isCurrentOrPastMonth)
                     wire:loading.attr="disabled" wire:target="previousMonth,nextMonth"
@@ -57,7 +55,6 @@
             </button>
         </div>
 
-        {{-- Grille des jours --}}
         <div class="mt-6 grid grid-cols-7 gap-1.5 text-center" role="group" aria-label="Jours du mois">
             @foreach ($weekDays as $i => $wd)
                 <div class="text-ink-muted pb-2 text-xs font-medium tracking-wider uppercase" aria-hidden="true">{{ $wd }}</div>
@@ -107,7 +104,6 @@
             </p>
         @endif
 
-        {{-- Créneaux du jour --}}
         @if ($selectedDate)
             <div class="border-ink/5 mt-8 border-t pt-6"
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })">
@@ -144,7 +140,6 @@
                  x-data x-init="$el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })"
                  aria-label="Récapitulatif et coordonnées">
 
-            {{-- Carte récapitulative --}}
             <div class="rounded-3xl bg-teal-50/60 p-5 ring-1 ring-teal-100">
                 <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre rendez-vous</p>
                 <p class="text-ink mt-2 font-serif text-xl font-medium">{{ $service->name }}</p>
@@ -187,7 +182,6 @@
                     </button>
                 </form>
             @else
-            {{-- Format du rendez-vous --}}
             <fieldset class="mt-7">
                 <legend class="text-ink font-serif text-2xl font-medium">Comment souhaitez-vous être accompagné·e ?</legend>
                 <p class="text-ink-soft mt-1 text-sm">Téléphone ou visioconférence : à vous de choisir, le créneau reste le même.</p>
@@ -219,7 +213,6 @@
             <h2 class="text-ink mt-8 font-serif text-2xl font-medium">Vos coordonnées</h2>
 
             <form wire:submit="book" class="mt-6 space-y-5" novalidate>
-                {{-- Honeypot --}}
                 <div aria-hidden="true" class="absolute top-auto -left-[9999px] size-px overflow-hidden">
                     <label for="website">Site web (ne pas remplir)</label>
                     <input type="text" id="website" wire:model="website" tabindex="-1" autocomplete="off">
@@ -285,7 +278,6 @@
                     </button>
                 </div>
 
-                {{-- Réassurance --}}
                 <ul class="text-ink-muted flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-xs">
                     <li class="inline-flex items-center gap-1.5">
                         <svg class="size-3.5 text-teal-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 13 4 4L19 7"/></svg>

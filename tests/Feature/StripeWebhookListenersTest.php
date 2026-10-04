@@ -5,40 +5,38 @@ use App\Listeners\HandleStripePaymentSucceeded;
 use Illuminate\Support\Facades\Log;
 use Laravel\Cashier\Events\WebhookReceived;
 
-it('retries payment_intent.succeeded processing several times with a backoff before giving up', function () {
-    $listener = app(HandleStripePaymentSucceeded::class);
+dataset('stripe webhook listeners', [
+    'payment_intent.succeeded' => [HandleStripePaymentSucceeded::class, 'payment_intent.succeeded'],
+    'charge.refunded' => [HandleStripeChargeRefunded::class, 'charge.refunded'],
+]);
+
+it('retries processing several times with a backoff before giving up', function (string $listenerClass) {
+    $listener = app($listenerClass);
 
     expect($listener->tries)->toBeGreaterThan(1)
         ->and($listener->backoff)->toBeArray()
         ->and($listener->backoff)->not->toBeEmpty();
-});
+})->with('stripe webhook listeners');
 
-it('logs critically instead of failing silently when payment_intent.succeeded processing is exhausted', function () {
+it('logs critically without personal data when processing is exhausted', function (string $listenerClass, string $type) {
     Log::spy();
 
-    $listener = app(HandleStripePaymentSucceeded::class);
-    $event = new WebhookReceived(['type' => 'payment_intent.succeeded', 'data' => ['object' => []]]);
+    $event = new WebhookReceived([
+        'id' => 'evt_test',
+        'type' => $type,
+        'data' => ['object' => [
+            'id' => 'pi_test',
+            'payment_intent' => 'pi_test',
+            'receipt_email' => 'camille@example.com',
+            'billing_details' => ['name' => 'Camille Martin', 'email' => 'camille@example.com'],
+        ]],
+    ]);
 
-    $listener->failed($event, new RuntimeException('Stripe indisponible'));
+    app($listenerClass)->failed($event, new RuntimeException('Stripe indisponible'));
 
-    Log::shouldHaveReceived('critical')->once();
-});
-
-it('retries charge.refunded processing several times with a backoff before giving up', function () {
-    $listener = app(HandleStripeChargeRefunded::class);
-
-    expect($listener->tries)->toBeGreaterThan(1)
-        ->and($listener->backoff)->toBeArray()
-        ->and($listener->backoff)->not->toBeEmpty();
-});
-
-it('logs critically instead of failing silently when charge.refunded processing is exhausted', function () {
-    Log::spy();
-
-    $listener = app(HandleStripeChargeRefunded::class);
-    $event = new WebhookReceived(['type' => 'charge.refunded', 'data' => ['object' => []]]);
-
-    $listener->failed($event, new RuntimeException('Stripe indisponible'));
-
-    Log::shouldHaveReceived('critical')->once();
-});
+    Log::shouldHaveReceived('critical')->once()->withArgs(
+        fn (string $message, array $context) => $context['event_id'] === 'evt_test'
+            && $context['payment_intent'] === 'pi_test'
+            && ! str_contains(json_encode($context), 'camille@example.com'),
+    );
+})->with('stripe webhook listeners');

@@ -5,11 +5,8 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Services\CoursePaymentService;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $intent = PaymentIntent::constructFrom(['id' => 'pi_test', 'client_secret' => 'pi_secret_test']);

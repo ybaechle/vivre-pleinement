@@ -1,5 +1,4 @@
 <div>
-    {{-- Lecteur vidéo --}}
     @if ($embed = $lesson->embedUrl())
         <div class="aspect-video w-full overflow-hidden rounded-3xl bg-ink shadow-lg">
             <iframe
@@ -33,7 +32,6 @@
         </div>
     @endif
 
-    {{-- Navigation précédent / suivant --}}
     <div class="border-ink/5 mt-10 flex items-center justify-between border-t pt-6">
         @if ($previous)
             <a href="{{ route('student.lesson', [$course, $previous]) }}" class="text-ink-soft inline-flex items-center gap-2 text-sm font-medium transition hover:text-teal-700">

@@ -9,11 +9,7 @@ use App\Services\BookingPaymentService;
 use App\Services\StripePaymentIntents;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function paidAppointment(string $intentId = 'pi_appointment_refund'): Appointment
 {
@@ -25,21 +21,10 @@ function paidAppointment(string $intentId = 'pi_appointment_refund'): Appointmen
     ]);
 }
 
-function appointmentRefundWebhook(?string $intentId = 'pi_appointment_refund'): void
-{
-    event(new WebhookReceived([
-        'type' => 'charge.refunded',
-        'data' => ['object' => [
-            'id' => 'ch_appointment_refund',
-            'payment_intent' => $intentId,
-        ]],
-    ]));
-}
-
 it('marque le paiement remboursé sur un webhook charge.refunded', function () {
     $appointment = paidAppointment();
 
-    appointmentRefundWebhook();
+    chargeRefundedWebhook('pi_appointment_refund');
 
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Refunded);
 });
@@ -47,7 +32,7 @@ it('marque le paiement remboursé sur un webhook charge.refunded', function () {
 it('laisse le rendez-vous au planning après un remboursement', function () {
     $appointment = paidAppointment();
 
-    appointmentRefundWebhook();
+    chargeRefundedWebhook('pi_appointment_refund');
 
     expect($appointment->fresh()->status)->toBe(AppointmentStatus::Confirmed);
 });
@@ -55,7 +40,7 @@ it('laisse le rendez-vous au planning après un remboursement', function () {
 it('ignore un remboursement dont le PaymentIntent est inconnu', function () {
     $appointment = paidAppointment();
 
-    appointmentRefundWebhook('pi_autre_paiement');
+    chargeRefundedWebhook('pi_autre_paiement');
 
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Paid);
 });
@@ -66,7 +51,7 @@ it('ne touche pas à un rendez-vous jamais payé', function () {
         'stripe_payment_intent_id' => 'pi_appointment_refund',
     ]);
 
-    appointmentRefundWebhook();
+    chargeRefundedWebhook('pi_appointment_refund');
 
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Unpaid);
 });
@@ -74,8 +59,8 @@ it('ne touche pas à un rendez-vous jamais payé', function () {
 it('est idempotent sur un rendez-vous déjà remboursé', function () {
     $appointment = paidAppointment();
 
-    appointmentRefundWebhook();
-    appointmentRefundWebhook();
+    chargeRefundedWebhook('pi_appointment_refund');
+    chargeRefundedWebhook('pi_appointment_refund');
 
     expect($appointment->fresh()->payment_status)->toBe(PaymentStatus::Refunded);
 });

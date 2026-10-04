@@ -2,9 +2,6 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Compte les balises <meta name="description"> et renvoie le content de la
@@ -83,7 +80,7 @@ it('falls back to the title with a brand suffix when seo_title is empty', functi
 });
 
 it('emits a single, query-string-free canonical on an article', function () {
-    Post::factory()->create(['slug' => 'burn-out', 'status' => 'published', 'seo_canonical' => null]);
+    Post::factory()->create(['slug' => 'burn-out', 'status' => 'published']);
 
     $html = $this->get('/blog/burn-out?utm_source=newsletter')->assertOk()->getContent();
 
@@ -103,6 +100,37 @@ it('uses the seo_description for the article og:description', function () {
     $this->get('/blog/toc')
         ->assertOk()
         ->assertSee('property="og:description" content="Description SEO courte et nette."', false);
+});
+
+it('emits a single set of Open Graph tags describing the article', function () {
+    Post::factory()->create(['slug' => 'toc', 'status' => 'published', 'title' => 'Comprendre les TOC', 'seo_title' => null]);
+
+    $html = $this->get('/blog/toc')->assertOk()->getContent();
+
+    expect(substr_count($html, 'property="og:type"'))->toBe(1)
+        ->and(substr_count($html, 'property="og:title"'))->toBe(1)
+        ->and(substr_count($html, 'property="og:image"'))->toBe(1)
+        ->and($html)->toContain('property="og:type" content="article"')
+        ->and($html)->toContain('property="og:title" content="Comprendre les TOC"');
+});
+
+it('links the breadcrumb to the first category of a multi-category article', function () {
+    $post = Post::factory()->create(['slug' => 'toc', 'status' => 'published']);
+    $first = Category::factory()->create(['slug' => 'premiere']);
+    $second = Category::factory()->create(['slug' => 'seconde']);
+    $post->categories()->attach([$first->id, $second->id]);
+
+    $this->get('/blog/toc')
+        ->assertOk()
+        ->assertSee(route('blog.category', 'premiere'), false)
+        ->assertDontSee(route('blog.category', 'seconde'), false);
+});
+
+it('emits a single set of Open Graph tags on the blog index', function () {
+    $html = $this->get('/blog')->assertOk()->getContent();
+
+    expect(substr_count($html, 'property="og:title"'))->toBe(1)
+        ->and(substr_count($html, 'name="twitter:card"'))->toBe(1);
 });
 
 it('emits exactly one canonical on the blog index, stripped of filter query strings', function () {
@@ -168,35 +196,9 @@ it('renders a single meta robots tag on a post with a custom seo_robots', functi
         ->and($html)->toContain('noindex, follow');
 });
 
-it('ignores a stale migrated seo_canonical and points to the new blog URL', function () {
-    Post::factory()->create([
-        'slug' => 'ergophobie-peur-du-travail',
-        'status' => 'published',
-        'seo_canonical' => 'https://vivre-pleinement.fr/ergophobie-peur-du-travail/',
-    ]);
+it('lists the latest articles in the blog ItemList, and omits it when nothing is previewed', function () {
+    Post::factory()->create(['status' => 'published', 'title' => 'Premier article']);
 
-    $this->get('/blog/ergophobie-peur-du-travail')
-        ->assertOk()
-        ->assertSee('<link rel="canonical" href="'.route('blog.show', 'ergophobie-peur-du-travail').'"', false)
-        ->assertDontSee('vivre-pleinement.fr/ergophobie-peur-du-travail/', false);
-});
-
-it('ignores a stale migrated seo_schema_json and renders a clean Article schema', function () {
-    Post::factory()->create([
-        'slug' => 'schema-obsolete',
-        'status' => 'published',
-        'title' => 'Article test',
-        'seo_schema_json' => [
-            '@context' => 'https://schema.org',
-            '@type' => 'Article',
-            'author' => ['name' => 'Laura B.'],
-            'mainEntityOfPage' => ['@id' => 'https://vivre-pleinement.fr/schema-obsolete/'],
-        ],
-    ]);
-
-    $html = $this->get('/blog/schema-obsolete')->assertOk()->getContent();
-
-    expect($html)->toContain('"name":"Laura Baechlé"')
-        ->and($html)->not->toContain('"name":"Laura B."')
-        ->and($html)->toContain('"@id":"'.route('blog.show', 'schema-obsolete').'"');
+    expect($this->get('/blog')->getContent())->toContain('"@type":"ItemList"')->toContain('Premier article');
+    expect($this->get('/blog?sort=oldest')->getContent())->not->toContain('"@type":"ItemList"');
 });

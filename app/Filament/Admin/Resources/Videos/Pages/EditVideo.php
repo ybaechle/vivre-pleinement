@@ -10,6 +10,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Icons\Heroicon;
 
 class EditVideo extends EditRecord
 {
@@ -20,7 +21,7 @@ class EditVideo extends EditRecord
         return [
             Action::make('view_on_site')
                 ->label('Voir sur le site')
-                ->icon('heroicon-o-eye')
+                ->icon(Heroicon::OutlinedEye)
                 ->color('gray')
                 ->url(fn (Video $record) => route('videos.show', $record))
                 ->openUrlInNewTab()
@@ -28,7 +29,7 @@ class EditVideo extends EditRecord
 
             Action::make('open_youtube')
                 ->label('Ouvrir sur YouTube')
-                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                 ->color('gray')
                 ->url(fn (Video $record) => $record->youtubeUrl())
                 ->openUrlInNewTab(),

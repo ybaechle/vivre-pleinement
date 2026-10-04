@@ -31,7 +31,7 @@
     };
 
     const firstError = (errors) => {
-        const value = errors?.email ?? errors?.first_name;
+        const value = errors?.email ?? errors?.first_name ?? errors?.ts;
 
         return Array.isArray(value) ? value[0] : value;
     };

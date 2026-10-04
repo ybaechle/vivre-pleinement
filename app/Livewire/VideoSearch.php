@@ -39,17 +39,11 @@ class VideoSearch extends Component
         $this->category = mb_substr($this->category, 0, 100);
     }
 
-    /**
-     * Réinitialise la pagination dès que la recherche change.
-     */
     public function updatedSearch(): void
     {
         $this->resetPage();
     }
 
-    /**
-     * Réinitialise la pagination dès que le filtre de catégorie change.
-     */
     public function updatedCategory(): void
     {
         $this->resetPage();

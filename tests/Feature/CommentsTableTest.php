@@ -1,15 +1,15 @@
 <?php
 
 use App\Enums\CommentStatus;
+use App\Filament\Admin\Resources\Comments\Pages\CreateComment;
 use App\Filament\Admin\Resources\Comments\Pages\ListComments;
 use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Filament\Forms\Components\Select;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -32,4 +32,15 @@ it('escapes html in the comment content column instead of rendering it', functio
     Livewire::test(ListComments::class)
         ->assertDontSee('<strong>bonjour</strong>', false)
         ->assertSee('<strong>bonjour</strong>');
+});
+
+it('lists only the comments of the same article as possible parents', function () {
+    $post = Post::factory()->create();
+    $sibling = Comment::factory()->create(['post_id' => $post->id, 'author_name' => 'Voisine']);
+    Comment::factory()->create(['author_name' => 'Ailleurs']);
+
+    Livewire::test(CreateComment::class)
+        ->fillForm(['post_id' => $post->id])
+        ->assertFormFieldExists('parent_id', fn (Select $field): bool => array_keys($field->getSearchResults('')) === [$sibling->id]
+            || array_keys($field->getOptions()) === [$sibling->id]);
 });

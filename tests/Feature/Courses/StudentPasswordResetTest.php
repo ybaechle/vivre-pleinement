@@ -3,12 +3,9 @@
 use App\Models\Student;
 use App\Notifications\StudentResetPassword;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
-
-uses(LazilyRefreshDatabase::class);
 
 it('met en file d\'attente la notification de réinitialisation de mot de passe', function () {
     expect(new StudentResetPassword('un-token'))->toBeInstanceOf(ShouldQueue::class);

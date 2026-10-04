@@ -2,9 +2,6 @@
 
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 function tokenAccessAppointment(): Appointment
 {

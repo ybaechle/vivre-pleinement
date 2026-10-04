@@ -7,16 +7,12 @@ use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();
@@ -29,17 +25,10 @@ function adminAppointment(?CarbonImmutable $start = null): Appointment
     $start ??= CarbonImmutable::now()->addDays(4)->setTime(10, 0);
     $service = AppointmentService::factory()->create(['duration_minutes' => 30]);
 
-    foreach (range(0, 6) as $dayOfWeek) {
-        Availability::factory()->create([
-            'day_of_week' => $dayOfWeek,
-            'start_time' => '08:00',
-            'end_time' => '20:00',
-        ]);
-    }
+    openEveryDay(['start_time' => '08:00', 'end_time' => '20:00']);
 
     return Appointment::factory()->create([
         'appointment_service_id' => $service->id,
-        'token' => Appointment::generateToken(),
         'starts_at' => $start,
         'ends_at' => $start->addMinutes(30),
         'status' => AppointmentStatus::Confirmed,
@@ -72,6 +61,34 @@ it('moves an appointment and notifies the client when an admin reschedules', fun
 
     expect($appointment->fresh()->starts_at->equalTo($newStart))->toBeTrue();
     Mail::assertQueued(AppointmentRescheduled::class, 1);
+});
+
+it('does not email the client when the admin keeps the current slot', function () {
+    $appointment = adminAppointment();
+
+    Livewire::test(ListAppointments::class)
+        ->callAction(TestAction::make('reschedule')->table($appointment), data: [
+            'date' => $appointment->starts_at->toDateString(),
+            'starts_at' => $appointment->starts_at->toDateTimeString(),
+        ])
+        ->assertHasNoActionErrors();
+
+    Mail::assertNothingQueued();
+});
+
+it('still reschedules an appointment whose service has been deleted', function () {
+    $appointment = adminAppointment();
+    $appointment->service->delete();
+    $newStart = CarbonImmutable::now()->addDays(6)->setTime(15, 0);
+
+    Livewire::test(ListAppointments::class)
+        ->callAction(TestAction::make('reschedule')->table($appointment), data: [
+            'date' => $newStart->toDateString(),
+            'starts_at' => $newStart->toDateTimeString(),
+        ])
+        ->assertHasNoActionErrors();
+
+    expect($appointment->fresh()->starts_at->equalTo($newStart))->toBeTrue();
 });
 
 it('marks a past confirmed appointment as no-show and emails the client', function () {

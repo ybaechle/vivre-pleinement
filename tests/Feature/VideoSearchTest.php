@@ -3,10 +3,7 @@
 use App\Livewire\VideoSearch;
 use App\Models\Category;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 it('filters videos by a search term across title, summary and intro', function () {
     Video::factory()->create(['title' => 'La peur de conduire', 'duration_seconds' => 600]);

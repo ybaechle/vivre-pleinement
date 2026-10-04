@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', "Pensées intrusives & TOC : le livre | Laura Baechlé")
 @section('description', "Pensées intrusives violentes, phobie d'impulsion, TOC : un guide pratique de 77 pages avec 12 fiches pour vous libérer, sans médicaments. Écrit par Laura Baechlé.")
@@ -20,7 +20,7 @@
         $offerSolo = ($offers['livre'] ?? null)?->price ?? 37;
         $offerCoaching = ($offers['livre-coaching'] ?? null)?->price ?? 70;
 
-        $offerPrice = fn (float $amount): string => rtrim(rtrim(number_format($amount, 2, ',', "\u{202f}"), '0'), ',').'&nbsp;€';
+        $offerPrice = fn (float $amount): string => number_format($amount, fmod($amount, 1.0) === 0.0 ? 0 : 2, ',', "\u{202f}")."\u{00A0}€";
 
         /**
          * Une offre dont le fichier manque n'est pas achetable : les boutons
@@ -77,7 +77,7 @@
             ],
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($productLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$productLd" />
 
     @php
         $breadcrumbLd = [
@@ -89,12 +89,10 @@
             ],
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$breadcrumbLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     @include('book.sections.hero')
@@ -108,6 +106,4 @@
     @include('book.sections.faq')
     @include('book.sections.final-cta')
     </main>
-
-    @include('home.sections.footer')
 @endsection

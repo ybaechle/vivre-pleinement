@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\BookOrder;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Disque simulé : sans cela, chaque exécution laisse un faux PDF dans
@@ -27,6 +24,16 @@ function attachDownloadable(BookOrder $order): void
 it('sert le fichier à une commande payée via un lien signé', function () {
     $order = BookOrder::factory()->paid()->create();
     attachDownloadable($order);
+
+    $this->get($order->downloadUrl())
+        ->assertOk()
+        ->assertDownload('livre.pdf');
+});
+
+it('sert encore le fichier quand le produit a été retiré du catalogue', function () {
+    $order = BookOrder::factory()->paid()->create();
+    attachDownloadable($order);
+    $order->product->delete();
 
     $this->get($order->downloadUrl())
         ->assertOk()

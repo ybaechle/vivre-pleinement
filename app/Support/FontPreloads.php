@@ -31,11 +31,6 @@ class FontPreloads
         return isset($latinFiles[basename(parse_url($url, PHP_URL_PATH) ?: $url)]);
     }
 
-    public static function flush(): void
-    {
-        self::$latinFiles = null;
-    }
-
     /**
      * Noms des fichiers woff2 couvrant le sous-ensemble latin, ou null si le
      * manifest de build est absent (dev server, CI sans build).

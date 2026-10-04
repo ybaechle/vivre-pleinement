@@ -1,6 +1,7 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
+    use App\Support\Duration;
     use Illuminate\Support\Str;
 
     $category = $video->categories->first();
@@ -68,12 +69,10 @@
 
         $videoLd = array_filter($videoLd, fn ($value) => $value !== null && $value !== '');
     @endphp
-    <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$videoLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     <article class="bg-cream-50">
@@ -122,7 +121,7 @@
 
         @if ($video->intro)
             <div class="mx-auto max-w-5xl px-4 pt-8 sm:px-6 lg:px-10">
-                <div class="prose prose-ink max-w-none text-lg leading-relaxed">
+                <div class="prose max-w-none text-lg leading-relaxed">
                     {!! $video->intro !!}
                 </div>
             </div>
@@ -153,9 +152,7 @@
                                rel="noopener noreferrer"
                                class="flex items-center gap-4 px-5 py-3 text-sm transition hover:bg-teal-50">
                                 <span class="font-mono text-xs font-medium text-teal-700 tabular-nums">
-                                    {{ $video->durationFormatted() && $chapter['startOffset'] >= 3600
-                                        ? sprintf('%d:%02d:%02d', intdiv($chapter['startOffset'], 3600), intdiv($chapter['startOffset'] % 3600, 60), $chapter['startOffset'] % 60)
-                                        : sprintf('%d:%02d', intdiv($chapter['startOffset'], 60), $chapter['startOffset'] % 60) }}
+                                    {{ Duration::clock($chapter['startOffset']) }}
                                 </span>
                                 <span class="text-ink">{{ $chapter['name'] }}</span>
                             </a>
@@ -202,7 +199,7 @@
                 <div class="ring-ink/5 relative mt-4 overflow-hidden rounded-2xl bg-white ring-1">
                     <input type="checkbox" id="transcript-toggle" class="peer sr-only">
 
-                    <div class="prose prose-ink max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
+                    <div class="prose max-h-[22rem] max-w-none overflow-hidden p-5 transition-[max-height] duration-500 peer-checked:max-h-none sm:px-6">
                         {!! $video->transcript !!}
                     </div>
 
@@ -270,6 +267,4 @@
         </section>
     @endif
     </main>
-
-    @include('home.sections.footer')
 @endsection

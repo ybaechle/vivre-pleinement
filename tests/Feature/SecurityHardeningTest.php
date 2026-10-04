@@ -3,13 +3,10 @@
 use App\Models\Redirect;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\Middleware\TrustHosts;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Testing\TestResponse;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * H2 — le Host sert à construire des URL absolues qui sont mises en cache

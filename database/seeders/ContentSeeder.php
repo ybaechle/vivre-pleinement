@@ -11,10 +11,12 @@ use Symfony\Component\Process\Process;
 /**
  * Charge le dump de contenu migré depuis WordPress (database/seed.sql).
  *
- * Le dump est importé via le client natif (mariadb/mysql) car il contient des
- * directives transactionnelles (AUTOCOMMIT, DROP/CREATE) que PHP/PDO gère mal :
- * c'est rapide (~1s) et fiable. Bascule sur DB::unprepared() si le binaire
- * manque.
+ * Le dump ne contient que les données : le schéma reste celui des migrations,
+ * qui ont pu évoluer depuis l'export.
+ *
+ * Il est importé via le client natif (mariadb/mysql) car ses directives
+ * transactionnelles (AUTOCOMMIT) passent mal par PHP/PDO : c'est rapide (~1s)
+ * et fiable. Bascule sur DB::unprepared() si le binaire manque.
  */
 class ContentSeeder extends Seeder
 {

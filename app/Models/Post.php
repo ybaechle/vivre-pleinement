@@ -30,9 +30,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
     'comments_enabled',
     'seo_title',
     'seo_description',
-    'seo_canonical',
     'seo_robots',
-    'seo_schema_json',
     'faq',
     'published_at',
 ])]
@@ -81,7 +79,6 @@ class Post extends Model implements HasMedia
         return [
             'status' => PostStatus::class,
             'comments_enabled' => 'boolean',
-            'seo_schema_json' => 'array',
             'faq' => 'array',
             'published_at' => 'datetime',
             'reading_time_minutes' => 'integer',

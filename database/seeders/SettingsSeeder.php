@@ -19,7 +19,6 @@ class SettingsSeeder extends Seeder
             'reminder_24h_enabled' => '1',
             'reminder_1h_enabled' => '1',
             'followup_enabled' => '1',
-            'timezone' => 'Europe/Paris',
             'contact_email' => config('mail.contact_to'),
             'contact_phone' => '',
             'social_instagram' => '',

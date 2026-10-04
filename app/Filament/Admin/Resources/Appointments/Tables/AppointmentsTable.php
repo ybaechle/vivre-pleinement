@@ -4,7 +4,6 @@ namespace App\Filament\Admin\Resources\Appointments\Tables;
 
 use App\Enums\AppointmentStatus;
 use App\Enums\PaymentStatus;
-use App\Mail\AppointmentNoShow;
 use App\Mail\AppointmentRescheduled;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
@@ -118,7 +117,7 @@ class AppointmentsTable
             ->recordActions([
                 Action::make('confirm')
                     ->label('Confirmer')
-                    ->icon('heroicon-o-check-circle')
+                    ->icon(Heroicon::OutlinedCheckCircle)
                     ->color('success')
                     ->button()
                     ->visible(fn (Appointment $record) => $record->status === AppointmentStatus::Pending)
@@ -139,7 +138,7 @@ class AppointmentsTable
 
                     Action::make('cancel')
                         ->label('Annuler')
-                        ->icon('heroicon-o-x-circle')
+                        ->icon(Heroicon::OutlinedXCircle)
                         ->color('danger')
                         ->visible(fn (Appointment $record) => $record->status->isCancellable())
                         ->requiresConfirmation()
@@ -151,16 +150,14 @@ class AppointmentsTable
 
                     Action::make('noShow')
                         ->label('Marquer absent')
-                        ->icon('heroicon-o-user-minus')
+                        ->icon(Heroicon::OutlinedUserMinus)
                         ->color('danger')
                         ->visible(fn (Appointment $record) => $record->status === AppointmentStatus::Confirmed
                             && $record->ends_at->isPast())
                         ->requiresConfirmation()
                         ->modalDescription('Le client sera marqué comme absent et recevra un email l\'invitant à reprendre rendez-vous.')
                         ->action(function (Appointment $record): void {
-                            $record->update(['status' => AppointmentStatus::NoShow]);
-
-                            Mail::to($record->customer_email)->send(new AppointmentNoShow($record));
+                            app(AppointmentLifecycleService::class)->markNoShow($record);
 
                             Notification::make()->success()->title('Client marqué absent')->send();
                         }),
@@ -172,7 +169,7 @@ class AppointmentsTable
                      */
                     Action::make('refund')
                         ->label('Rembourser')
-                        ->icon('heroicon-o-arrow-uturn-left')
+                        ->icon(Heroicon::OutlinedArrowUturnLeft)
                         ->color('danger')
                         ->visible(fn (Appointment $record) => $record->payment_status === PaymentStatus::Paid
                             && $record->stripe_payment_intent_id !== null)
@@ -224,7 +221,7 @@ class AppointmentsTable
     {
         return Action::make('reschedule')
             ->label('Déplacer')
-            ->icon('heroicon-o-arrows-right-left')
+            ->icon(Heroicon::OutlinedArrowsRightLeft)
             ->color('warning')
             ->visible(fn (Appointment $record) => $record->isManageable())
             ->modalHeading('Déplacer le rendez-vous')
@@ -252,9 +249,14 @@ class AppointmentsTable
             ])
             ->action(function (Appointment $record, array $data): void {
                 $previousStart = $record->starts_at->copy();
+                $newStart = CarbonImmutable::parse($data['starts_at']);
+
+                if ($newStart->equalTo($previousStart)) {
+                    return;
+                }
 
                 $moved = app(AppointmentSlotService::class)
-                    ->move($record, CarbonImmutable::parse($data['starts_at']));
+                    ->move($record, $newStart);
 
                 if (! $moved) {
                     Notification::make()

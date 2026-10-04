@@ -7,7 +7,6 @@ use App\Http\Requests\StudentNewPasswordFormRequest;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -17,7 +16,7 @@ class NewPasswordController extends Controller
     public function create(Request $request): View
     {
         return view('student.auth.reset-password', [
-            'request' => $request,
+            'email' => $request->string('email')->value(),
             'token' => $request->route('token'),
         ]);
     }
@@ -34,7 +33,7 @@ class NewPasswordController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function ($student) use ($request): void {
                 $student->forceFill([
-                    'password' => Hash::make($request->string('password')),
+                    'password' => $request->validated('password'),
                     'remember_token' => Str::random(60),
                 ])->save();
 

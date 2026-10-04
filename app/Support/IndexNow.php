@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -54,8 +56,8 @@ class IndexNow
                 'key' => $key,
                 'keyLocation' => url("/{$key}.txt"),
                 'urlList' => $urls,
-            ]);
-        } catch (\Throwable $exception) {
+            ])->throw();
+        } catch (ConnectionException|RequestException $exception) {
             Log::warning('IndexNow ping failed', ['error' => $exception->getMessage()]);
         }
     }

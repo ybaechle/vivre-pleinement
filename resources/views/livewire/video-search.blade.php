@@ -1,5 +1,4 @@
 <div>
-    {{-- Barre de recherche --}}
     <div class="mb-8">
         <label for="video-search" class="sr-only">Rechercher une vidéo</label>
         <div class="relative max-w-xl">
@@ -30,7 +29,6 @@
         </div>
     </div>
 
-    {{-- Filtres par catégorie --}}
     @if ($this->categories->isNotEmpty())
         <nav class="mb-10 flex flex-wrap items-center gap-2" aria-label="Filtres par catégorie">
             <button
@@ -65,7 +63,6 @@
         </nav>
     @endif
 
-    {{-- Résultats --}}
     @if ($videos->isNotEmpty())
         <h2 class="sr-only">Liste des vidéos</h2>
 

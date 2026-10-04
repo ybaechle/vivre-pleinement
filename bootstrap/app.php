@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\AuthenticateStudentSession;
 use App\Http\Middleware\EnsureEnrolled;
 use App\Http\Middleware\EnsureStripeWebhookIsSigned;
 use App\Http\Middleware\HandleRedirects;
@@ -51,8 +50,6 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecureHeaders::class);
         $middleware->append(HandleRedirects::class);
 
-        $middleware->appendToGroup('web', AuthenticateStudentSession::class);
-
         /**
          * Le webhook Stripe (Cashier, préfixe cashier.path) n'exige pas de CSRF
          * : sa signature est vérifiée par EnsureStripeWebhookIsSigned.
@@ -67,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
          * Les élèves non connectés sont redirigés vers leur page de connexion ;
          * l'admin Filament gère sa propre redirection sur /espace-pro.
          */
-        $middleware->redirectGuestsTo(function ($request) {
+        $middleware->redirectGuestsTo(function (Request $request): ?string {
             if ($request->is('espace-pro*')) {
                 return null;
             }

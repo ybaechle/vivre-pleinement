@@ -12,9 +12,6 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * Mot de passe courant utilisé par la factory.
-     */
     protected static ?string $password;
 
     /**
@@ -37,9 +34,6 @@ class UserFactory extends Factory
         ];
     }
 
-    /**
-     * Indique que l'adresse e-mail du modèle doit être non vérifiée.
-     */
     public function unverified(): static
     {
         return $this->state(fn (array $attributes) => [

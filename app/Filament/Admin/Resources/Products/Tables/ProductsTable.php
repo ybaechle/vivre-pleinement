@@ -74,17 +74,6 @@ class ProductsTable
                     ->tooltip(fn (Product $record): ?string => $record->isDeliverable()
                         ? null
                         : 'Tant qu\'aucun fichier n\'est rattaché, cette offre ne peut pas être achetée.'),
-
-                TextColumn::make('stripe_payment_link')
-                    ->label('Paiement')
-                    ->placeholder('–')
-                    ->formatStateUsing(fn (?string $state): string => $state
-                        ? 'Ouvrir dans Stripe'
-                        : '–')
-                    ->color('primary')
-                    ->url(fn (?string $state) => $state)
-                    ->openUrlInNewTab()
-                    ->toggleable(),
             ])
             ->filters([
                 TernaryFilter::make('is_active')

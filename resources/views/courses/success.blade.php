@@ -1,18 +1,17 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @section('title', 'Merci · '.$course->title)
 
+@section('robots', 'noindex,nofollow')
+
 @push('head')
-    <meta name="robots" content="noindex,nofollow">
     @unless ($hasAccess)
         <meta http-equiv="refresh" content="5">
     @endunless
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="bg-cream-50 pt-32 pb-20 sm:pt-36">
+@section('content')
+    <main id="main" class="bg-cream-50 pt-32 pb-20 sm:pt-36">
         <div class="mx-auto max-w-xl px-4 text-center sm:px-6">
             @if ($hasAccess)
                 <span class="mx-auto flex size-16 items-center justify-center rounded-full bg-teal-100 text-teal-700">

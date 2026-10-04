@@ -9,16 +9,19 @@ namespace App\Support;
 class BookingFaq
 {
     /**
-     * Liste complète des questions/réponses.
+     * Le montant cité est celui de la prestation présentée, pour que la FAQ
+     * ne contredise jamais le tarif réellement débité.
      *
      * @return list<array{q: string, a: string}>
      */
-    public static function all(): array
+    public static function all(int $priceCents): array
     {
+        $price = number_format($priceCents / 100, $priceCents % 100 === 0 ? 0 : 2, ',', ' ').' €';
+
         return [
             [
                 'q' => 'Comment cela va-t-il se passer pour prendre rendez-vous ?',
-                'a' => "Lorsque vous cliquerez sur le bouton « prendre rendez-vous », vous allez pouvoir choisir le type de prestation sollicité (téléphone ou visio). Puis, vous serez redirigé vers une autre page où vous devrez entrer vos coordonnées (mail et numéro de portable notamment), et régler le montant de 50 €, par carte bancaire ou PayPal. Si vous choisissez le rendez-vous téléphonique, je vous appellerai directement le jour J à l'heure convenue. Si vous optez pour un rendez-vous en visio, nous conviendrons par courriel de la plateforme qui sera utilisée pour la communication : Zoom, Skype, WhatsApp, etc.",
+                'a' => "Lorsque vous cliquerez sur le bouton « prendre rendez-vous », vous allez pouvoir choisir le type de prestation sollicité (téléphone ou visio). Puis, vous serez redirigé vers une autre page où vous devrez entrer vos coordonnées (mail et numéro de portable notamment), et régler le montant de {$price}, par carte bancaire ou PayPal. Si vous choisissez le rendez-vous téléphonique, je vous appellerai directement le jour J à l'heure convenue. Si vous optez pour un rendez-vous en visio, nous conviendrons par courriel de la plateforme qui sera utilisée pour la communication : Zoom, Skype, WhatsApp, etc.",
             ],
             [
                 'q' => "Comment se passe le règlement. Aurais-je un justificatif d'achat ?",

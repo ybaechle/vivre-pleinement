@@ -12,7 +12,7 @@
                     @csrf
                     <input type="hidden" name="token" value="{{ $token }}">
 
-                    <x-form-field name="email" label="Email" type="email" :value="old('email', $request->email)" required autocomplete="email" />
+                    <x-form-field name="email" label="Email" type="email" :value="old('email', $email)" required autocomplete="email" />
 
                     <x-form-field name="password" label="Nouveau mot de passe" type="password" required autofocus autocomplete="new-password" />
 

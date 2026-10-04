@@ -3,49 +3,6 @@
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
-
-it('links a video to its article from the youtube description url', function () {
-    $post = Post::factory()->create(['slug' => 'phobie-de-conduire']);
-    $video = Video::factory()->create([
-        'duration_seconds' => 600,
-        'description' => "Ma vidéo sur la conduite.\nMon article : https://vivre-pleinement.fr/phobie-de-conduire/\nAbonnez-vous !",
-    ]);
-
-    $this->artisan('videos:link-related-posts')->assertSuccessful();
-
-    expect($video->fresh()->related_post_id)->toBe($post->id);
-});
-
-it('ignores non-article paths like prendre-rendez-vous', function () {
-    Post::factory()->create(['slug' => 'phobie-de-conduire']);
-    $video = Video::factory()->create([
-        'duration_seconds' => 600,
-        'description' => 'Rdv : https://vivre-pleinement.fr/prendre-rendez-vous',
-    ]);
-
-    $this->artisan('videos:link-related-posts')->assertSuccessful();
-
-    expect($video->fresh()->related_post_id)->toBeNull();
-});
-
-it('does not overwrite an existing link unless --force is passed', function () {
-    $old = Post::factory()->create(['slug' => 'ancien']);
-    $new = Post::factory()->create(['slug' => 'nouveau']);
-    $video = Video::factory()->create([
-        'duration_seconds' => 600,
-        'related_post_id' => $old->id,
-        'description' => 'https://vivre-pleinement.fr/nouveau/',
-    ]);
-
-    $this->artisan('videos:link-related-posts')->assertSuccessful();
-    expect($video->fresh()->related_post_id)->toBe($old->id);
-
-    $this->artisan('videos:link-related-posts', ['--force' => true])->assertSuccessful();
-    expect($video->fresh()->related_post_id)->toBe($new->id);
-});
 
 it('shows the related article block on the video page', function () {
     $post = Post::factory()->create(['slug' => 'mon-article', 'title' => 'Mon article lié']);

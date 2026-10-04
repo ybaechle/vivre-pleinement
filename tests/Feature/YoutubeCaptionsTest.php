@@ -2,11 +2,9 @@
 
 use App\Models\Video;
 use App\Services\YoutubeCaptions;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Sleep;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config()->set('services.youtube.oauth_client_id', 'cid');
@@ -179,4 +177,32 @@ it('surfaces a RuntimeException instead of an uncaught RequestException when cap
 
     expect(fn () => $captions->listTracks('abc123'))
         ->toThrow(RuntimeException::class, 'Échec du listing des sous-titres');
+});
+
+it('reports a failed video and exits in failure instead of claiming success', function () {
+    Sleep::fake();
+    Exceptions::fake();
+    Video::factory()->create(['youtube_id' => 'boom', 'duration_seconds' => 600, 'transcript' => null]);
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['access_token' => 'tok', 'expires_in' => 3600]),
+        '*/captions?*' => Http::response(['error' => 'forbidden'], 403),
+    ]);
+
+    $this->artisan('youtube:fetch-transcripts')->assertFailed();
+
+    Exceptions::assertReported(RuntimeException::class);
+});
+
+it('does not retry a quota or permission error', function () {
+    Sleep::fake();
+
+    Http::fake([
+        'oauth2.googleapis.com/token' => Http::response(['access_token' => 'tok', 'expires_in' => 3600]),
+        '*/captions?*' => Http::response(['error' => 'quotaExceeded'], 403),
+    ]);
+
+    expect(fn () => YoutubeCaptions::fromConfig()->listTracks('abc123'))->toThrow(RuntimeException::class);
+
+    Http::assertSentCount(2);
 });

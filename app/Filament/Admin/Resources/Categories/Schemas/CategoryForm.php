@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Categories\Schemas;
 
 use App\Models\Category;
+use App\Support\SlugFromTitle;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -10,7 +11,6 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 
 class CategoryForm
 {
@@ -24,11 +24,7 @@ class CategoryForm
                         ->label('Nom')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (string $state, callable $set, $record) {
-                            if (! $record) {
-                                $set('slug', Str::slug($state));
-                            }
-                        }),
+                        ->afterStateUpdated(SlugFromTitle::onCreate()),
 
                     TextInput::make('slug')
                         ->required()

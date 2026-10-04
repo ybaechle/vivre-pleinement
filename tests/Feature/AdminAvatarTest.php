@@ -3,9 +3,6 @@
 use App\Filament\AvatarProviders\InitialsAvatarProvider;
 use App\Models\User;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(fn () => Filament::setCurrentPanel('admin'));
 

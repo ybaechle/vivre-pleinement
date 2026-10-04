@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @php
     $cancelled = $appointment->status === \App\Enums\AppointmentStatus::Cancelled;
@@ -7,14 +7,10 @@
 
 @section('title', 'Gérer mon rendez-vous · Vivre Pleinement')
 
-@push('head')
-    <meta name="robots" content="noindex,nofollow">
-@endpush
+@section('robots', 'noindex,nofollow')
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="to-cream-50 flex min-h-svh flex-col bg-linear-to-b from-teal-100 via-teal-50/60">
+@section('content')
+    <main id="main" class="to-cream-50 flex min-h-svh flex-col bg-linear-to-b from-teal-100 via-teal-50/60">
         <div class="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center px-4 py-16 text-center sm:px-6">
             <h1 class="text-ink font-serif text-3xl font-medium tracking-tight sm:text-4xl">
                 {{ $cancelled ? 'Rendez-vous annulé' : 'Votre rendez-vous' }}

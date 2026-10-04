@@ -72,8 +72,6 @@ class SecureHeaders
     }
 
     /**
-     * Construit l'en-tête CSP.
-     *
      * En local, le serveur de développement Vite sert les assets depuis une
      * autre origine et ouvre un websocket HMR : on élargit alors les directives
      * concernées plutôt que de retirer l'en-tête, pour que la politique reste

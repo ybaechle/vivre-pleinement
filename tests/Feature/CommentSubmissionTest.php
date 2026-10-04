@@ -5,11 +5,9 @@ use App\Mail\NewCommentNotification;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use App\Support\SiteContact;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();
@@ -122,4 +120,23 @@ it('hides the comment form when comments are closed on the post', function () {
     $this->get(route('blog.show', $post->slug))
         ->assertOk()
         ->assertDontSee('Laisser un commentaire');
+});
+
+it('refuses a visitor using the site author email to get the author badge', function () {
+    $post = Post::factory()->create(['status' => 'published', 'comments_enabled' => true]);
+
+    $this->post(route('blog.comments.store', $post->slug), validCommentPayload([
+        'author_email' => strtoupper(SiteContact::email()),
+    ]))->assertSessionHasErrors('author_email');
+
+    expect(Comment::query()->count())->toBe(0);
+});
+
+it('holds a comment created without explicit status for moderation', function () {
+    $comment = Post::factory()->create()->comments()->create([
+        'author_name' => 'Import',
+        'content' => 'Commentaire importé sans statut.',
+    ]);
+
+    expect($comment->fresh()->status)->toBe(CommentStatus::Pending);
 });

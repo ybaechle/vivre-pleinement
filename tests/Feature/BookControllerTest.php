@@ -3,11 +3,8 @@
 use App\Enums\BookOrderStatus;
 use App\Models\BookOrder;
 use App\Models\Product;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Disque simulé : sans cela, chaque exécution laisse un faux PDF dans
@@ -147,4 +144,13 @@ it('rejette une soumission piégée par le champ honeypot', function () {
     ])->assertSessionHasErrors('website');
 
     expect(BookOrder::query()->count())->toBe(0);
+});
+
+it('affiche les centimes d\'un prix non rond sans les tronquer', function () {
+    $this->solo->update(['price_cents' => 1990]);
+
+    $this->get(route('book.show'))
+        ->assertOk()
+        ->assertSee("19,90\u{00A0}€", false)
+        ->assertDontSee("19,9\u{00A0}€", false);
 });

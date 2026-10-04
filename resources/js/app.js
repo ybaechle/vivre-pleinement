@@ -39,6 +39,12 @@ import './account-delete-dialog.js';
             return;
         }
 
+        // Sans transition (mouvement réduit), transitionend ne viendrait jamais.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            details.open = false;
+            return;
+        }
+
         if (details.dataset.animating === 'true') return;
         details.dataset.animating = 'true';
 

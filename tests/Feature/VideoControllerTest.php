@@ -3,10 +3,7 @@
 use App\Enums\VideoStatus;
 use App\Models\Category;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
-
-uses(LazilyRefreshDatabase::class);
 
 it('shows the video index page with the SEO metadata', function () {
     Video::factory()->count(3)->create();

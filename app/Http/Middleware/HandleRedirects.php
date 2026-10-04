@@ -26,8 +26,7 @@ class HandleRedirects
             return $response;
         }
 
-        $path = '/'.ltrim($request->path(), '/');
-        $redirect = $this->map()[$path] ?? null;
+        $redirect = $this->map()[Redirect::normalizePath($request->path())] ?? null;
 
         if ($redirect === null) {
             return $response;
@@ -59,7 +58,7 @@ class HandleRedirects
             now()->addMinutes(self::CACHE_MINUTES),
             fn (): array => Redirect::query()
                 ->get(['id', 'from_path', 'to_path', 'status_code'])
-                ->keyBy('from_path')
+                ->keyBy(fn (Redirect $redirect): string => Redirect::normalizePath($redirect->from_path))
                 ->map(fn (Redirect $redirect): array => [
                     'id' => $redirect->id,
                     'to_path' => $redirect->to_path,
@@ -88,8 +87,6 @@ class HandleRedirects
     }
 
     /**
-     * Résout la cible d'une redirection.
-     *
      * Une cible absolue n'est suivie que si elle est en http(s) : sans ce
      * filtre, une entrée mal saisie — ou créée depuis un compte admin compromis
      * — pourrait pointer vers un schéma exotique (javascript:, data:) et
@@ -99,7 +96,7 @@ class HandleRedirects
      * `url()` laisse passer les URL protocole-relatives (`//exemple.com`), qui
      * seraient sinon une redirection ouverte déguisée en chemin local.
      */
-    private function resolveTarget(string $toPath): ?string
+    public static function resolveTarget(string $toPath): ?string
     {
         $scheme = parse_url($toPath, PHP_URL_SCHEME);
 

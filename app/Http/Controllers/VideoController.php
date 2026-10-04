@@ -48,7 +48,7 @@ class VideoController extends Controller
     {
         $video = Video::query()
             ->published()
-            ->with(['categories', 'relatedPost' => fn ($query) => $query->published()->with('media')])
+            ->with('categories')
             ->where('slug', $slug)
             ->firstOrFail();
 

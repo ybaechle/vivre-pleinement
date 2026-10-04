@@ -24,7 +24,7 @@ class ContactController extends Controller
         if ($retryAfter !== null) {
             return back()
                 ->withInput($request->except(['website', 'consent', 'ts']))
-                ->withErrors(['message' => "Trop d'envois. Réessayez dans {$retryAfter}s."]);
+                ->withErrors(['throttle' => "Trop d'envois. Réessayez dans {$retryAfter}s."]);
         }
 
         $data = $request->validated();

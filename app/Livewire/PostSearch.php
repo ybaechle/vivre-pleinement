@@ -8,6 +8,7 @@ use App\Models\Tag;
 use App\Support\LikeSearch;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
@@ -108,12 +109,12 @@ class PostSearch extends Component
 
     /**
      * Article à la une : uniquement sur la vue vierge (aucun filtre, tri par
-     * défaut, première page). Reproduit la logique du PostController.
+     * défaut), en première page. Reproduit la logique du PostController.
      */
     #[Computed]
     public function featured(): ?Post
     {
-        if ($this->hasFilters() || $this->sort !== 'recent' || $this->getPage() > 1) {
+        if (! $this->isUnfilteredRecent() || $this->getPage() > 1) {
             return null;
         }
 
@@ -128,10 +129,19 @@ class PostSearch extends Component
     {
         $featured = $this->featured;
 
+        /**
+         * L'article à la une est retiré de la liste sur toutes les pages de la
+         * vue vierge, pas seulement la première : sinon la pagination décale et
+         * un même article apparaît en fin de page 1 et en tête de page 2.
+         */
+        $featuredId = $this->isUnfilteredRecent()
+            ? ($featured?->id ?? Post::query()->published()->orderByDesc('published_at')->value('id'))
+            : null;
+
         $posts = Post::query()
             ->published()
             ->with(['categories', 'tags', 'media'])
-            ->when($featured, fn (Builder $q) => $q->where('id', '!=', $featured->id))
+            ->when($featuredId, fn (Builder $q) => $q->whereKeyNot($featuredId))
             ->when(trim($this->search) !== '', function (Builder $q): void {
                 $like = LikeSearch::wrap(trim($this->search));
 
@@ -163,13 +173,17 @@ class PostSearch extends Component
         ]);
     }
 
+    private function isUnfilteredRecent(): bool
+    {
+        return ! $this->hasFilters() && $this->sort === 'recent';
+    }
+
     /**
      * Catégories avec compteur d'articles publiés (sidebar).
      *
-     * @return \Illuminate\Database\Eloquent\Collection<int, Category>
+     * @return EloquentCollection<int, Category>
      */
-    #[Computed]
-    public function sidebarCategories(): \Illuminate\Database\Eloquent\Collection
+    private function sidebarCategories(): EloquentCollection
     {
         return Category::query()
             ->withCount(['posts' => fn (Builder $q) => $q->published()])
@@ -182,8 +196,7 @@ class PostSearch extends Component
      *
      * @return Collection<int, Tag>
      */
-    #[Computed]
-    public function popularTags(): Collection
+    private function popularTags(): Collection
     {
         return Tag::query()
             ->withCount(['posts' => fn (Builder $q) => $q->published()])

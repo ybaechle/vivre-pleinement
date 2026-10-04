@@ -47,7 +47,7 @@ class BookingPaymentService
 
         $intent = $this->intents->create([
             'amount' => $appointment->price_cents,
-            'currency' => config('cashier.currency', 'eur'),
+            'currency' => strtolower($appointment->service->currency),
             'description' => $appointment->service->name.' – '.$appointment->starts_at->isoFormat('D MMMM YYYY à H\hi'),
             'receipt_email' => $appointment->customer_email,
             'metadata' => ['appointment_id' => $appointment->id],
@@ -108,7 +108,7 @@ class BookingPaymentService
         });
 
         match ($outcome) {
-            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'duplicate' => $this->intents->refundDuplicate($locked, $paymentIntentId, 'un rendez-vous déjà payé'),
             'conflict' => $this->refundAndApologise($locked, $paymentIntentId),
             'fulfilled' => $this->sendConfirmation($locked),
         };
@@ -122,49 +122,15 @@ class BookingPaymentService
     }
 
     /**
-     * Un paiement réussi arrive pour un rendez-vous déjà payé via un intent
-     * différent : le client a payé deux fois (deux onglets avant la
-     * réutilisation d'intent). On rembourse le second débit.
-     */
-    private function refundDuplicatePayment(Appointment $appointment, ?string $paymentIntentId): void
-    {
-        if ($paymentIntentId === null || $paymentIntentId === $appointment->stripe_payment_intent_id) {
-            return;
-        }
-
-        if ($this->intents->refundQuietly($paymentIntentId)) {
-            Log::warning('Second paiement détecté pour un rendez-vous déjà payé : remboursé automatiquement.', [
-                'appointment_id' => $appointment->id,
-                'kept_payment_intent_id' => $appointment->stripe_payment_intent_id,
-                'refunded_payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        Log::error('Second paiement détecté pour un rendez-vous déjà payé mais remboursement impossible.', [
-            'appointment_id' => $appointment->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
-    }
-
-    /**
-     * Enregistre qu'un rendez-vous payé a été remboursé (webhook
-     * charge.refunded ou action admin). Idempotent : un rendez-vous déjà
+     * Enregistre qu'un remboursement a eu lieu, sans rien demander à Stripe :
+     * c'est la voie du webhook charge.refunded, qui arrive précisément parce
+     * que Stripe a déjà crédité le client. Idempotent : un rendez-vous déjà
      * remboursé ou jamais payé ne bouge pas.
      *
      * Le statut du rendez-vous lui-même n'est pas touché : rembourser n'est
      * pas annuler. Une séance honorée puis remboursée par geste commercial
      * doit rester au planning, et libérer le créneau enverrait des emails
-     * d'annulation que personne n'a demandés. L'annulation reste une action
-     * explicite.
-     */
-    /**
-     * Enregistre qu'un remboursement a eu lieu, sans rien demander à Stripe.
-     *
-     * C'est la voie du webhook charge.refunded, qui arrive précisément parce
-     * que Stripe a déjà crédité le client : y déclencher un remboursement en
-     * émettrait un second.
+     * d'annulation que personne n'a demandés.
      */
     public function refund(Appointment $appointment): void
     {

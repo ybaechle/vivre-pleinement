@@ -1,6 +1,5 @@
 <?php
 
-use Laravel\Cashier\Console\WebhookCommand;
 use Laravel\Cashier\Invoices\DompdfInvoiceRenderer;
 
 // use Laravel\Cashier\Invoices\LaravelPdfInvoiceRenderer;
@@ -44,12 +43,19 @@ return [
     | your Stripe webhook handling controllers. The tolerance setting will
     | check the drift between the current time and the signed request's.
     |
+    | The events are those registered by `cashier:webhook`: payments go
+    | through PaymentIntents, not subscriptions, so Cashier's default list
+    | would never deliver payment_intent.succeeded nor charge.refunded.
+    |
     */
 
     'webhook' => [
         'secret' => env('STRIPE_WEBHOOK_SECRET'),
         'tolerance' => env('STRIPE_WEBHOOK_TOLERANCE', 300),
-        'events' => WebhookCommand::DEFAULT_EVENTS,
+        'events' => [
+            'payment_intent.succeeded',
+            'charge.refunded',
+        ],
     ],
 
     /*
@@ -63,7 +69,7 @@ return [
     |
     */
 
-    'currency' => env('CASHIER_CURRENCY', 'usd'),
+    'currency' => env('CASHIER_CURRENCY', 'eur'),
 
     /*
     |--------------------------------------------------------------------------
@@ -76,7 +82,7 @@ return [
     |
     */
 
-    'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'en'),
+    'currency_locale' => env('CASHIER_CURRENCY_LOCALE', 'fr_FR'),
 
     /*
     |--------------------------------------------------------------------------

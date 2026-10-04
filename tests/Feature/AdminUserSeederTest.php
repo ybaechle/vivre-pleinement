@@ -2,10 +2,7 @@
 
 use App\Models\User;
 use Database\Seeders\AdminUserSeeder;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-
-uses(LazilyRefreshDatabase::class);
 
 it('creates the admin user from configured credentials, not raw env() at runtime', function () {
     config([

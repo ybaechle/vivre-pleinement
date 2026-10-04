@@ -3,9 +3,6 @@
 use App\Models\Course;
 use App\Models\Student;
 use App\Models\User;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('inscrit un nouvel élève sur le guard student', function () {
     $response = $this->post(route('student.register.store'), [
@@ -125,4 +122,18 @@ it("empêche un administrateur d'accéder au tableau de bord élève", function 
 it('redirige un visiteur non connecté vers la connexion élève', function () {
     $this->get(route('student.dashboard'))
         ->assertRedirect(route('student.login'));
+});
+
+it('ignore un paramètre course mal formé sur la page d\'inscription', function () {
+    $this->get(route('student.register', ['course' => ['x']]))->assertOk();
+});
+
+it('refuse une inscription dont le paramètre course est mal formé', function () {
+    $this->post(route('student.register.store'), [
+        'name' => 'Camille',
+        'email' => 'camille@example.com',
+        'password' => 'mot-de-passe-solide',
+        'password_confirmation' => 'mot-de-passe-solide',
+        'course' => ['x'],
+    ])->assertSessionHasErrors('course');
 });

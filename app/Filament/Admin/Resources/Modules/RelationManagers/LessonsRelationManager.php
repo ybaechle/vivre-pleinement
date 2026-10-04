@@ -2,21 +2,22 @@
 
 namespace App\Filament\Admin\Resources\Modules\RelationManagers;
 
+use App\Models\Lesson;
 use App\Support\VideoEmbed;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Str;
 
 class LessonsRelationManager extends RelationManager
 {
@@ -36,19 +37,13 @@ class LessonsRelationManager extends RelationManager
                     ->placeholder('Ex. : La respiration apaisante')
                     ->required()
                     ->maxLength(255)
-                    ->live(onBlur: true)
-                    ->afterStateUpdated(function (string $state, callable $set, $record): void {
-                        if (! $record) {
-                            $set('slug', Str::slug($state).'-'.Str::lower(Str::random(5)));
-                        }
-                    })
                     ->columnSpanFull(),
 
                 TextInput::make('video_id')
                     ->label('Vidéo')
                     ->placeholder('Collez le lien YouTube ou Vimeo')
                     ->helperText('Collez l\'adresse complète de la vidéo : la plateforme est détectée automatiquement.')
-                    ->prefixIcon('heroicon-o-play')
+                    ->prefixIcon(Heroicon::OutlinedPlay)
                     ->maxLength(500)
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (?string $state, callable $set): void {
@@ -58,13 +53,7 @@ class LessonsRelationManager extends RelationManager
                     })
                     ->columnSpanFull(),
 
-                Select::make('video_provider')
-                    ->options([
-                        'youtube' => 'YouTube',
-                        'vimeo' => 'Vimeo',
-                    ])
-                    ->dehydrated()
-                    ->hidden(),
+                Hidden::make('video_provider'),
 
                 RichEditor::make('content')
                     ->label('Texte de la leçon')
@@ -96,7 +85,7 @@ class LessonsRelationManager extends RelationManager
             ->reorderRecordsTriggerAction(fn ($action) => $action->label('Réorganiser')->button())
             ->emptyStateHeading('Aucune leçon')
             ->emptyStateDescription('Ajoutez votre première leçon pour ce module.')
-            ->emptyStateIcon('heroicon-o-play-circle')
+            ->emptyStateIcon(Heroicon::OutlinedPlayCircle)
             ->columns([
                 TextColumn::make('position')
                     ->label('#')
@@ -113,13 +102,13 @@ class LessonsRelationManager extends RelationManager
                     ->state(fn ($record): bool => filled($record->video_id)),
                 TextColumn::make('duration_seconds')
                     ->label('Durée')
-                    ->formatStateUsing(fn (?int $state): string => $state ? gmdate('i:s', $state) : '–')
+                    ->formatStateUsing(fn (Lesson $record): string => $record->durationFormatted() ?? '–')
                     ->color('gray'),
             ])
             ->headerActions([
                 CreateAction::make()
                     ->label('Ajouter une leçon')
-                    ->icon('heroicon-o-plus')
+                    ->icon(Heroicon::OutlinedPlus)
                     ->modalHeading('Nouvelle leçon')
                     ->modalWidth(Width::TwoExtraLarge),
             ])

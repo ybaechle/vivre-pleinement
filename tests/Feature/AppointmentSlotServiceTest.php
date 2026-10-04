@@ -7,9 +7,6 @@ use App\Models\Availability;
 use App\Models\DateOverride;
 use App\Services\AppointmentSlotService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Returns the next occurrence of a given weekday (Carbon dayOfWeek, 0=Sun),
@@ -87,11 +84,14 @@ it('never offers a slot already gone when no notice is required', function () {
 });
 
 it('excludes dates beyond the booking horizon', function () {
-    $service = serviceWithAvailability(CarbonImmutable::now()->dayOfWeek, '09:00', '12:00', ['max_advance_days' => 7]);
-
-    $farDate = CarbonImmutable::now()->addDays(30)->startOfDay();
+    $farDate = CarbonImmutable::now()->addDays(28)->startOfDay();
+    $service = serviceWithAvailability($farDate->dayOfWeek, '09:00', '12:00', ['max_advance_days' => 7]);
 
     expect(app(AppointmentSlotService::class)->slotsForDate($service, $farDate))->toBeEmpty();
+
+    $service->update(['max_advance_days' => 60]);
+
+    expect(app(AppointmentSlotService::class)->slotsForDate($service, $farDate))->not->toBeEmpty();
 });
 
 it('excludes slots overlapping an existing appointment', function () {
@@ -110,6 +110,25 @@ it('excludes slots overlapping an existing appointment', function () {
 
     expect($slots->pluck('label'))->not->toContain('09:00')
         ->and($slots)->toHaveCount(5);
+});
+
+it('excludes slots already booked for another service, the agenda being shared', function () {
+    $day = nextWeekday(3);
+    $service = serviceWithAvailability($day->dayOfWeek, '09:00', '12:00');
+    $otherService = AppointmentService::factory()->create();
+
+    $start = $day->setTime(9, 0);
+    Appointment::factory()->create([
+        'appointment_service_id' => $otherService->id,
+        'starts_at' => $start,
+        'ends_at' => $start->addMinutes(30),
+        'status' => AppointmentStatus::Confirmed,
+    ]);
+
+    $slotService = app(AppointmentSlotService::class);
+
+    expect($slotService->slotsForDate($service, $day)->pluck('label'))->not->toContain('09:00')
+        ->and($slotService->reserve($service, $start, ['customer_first_name' => 'Camille', 'customer_email' => 'camille@example.com']))->toBeNull();
 });
 
 it('keeps slots when the overlapping appointment is cancelled', function () {

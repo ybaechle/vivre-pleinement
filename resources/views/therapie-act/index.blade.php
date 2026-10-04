@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     $faq = [
@@ -54,12 +54,10 @@
 @section('og_description', "Définition, principes et efficacité de la thérapie d'acceptation et d'engagement (ACT) sur les troubles anxieux.")
 
 @push('head')
-    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$faqLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -147,12 +145,12 @@
             <p>
                 L'ACT est particulièrement adaptée aux troubles anxieux, là où la lutte contre les pensées
                 entretient le problème :
-                <a href="{{ url('/blog/trouble-anxieux-generalise') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">trouble anxieux généralisé</a>,
-                <a href="{{ url('/blog/toc-troubles-obsessionnels-compulsifs') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">TOC</a>,
-                <a href="{{ url('/blog/les-phobies-dimpulsion') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobies d'impulsion</a>,
-                <a href="{{ url('/blog/phobie-sociale') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobie sociale</a>,
-                <a href="{{ url('/blog/ruminations') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">ruminations mentales</a>
-                ou encore <a href="{{ url('/blog/burn-out') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">burn-out</a>.
+                <a href="{{ route('blog.show', 'trouble-anxieux-generalise') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">trouble anxieux généralisé</a>,
+                <a href="{{ route('blog.show', 'toc-troubles-obsessionnels-compulsifs') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">TOC</a>,
+                <a href="{{ route('blog.show', 'les-phobies-dimpulsion') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobies d'impulsion</a>,
+                <a href="{{ route('blog.show', 'phobie-sociale') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobie sociale</a>,
+                <a href="{{ route('blog.show', 'ruminations') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">ruminations mentales</a>
+                ou encore <a href="{{ route('blog.show', 'burn-out') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">burn-out</a>.
             </p>
             <p>
                 J'ai moi-même traversé plusieurs de ces troubles avant de devenir praticienne, c'est
@@ -199,6 +197,4 @@
     </div>
 
     </main>
-
-    @include('home.sections.footer')
 @endsection

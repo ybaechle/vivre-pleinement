@@ -8,11 +8,7 @@ use App\Models\Student;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function activeEnrollment(string $intentId = 'pi_refund_test'): Enrollment
 {
@@ -23,21 +19,10 @@ function activeEnrollment(string $intentId = 'pi_refund_test'): Enrollment
     ]);
 }
 
-function refundWebhook(?string $intentId = 'pi_refund_test'): void
-{
-    event(new WebhookReceived([
-        'type' => 'charge.refunded',
-        'data' => ['object' => [
-            'id' => 'ch_test_123',
-            'payment_intent' => $intentId,
-        ]],
-    ]));
-}
-
 it('révoque l\'accès sur un webhook charge.refunded', function () {
     $enrollment = activeEnrollment();
 
-    refundWebhook();
+    chargeRefundedWebhook('pi_refund_test');
 
     expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Refunded);
 });
@@ -45,15 +30,23 @@ it('révoque l\'accès sur un webhook charge.refunded', function () {
 it('retire l\'accès aux leçons à un élève remboursé', function () {
     $enrollment = activeEnrollment();
 
-    refundWebhook();
+    chargeRefundedWebhook('pi_refund_test');
 
     expect($enrollment->student->fresh()->hasAccessTo($enrollment->course))->toBeFalse();
+});
+
+it('conserve l\'accès sur un remboursement partiel', function () {
+    $enrollment = activeEnrollment();
+
+    chargeRefundedWebhook('pi_refund_test', fullyRefunded: false);
+
+    expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Active);
 });
 
 it('ignore un remboursement dont le PaymentIntent est inconnu', function () {
     $enrollment = activeEnrollment();
 
-    refundWebhook('pi_autre_paiement');
+    chargeRefundedWebhook('pi_autre_paiement');
 
     expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Active);
 });
@@ -61,7 +54,7 @@ it('ignore un remboursement dont le PaymentIntent est inconnu', function () {
 it('ignore un webhook charge.refunded sans payment_intent', function () {
     $enrollment = activeEnrollment();
 
-    refundWebhook(null);
+    chargeRefundedWebhook(null);
 
     expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Active);
 });
@@ -71,7 +64,7 @@ it('ne réactive pas une inscription en attente lors d\'un remboursement', funct
         'stripe_payment_intent_id' => 'pi_refund_test',
     ]);
 
-    refundWebhook();
+    chargeRefundedWebhook('pi_refund_test');
 
     expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::Pending);
 });

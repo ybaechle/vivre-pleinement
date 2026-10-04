@@ -10,12 +10,21 @@ use Illuminate\Support\Facades\Cache;
 
 class VideoObserver
 {
-    public function saved(Video $video): void
-    {
-        $this->flushCaches();
+    /**
+     * Rafraîchis à chaque synchronisation horaire sans changer la page :
+     * ils ne justifient ni une notification IndexNow ni une purge des caches.
+     */
+    private const SYNC_ONLY_ATTRIBUTES = ['view_count', 'like_count', 'synced_at', 'updated_at'];
 
-        if (Video::query()->indexable()->whereKey($video->getKey())->exists()) {
-            IndexNow::ping(route('videos.show', $video->slug));
+    public function created(Video $video): void
+    {
+        $this->contentChanged($video);
+    }
+
+    public function updated(Video $video): void
+    {
+        if (array_diff(array_keys($video->getChanges()), self::SYNC_ONLY_ATTRIBUTES) !== []) {
+            $this->contentChanged($video);
         }
     }
 
@@ -32,6 +41,15 @@ class VideoObserver
     public function forceDeleted(Video $video): void
     {
         $this->flushCaches();
+    }
+
+    private function contentChanged(Video $video): void
+    {
+        $this->flushCaches();
+
+        if (Video::query()->indexable()->whereKey($video->getKey())->exists()) {
+            IndexNow::ping(route('videos.show', $video->slug));
+        }
     }
 
     private function flushCaches(): void

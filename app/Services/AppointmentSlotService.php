@@ -106,7 +106,6 @@ class AppointmentSlotService
             ->groupBy(fn (DateOverride $override) => CarbonImmutable::parse($override->date)->toDateString());
 
         $bookedByDate = Appointment::query()
-            ->where('appointment_service_id', $service->id)
             ->blocking()
             ->whereBetween('starts_at', [$from->startOfDay(), $to->endOfDay()])
             ->get(['starts_at', 'ends_at'])
@@ -173,7 +172,7 @@ class AppointmentSlotService
                 }
 
                 foreach ($overrides as $override) {
-                    if ($this->overlapsOverride($slot, $override, $slot['start'])) {
+                    if ($this->overlapsOverride($slot['start'], $slot['end'], $override)) {
                         return true;
                     }
                 }
@@ -214,14 +213,7 @@ class AppointmentSlotService
             ->get();
 
         foreach ($overrides as $override) {
-            if ($override->isFullDay()) {
-                return false;
-            }
-
-            $blockStart = $this->applyTime($date, $override->start_time);
-            $blockEnd = $this->applyTime($date, $override->end_time);
-
-            if ($start->lessThan($blockEnd) && $end->greaterThan($blockStart)) {
+            if ($this->overlapsOverride($start, $end, $override)) {
                 return false;
             }
         }
@@ -260,7 +252,6 @@ class AppointmentSlotService
     public function hasConflictingAppointment(Appointment $appointment): bool
     {
         return $this->hasOverlap(
-            $appointment->appointment_service_id,
             $appointment->starts_at,
             $appointment->ends_at,
             $appointment->id,
@@ -268,13 +259,13 @@ class AppointmentSlotService
     }
 
     /**
-     * Indique si un autre rendez-vous bloquant chevauche la fenêtre donnée pour
-     * cette prestation. Utilisé par le formulaire admin pour empêcher la
-     * création/modification d'un rendez-vous en double-réservation.
+     * Indique si un autre rendez-vous bloquant chevauche la fenêtre donnée.
+     * Utilisé par le formulaire admin pour empêcher la création/modification
+     * d'un rendez-vous en double-réservation.
      */
-    public function hasOverlap(int $serviceId, CarbonInterface $start, CarbonInterface $end, ?int $excludingAppointmentId = null): bool
+    public function hasOverlap(CarbonInterface $start, CarbonInterface $end, ?int $excludingAppointmentId = null): bool
     {
-        $query = $this->overlapQuery($serviceId, $start, $end);
+        $query = $this->overlapQuery($start, $end);
 
         if ($excludingAppointmentId !== null) {
             $query->where('id', '!=', $excludingAppointmentId);
@@ -295,9 +286,9 @@ class AppointmentSlotService
         $end = $start->addMinutes($service->duration_minutes);
 
         return DB::transaction(function () use ($service, $start, $end, $attributes) {
-            AppointmentService::query()->whereKey($service->id)->lockForUpdate()->first();
+            $this->lockAgenda();
 
-            if ($this->overlapQuery($service->id, $start, $end)->lockForUpdate()->exists()) {
+            if ($this->overlapQuery($start, $end)->lockForUpdate()->exists()) {
                 return null;
             }
 
@@ -318,10 +309,10 @@ class AppointmentSlotService
         $service = $appointment->service;
         $end = $start->addMinutes($service->duration_minutes);
 
-        return DB::transaction(function () use ($appointment, $service, $start, $end) {
-            AppointmentService::query()->whereKey($service->id)->lockForUpdate()->first();
+        return DB::transaction(function () use ($appointment, $start, $end) {
+            $this->lockAgenda();
 
-            $conflict = $this->overlapQuery($service->id, $start, $end)
+            $conflict = $this->overlapQuery($start, $end)
                 ->where('id', '!=', $appointment->id)
                 ->lockForUpdate()
                 ->exists();
@@ -337,12 +328,21 @@ class AppointmentSlotService
     }
 
     /**
+     * Une seule praticienne reçoit toutes les prestations : l'agenda est
+     * commun, donc deux réservations concurrentes, même sur des prestations
+     * différentes, doivent passer l'une après l'autre.
+     */
+    private function lockAgenda(): void
+    {
+        AppointmentService::withTrashed()->lockForUpdate()->get(['id']);
+    }
+
+    /**
      * @return Builder<Appointment>
      */
-    private function overlapQuery(int $serviceId, CarbonInterface $start, CarbonInterface $end): Builder
+    private function overlapQuery(CarbonInterface $start, CarbonInterface $end): Builder
     {
         return Appointment::query()
-            ->where('appointment_service_id', $serviceId)
             ->blocking()
             ->where('starts_at', '<', $end)
             ->where('ends_at', '>', $start);
@@ -375,16 +375,14 @@ class AppointmentSlotService
         return $slots;
     }
 
-    private function overlapsOverride(array $slot, DateOverride $override, CarbonImmutable $date): bool
+    private function overlapsOverride(CarbonImmutable $start, CarbonImmutable $end, DateOverride $override): bool
     {
         if ($override->isFullDay()) {
             return true;
         }
 
-        $blockStart = $this->applyTime($date, $override->start_time);
-        $blockEnd = $this->applyTime($date, $override->end_time);
-
-        return $slot['start']->lessThan($blockEnd) && $slot['end']->greaterThan($blockStart);
+        return $start->lessThan($this->applyTime($start, $override->end_time))
+            && $end->greaterThan($this->applyTime($start, $override->start_time));
     }
 
     private function applyTime(CarbonImmutable $date, string $time): CarbonImmutable

@@ -2,10 +2,7 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\DB;
-
-uses(LazilyRefreshDatabase::class);
 
 it('persists reading_time_minutes when content changes', function () {
     $post = Post::factory()->create(['content' => str_repeat('mot ', 230)]);

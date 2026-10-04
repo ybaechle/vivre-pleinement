@@ -16,11 +16,6 @@ class PostController extends Controller
 {
     private const PER_PAGE = 9;
 
-    /**
-     * Clé distincte de l'ancienne `blog.rss.posts`, qui contenait des
-     * modèles : au déploiement, l'entrée héritée ne doit pas être
-     * relue comme du XML. Elle expire seule en trente minutes.
-     */
     public const RSS_CACHE_KEY = 'blog.rss.xml';
 
     /**

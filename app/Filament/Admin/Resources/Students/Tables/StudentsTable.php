@@ -38,9 +38,8 @@ class StudentsTable
                 TextColumn::make('anonymized_at')
                     ->label('Anonymisé')
                     ->badge()
-                    ->formatStateUsing(fn ($state): string => $state ? 'Oui' : '')
-                    ->color('danger')
-                    ->placeholder(''),
+                    ->formatStateUsing(fn (): string => 'Oui')
+                    ->color('danger'),
             ])
             ->recordActions([
                 ViewAction::make(),

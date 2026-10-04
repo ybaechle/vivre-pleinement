@@ -31,10 +31,13 @@ class Comment extends Model
     use SoftDeletes;
 
     /**
+     * Un commentaire n'est publié qu'après modération, sauf statut explicite
+     * (réponse saisie dans l'admin).
+     *
      * @var array<string, mixed>
      */
     protected $attributes = [
-        'status' => 'approved',
+        'status' => 'pending',
     ];
 
     protected function casts(): array

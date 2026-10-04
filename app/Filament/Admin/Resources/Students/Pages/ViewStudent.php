@@ -9,6 +9,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ViewStudent extends ViewRecord
 {
@@ -32,7 +33,7 @@ class ViewStudent extends ViewRecord
         return [
             Action::make('anonymize')
                 ->label('Supprimer / anonymiser (RGPD)')
-                ->icon('heroicon-o-trash')
+                ->icon(Heroicon::OutlinedTrash)
                 ->color('danger')
                 ->visible(fn (): bool => ! $this->record->isAnonymized())
                 ->requiresConfirmation()

@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
-
 it('sends the security headers on every response', function () {
     $response = $this->get('/');
 

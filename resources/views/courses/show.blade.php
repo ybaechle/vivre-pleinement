@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', $course->seo_title ?: $course->title.' · Formation')
 @section('description', $course->seo_description ?: $course->subtitle)
@@ -37,7 +37,7 @@
 
         $courseLd['hasCourseInstance'] = array_filter($courseLd['hasCourseInstance']);
     @endphp
-    <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$courseLd" />
 @endpush
 
 @php
@@ -46,13 +46,7 @@
     $lessonCount = $course->modules->sum(fn ($module) => $module->lessons->count());
 @endphp
 
-@section('body')
-    <a href="#main" class="focus:bg-ink sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white">
-        Aller au contenu
-    </a>
-
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -77,7 +71,6 @@
             @endif
 
             <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
-                {{-- Contenu principal --}}
                 <div class="lg:col-span-7">
                     @if ($course->intro_video_provider === 'youtube' && $course->intro_video_id)
                         <x-youtube-embed :youtubeId="$course->intro_video_id" :title="$course->title" />
@@ -103,7 +96,6 @@
                         </div>
                     @endif
 
-                    {{-- Programme --}}
                     <div class="mt-10">
                         <h2 class="text-ink font-serif text-2xl font-medium">Programme</h2>
                         <p class="text-ink-muted mt-1 text-sm">{{ $course->modules->count() }} module(s) · {{ $lessonCount }} leçon(s)</p>
@@ -135,7 +127,6 @@
                     </div>
                 </div>
 
-                {{-- Carte d'achat (sticky) --}}
                 <aside class="lg:col-span-5">
                     <div class="lg:sticky lg:top-28">
                         <div class="ring-ink/5 overflow-hidden rounded-4xl bg-white shadow-sm ring-1">
@@ -205,6 +196,4 @@
             @endif
         </div>
     </div>
-
-    @include('home.sections.footer')
 @endsection

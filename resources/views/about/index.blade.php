@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', 'Qui suis-je · Laura Baechlé - Vivre Pleinement')
 @section('description', "Laura Baechlé, praticienne ACT. Mon parcours avec les troubles anxieux et comment la thérapie d'acceptation et d'engagement (ACT) m'a permis de vivre pleinement.")
@@ -6,13 +6,7 @@
 @section('og_title', 'Qui suis-je · Laura Baechlé')
 @section('og_description', "Mon parcours avec les troubles anxieux et la thérapie ACT, que j'exerce aujourd'hui en tant que praticienne.")
 
-@section('body')
-    <a href="#main" class="focus:bg-ink sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white">
-        Aller au contenu
-    </a>
-
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -36,7 +30,6 @@
 
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
-            {{-- Portrait centré en ouverture --}}
             <div class="mx-auto w-full max-w-xs sm:max-w-sm">
                 <div class="relative">
                     <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-full bg-linear-to-br from-teal-100/60 blur-2xl"></div>
@@ -119,7 +112,6 @@
 
                     <x-health-disclaimer class="mt-12" />
 
-                    {{-- CTA --}}
                     <div class="mt-12 rounded-3xl bg-teal-700 p-8 text-center shadow-lg shadow-teal-700/20 sm:p-10">
                         <h2 class="font-serif text-2xl font-medium text-white sm:text-3xl">Et si on en parlait&nbsp;?</h2>
                         <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-teal-50 sm:text-base">
@@ -133,6 +125,4 @@
             </article>
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

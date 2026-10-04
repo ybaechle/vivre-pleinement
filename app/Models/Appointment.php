@@ -42,12 +42,16 @@ class Appointment extends Model
     use HasFactory;
 
     /**
+     * Seul le tunnel de paiement déclare un rendez-vous impayé : par défaut
+     * (création depuis l'admin), il échappe ainsi au nettoyage des paniers
+     * abandonnés.
+     *
      * @var array<string, mixed>
      */
     protected $attributes = [
         'status' => 'confirmed',
         'price_cents' => 0,
-        'payment_status' => 'unpaid',
+        'payment_status' => 'not_required',
         'channel' => 'video',
     ];
 
@@ -56,6 +60,18 @@ class Appointment extends Model
         static::creating(function (Appointment $appointment): void {
             $appointment->reference ??= self::generateReference();
             $appointment->token ??= self::generateToken();
+        });
+
+        /**
+         * Une séance de coaching offerte avec le livre et annulée reste due :
+         * on libère la commande pour que son lien permette de la reprendre.
+         */
+        static::updated(function (Appointment $appointment): void {
+            if ($appointment->wasChanged('status') && $appointment->status === AppointmentStatus::Cancelled) {
+                BookOrder::query()
+                    ->where('coaching_appointment_id', $appointment->id)
+                    ->update(['coaching_appointment_id' => null]);
+            }
         });
     }
 
@@ -76,11 +92,14 @@ class Appointment extends Model
     }
 
     /**
+     * Inclut la prestation supprimée : les rendez-vous déjà pris restent
+     * consultables, déplaçables et notifiables.
+     *
      * @return BelongsTo<AppointmentService, $this>
      */
     public function service(): BelongsTo
     {
-        return $this->belongsTo(AppointmentService::class, 'appointment_service_id');
+        return $this->belongsTo(AppointmentService::class, 'appointment_service_id')->withTrashed();
     }
 
     /**

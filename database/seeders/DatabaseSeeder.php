@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
             ContentSeeder::class,
             SettingsSeeder::class,
             BookingSeeder::class,
-            MigrationCleanupSeeder::class,
         ]);
     }
 }

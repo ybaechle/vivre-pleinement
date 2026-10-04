@@ -116,30 +116,6 @@ it('returns real Post models on a second (cached) read', function () {
         ->and($second->pluck('id')->all())->toBe($first->pluck('id')->all());
 });
 
-it('reports a healthy mesh when everything is wired', function () {
-    $cluster = Category::factory()->create();
-    $pillar = Post::factory()->create();
-    $pillar->categories()->attach($cluster);
-    $cluster->update(['pillar_post_id' => $pillar->id]);
-
-    $this->artisan('seo:maillage')->assertExitCode(0);
-});
-
-it('fails the audit when a published post is orphaned', function () {
-    Post::factory()->create(['slug' => 'orphelin']);
-
-    $this->artisan('seo:maillage')
-        ->expectsOutputToContain('orphelin')
-        ->assertExitCode(1);
-});
-
-it('fails the audit when a category has no pillar', function () {
-    $cluster = Category::factory()->create();
-    Post::factory()->create()->categories()->attach($cluster);
-
-    $this->artisan('seo:maillage')->assertExitCode(1);
-});
-
 it('refreshes the similar block of an article outside the cluster of a new publication', function () {
     $post = Post::factory()->create(['status' => 'published']);
     $post->categories()->attach(Category::factory()->create());

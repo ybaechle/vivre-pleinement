@@ -147,12 +147,12 @@
             <p>
                 L'ACT est particulièrement adaptée aux troubles anxieux, là où la lutte contre les pensées
                 entretient le problème :
-                <a href="{{ url('/blog/trouble-anxieux-generalise') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">trouble anxieux généralisé</a>,
-                <a href="{{ url('/blog/toc-troubles-obsessionnels-compulsifs') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">TOC</a>,
-                <a href="{{ url('/blog/les-phobies-dimpulsion') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobies d'impulsion</a>,
-                <a href="{{ url('/blog/phobie-sociale') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobie sociale</a>,
-                <a href="{{ url('/blog/ruminations') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">ruminations mentales</a>
-                ou encore <a href="{{ url('/blog/burn-out') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">burn-out</a>.
+                <a href="{{ route('blog.show', 'trouble-anxieux-generalise') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">trouble anxieux généralisé</a>,
+                <a href="{{ route('blog.show', 'toc-troubles-obsessionnels-compulsifs') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">TOC</a>,
+                <a href="{{ route('blog.show', 'les-phobies-dimpulsion') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobies d'impulsion</a>,
+                <a href="{{ route('blog.show', 'phobie-sociale') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">phobie sociale</a>,
+                <a href="{{ route('blog.show', 'ruminations') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">ruminations mentales</a>
+                ou encore <a href="{{ route('blog.show', 'burn-out') }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">burn-out</a>.
             </p>
             <p>
                 J'ai moi-même traversé plusieurs de ces troubles avant de devenir praticienne, c'est

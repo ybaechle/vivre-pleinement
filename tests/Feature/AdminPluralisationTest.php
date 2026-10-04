@@ -24,35 +24,6 @@ beforeEach(function () {
     Filament::setCurrentPanel('admin');
 });
 
-/**
- * Laravel n'accepte que les intervalles entre accolades ou crochets fermants
- * ({1}, [2,*]). La notation exclusive ]1,*[ empruntée à ICU ne correspond à
- * aucune de ses expressions régulières : le segment n'est ni choisi ni
- * nettoyé, et l'admin lit « ]1,*[ 5 créneaux » à l'écran dès que le compte
- * dépasse un. Ce test interdit la notation à la source.
- */
-it('never uses an interval syntax Laravel cannot strip', function () {
-    $offenders = [];
-
-    $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator(app_path()),
-    );
-
-    foreach ($files as $file) {
-        if ($file->getExtension() !== 'php') {
-            continue;
-        }
-
-        $contents = file_get_contents($file->getPathname());
-
-        if (str_contains($contents, ']1,*[') || preg_match('/\]\d+,/', $contents)) {
-            $offenders[] = $file->getPathname();
-        }
-    }
-
-    expect($offenders)->toBe([]);
-});
-
 it('pluralises the dashboard summary beyond one', function () {
     Comment::factory()->count(3)->create(['status' => CommentStatus::Pending]);
     Appointment::factory()->count(2)->create([

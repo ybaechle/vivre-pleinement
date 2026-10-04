@@ -66,6 +66,9 @@ jobs:
       - name: Run Pint (code style)
         run: vendor/bin/pint --test
 
+      - name: Check project conventions
+        run: composer lint:conventions
+
       - name: Install npm dependencies
         run: npm ci
 

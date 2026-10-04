@@ -37,6 +37,7 @@ Les mails partent dans Mailpit : <http://localhost:8025>.
 |---|---|
 | `vendor/bin/sail artisan test --compact` | Lance la suite de tests |
 | `vendor/bin/sail bin pint --dirty` | Formate le code PHP modifié |
+| `vendor/bin/sail composer lint:conventions` | Vérifie les conventions de design et de code (échelles, libellés, pièges Blade), aussi lancé en CI |
 | `vendor/bin/sail npm run build` | Compile les assets |
 | `vendor/bin/sail artisan youtube:oauth-setup` | Configure l'accès OAuth à la chaîne YouTube (sous-titres) |
 | `vendor/bin/sail artisan videos:export-transcripts` / `videos:import-transcripts` | Mise en forme manuelle des transcriptions, en secours du pipeline n8n |

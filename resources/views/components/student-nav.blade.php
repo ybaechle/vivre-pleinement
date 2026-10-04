@@ -1,7 +1,7 @@
 @php
     $tabs = [
-        ['label' => 'Mes formations', 'href' => route('student.dashboard'), 'active' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson')],
-        ['label' => 'Mon compte', 'href' => route('student.account.edit'), 'active' => request()->routeIs('student.account.*') || request()->routeIs('student.verification.*')],
+        ['label' => 'Mes formations', 'href' => route('student.dashboard'), 'active' => request()->routeIs('student.dashboard', 'student.course', 'student.lesson')],
+        ['label' => 'Mon compte', 'href' => route('student.account.edit'), 'active' => request()->routeIs('student.account.*', 'student.verification.*')],
     ];
 @endphp
 

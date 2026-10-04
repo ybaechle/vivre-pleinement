@@ -93,16 +93,16 @@
                             <div class="border-ink/5 my-1 border-t"></div>
                             <a href="{{ route('student.dashboard') }}" @class([
                                 'flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
-                                'text-teal-700' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson'),
-                                'text-ink-soft' => ! (request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson')),
+                                'text-teal-700' => request()->routeIs('student.dashboard', 'student.course', 'student.lesson'),
+                                'text-ink-soft' => ! (request()->routeIs('student.dashboard', 'student.course', 'student.lesson')),
                             ])>
                                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 9 12 2l9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/></svg>
                                 Mes formations
                             </a>
                             <a href="{{ route('student.account.edit') }}" @class([
                                 'flex items-center gap-2.5 rounded-2xl px-3 py-2.5 text-sm font-medium transition hover:bg-teal-50 hover:text-teal-700',
-                                'text-teal-700' => request()->routeIs('student.account.*') || request()->routeIs('student.verification.*'),
-                                'text-ink-soft' => ! (request()->routeIs('student.account.*') || request()->routeIs('student.verification.*')),
+                                'text-teal-700' => request()->routeIs('student.account.*', 'student.verification.*'),
+                                'text-ink-soft' => ! (request()->routeIs('student.account.*', 'student.verification.*')),
                             ])>
                                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
                                 Mon compte
@@ -175,14 +175,14 @@
                     </p>
                     <a href="{{ route('student.dashboard') }}" @class([
                         'flex items-center gap-2 rounded-2xl py-3 pr-4 pl-6 transition hover:bg-teal-50 hover:text-teal-700',
-                        'text-teal-700' => request()->routeIs('student.dashboard') || request()->routeIs('student.course') || request()->routeIs('student.lesson'),
+                        'text-teal-700' => request()->routeIs('student.dashboard', 'student.course', 'student.lesson'),
                     ])>
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 9 12 2l9 7"/><path d="M5 10v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V10"/></svg>
                         Mes formations
                     </a>
                     <a href="{{ route('student.account.edit') }}" @class([
                         'flex items-center gap-2 rounded-2xl py-3 pr-4 pl-6 transition hover:bg-teal-50 hover:text-teal-700',
-                        'text-teal-700' => request()->routeIs('student.account.*') || request()->routeIs('student.verification.*'),
+                        'text-teal-700' => request()->routeIs('student.account.*', 'student.verification.*'),
                     ])>
                         <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/><path d="M3 21a9 9 0 0 1 18 0"/></svg>
                         Mon compte

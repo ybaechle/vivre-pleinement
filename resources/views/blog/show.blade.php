@@ -226,11 +226,9 @@
                             <rect x="9" y="9" width="13" height="13" rx="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
-                        {{-- Coche (état copié) --}}
                         <svg class="hidden size-4 group-data-[copied=true]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/>
                         </svg>
-                        {{-- Tooltip --}}
                         <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-2xl px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
                             Copié&nbsp;!
                         </span>

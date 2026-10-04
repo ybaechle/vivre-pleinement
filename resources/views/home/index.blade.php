@@ -60,7 +60,6 @@
     <div class="parallax-scene to-cream-50 text-ink relative flex h-svh min-h-160 flex-col overflow-hidden bg-linear-to-b from-teal-200 from-0% via-teal-100 via-30% to-85%">
 
         <section class="relative isolate flex min-h-0 flex-1">
-            {{-- Soleil --}}
             <div class="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
                 <div data-parallax="0.02" class="absolute -top-56 -right-40 size-150 rounded-full bg-amber-100/45 blur-3xl will-change-transform"></div>
                 <div data-parallax="0.02" class="absolute -top-24 -right-24 size-56 rounded-full bg-linear-to-br from-white via-amber-50 to-amber-100/70 blur-xl will-change-transform sm:size-72"></div>
@@ -131,7 +130,6 @@
                         @csrf
                         <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
-                        {{-- Honeypot anti-spam --}}
                         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">
                             <label for="nl_website">Site web (ne pas remplir)</label>
                             <input type="text" id="nl_website" name="website" tabindex="-1" autocomplete="off">

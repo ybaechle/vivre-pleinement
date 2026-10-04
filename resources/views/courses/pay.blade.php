@@ -20,7 +20,6 @@
                 Paiement sécurisé. Accès immédiat à votre formation après paiement.
             </p>
 
-            {{-- Récapitulatif --}}
             <div class="ring-ink/5 mt-8 rounded-3xl bg-white p-6 shadow-xs ring-1">
                 <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre formation</p>
                 <div class="mt-3 flex items-baseline justify-between gap-4">
@@ -32,7 +31,6 @@
 
             @php $amountLabel = Number::currency($course->price, in: 'EUR', locale: 'fr'); @endphp
 
-            {{-- Paiement --}}
             <form id="payment-form"
                   class="ring-ink/5 mt-6 rounded-3xl bg-white p-6 shadow-xs ring-1 sm:p-8"
                   data-stripe-key="{{ $stripeKey }}"

@@ -52,7 +52,6 @@
                 <x-logo class="h-9 w-auto sm:h-11 lg:h-12" />
             </a>
 
-            {{-- Navigation desktop --}}
             <ul class="hidden items-center gap-7 text-sm font-medium md:pointer-events-auto md:flex">
                 @foreach ($offerLinks as $link)
                     <li>
@@ -76,7 +75,6 @@
             <div class="flex items-center gap-2 md:pointer-events-auto">
                 @auth('student')
                     @php $studentUser = auth('student')->user(); @endphp
-                    {{-- Menu utilisateur (desktop) --}}
                     <details name="student-menu" class="group/user relative hidden md:block">
                         <summary @class([
                             'flex cursor-pointer list-none items-center gap-2 rounded-full px-3 py-2 text-xs font-medium text-ink-soft transition hover:bg-teal-50 hover:text-teal-700 sm:text-sm [&::-webkit-details-marker]:hidden',
@@ -149,7 +147,6 @@
             </div>
         </summary>
 
-        {{-- Navigation mobile --}}
         <ul class="border-ink/5 text-ink-soft flex flex-col border-t p-2 text-sm font-medium md:hidden">
             @foreach ($mobileSections as $sectionLabel => $sectionLinks)
                 {{-- Ces intitulés ne sont pas cliquables. Le filet qui les

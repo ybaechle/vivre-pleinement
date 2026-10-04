@@ -88,7 +88,6 @@
                     vos troubles anxieux
                 </p>
 
-                {{-- Modalités : avatars --}}
                 <div class="mt-10 flex items-center justify-center gap-8 sm:gap-12">
                     {{-- Cadre « feuille » : les clichés sont en 2:3, un disque
                          perdrait soit le visage, soit l'ordinateur. Les deux
@@ -149,7 +148,6 @@
         </div>
     </header>
 
-    {{-- Mon histoire / empathie --}}
     <x-section bg="bg-cream-50" eyebrow="Je vous comprends" title="Votre anxiété vous gâche l'existence." headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-lg leading-relaxed sm:text-xl">
             <p class="first-letter:float-left first-letter:mr-3 first-letter:font-serif first-letter:text-6xl first-letter:leading-[0.8] first-letter:font-medium first-letter:text-teal-700">
@@ -193,7 +191,6 @@
         </div>
     </x-section>
 
-    {{-- Pour qui --}}
     <x-section bg="bg-white" eyebrow="Pour qui ?" title="Pour qui est fait cet accompagnement en ACT ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
@@ -231,7 +228,6 @@
         </ul>
     </x-section>
 
-    {{-- Le déroulé --}}
     <x-section bg="bg-cream-50" eyebrow="Le déroulé" title="Comment se déroule la séance d'ACT ?" headerWidth="max-w-3xl">
         <div class="text-ink-soft mx-auto max-w-2xl space-y-6 text-base leading-relaxed sm:text-lg">
             <p>
@@ -254,7 +250,6 @@
         </div>
     </x-section>
 
-    {{-- Témoignages --}}
     <x-section bg="bg-white" eyebrow="Témoignages" title="Elles en parlent mieux que moi."
         lead="Quelques retours de personnes que j'ai accompagnées." headerWidth="max-w-3xl">
         <div class="mx-auto grid max-w-6xl grid-cols-1 gap-6 md:grid-cols-3">
@@ -295,7 +290,6 @@
         </p>
     </x-section>
 
-    {{-- Réservation --}}
     <x-section id="reserver" bg="bg-cream-50" eyebrow="Réservation" title="Et si vous preniez rendez-vous maintenant ?"
         lead="Choisissez votre créneau ci-dessous, je vous contacte au moment indiqué." headerWidth="max-w-3xl">
         @if (! $primaryService)
@@ -337,7 +331,6 @@
     @endif
     </main>
 
-    {{-- ════════ FAQ ════════ --}}
     <x-section
         eyebrow="Avant de réserver"
         title="Questions fréquentes."

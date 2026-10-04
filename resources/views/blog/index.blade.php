@@ -101,7 +101,6 @@
         </div>
     </main>
 
-    {{-- Drawer filtres mobile --}}
     <div id="filters-drawer" data-drawer class="invisible fixed inset-0 z-50 overflow-hidden opacity-0 transition-opacity duration-300 ease-out lg:hidden">
         <button type="button" data-drawer-close class="bg-ink/40 absolute inset-0 backdrop-blur-xs" aria-label="Fermer les filtres"></button>
         <div class="bg-cream-50 absolute inset-y-0 right-0 w-full max-w-sm translate-x-full overflow-y-auto shadow-2xl transition-[translate] duration-300 ease-out motion-reduce:transition-none" data-drawer-panel>

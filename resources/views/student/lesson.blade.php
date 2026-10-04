@@ -11,12 +11,10 @@
         ]" />
 
         <div class="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-            {{-- Lecteur de leçon --}}
             <div class="lg:col-span-8">
                 <livewire:student.lesson-player :course="$course" :lesson="$lesson" :key="$lesson->id" />
             </div>
 
-            {{-- Sommaire de la formation --}}
             <aside class="lg:col-span-4">
                 <div class="lg:sticky lg:top-28">
                     <div class="ring-ink/5 overflow-hidden rounded-3xl bg-white ring-1">

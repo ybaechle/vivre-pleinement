@@ -27,10 +27,8 @@
              width="1280" height="720"
              class="absolute inset-0 size-full scale-[1.04] object-cover transition duration-500 group-hover:scale-[1.08]">
 
-        {{-- Overlay --}}
         <div class="from-ink/60 via-ink/20 group-hover:from-ink/70 absolute inset-0 bg-linear-to-t to-transparent transition"></div>
 
-        {{-- Bouton Play --}}
         <button type="button"
                 class="absolute inset-0 flex w-full cursor-pointer items-center justify-center text-white"
                 aria-label="Lire la vidéo : {{ $ytTitle }}">
@@ -41,7 +39,6 @@
             </span>
         </button>
 
-        {{-- Titre + durée --}}
         <figcaption class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 p-4 sm:p-5">
             <p class="font-serif text-base leading-tight font-medium text-white sm:text-lg">{{ $ytTitle }}</p>
             @if ($ytDuration)

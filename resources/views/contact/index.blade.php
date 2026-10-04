@@ -55,7 +55,6 @@
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
             <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
-                {{-- Formulaire --}}
                 <div class="lg:col-span-7">
                     <div class="ring-ink/5 rounded-4xl bg-white p-6 shadow-sm ring-1 sm:p-10">
                     @if (session('status'))
@@ -74,7 +73,6 @@
                         @csrf
                         <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
-                        {{-- Honeypot --}}
                         <div aria-hidden="true" class="absolute top-auto -left-[9999px] size-px overflow-hidden">
                             <label for="website">Site web (ne pas remplir)</label>
                             <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
@@ -132,7 +130,6 @@
                 </div>
                 </div>
 
-                {{-- Coordonnées + réseaux --}}
                 <aside class="space-y-6 lg:col-span-5">
                     <div class="text-cream-100 rounded-4xl bg-linear-to-br from-teal-700 to-teal-800 p-6 sm:p-8">
                         <h2 class="font-serif text-2xl font-medium text-white">Autres moyens</h2>
@@ -185,7 +182,6 @@
                         @endif
                     </div>
 
-                    {{-- Réassurance --}}
                     <ul class="space-y-3 px-1">
                         <li class="text-ink-soft flex items-start gap-3 text-sm">
                             <svg class="mt-0.5 size-5 shrink-0 text-teal-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">

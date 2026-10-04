@@ -14,7 +14,6 @@
         @csrf
         <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
-        {{-- Honeypot anti-spam --}}
         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">
             <label for="c_website">Site web (ne pas remplir)</label>
             <input type="text" id="c_website" name="website" tabindex="-1" autocomplete="off">

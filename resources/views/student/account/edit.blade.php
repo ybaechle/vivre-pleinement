@@ -20,7 +20,6 @@
                 <p class="mt-6 rounded-2xl bg-teal-50 px-4 py-3 text-sm text-teal-800 ring-1 ring-teal-200">Votre mot de passe a été modifié.</p>
             @endif
 
-            {{-- Profil --}}
             <section class="ring-ink/5 mt-8 rounded-4xl bg-white p-6 shadow-sm ring-1 sm:p-8">
                 <h2 class="text-ink font-serif text-xl font-medium">Informations personnelles</h2>
                 <p class="text-ink-soft mt-1 text-sm">Mettre à jour votre nom et votre adresse e-mail.</p>
@@ -48,7 +47,6 @@
                 </form>
             </section>
 
-            {{-- Mot de passe --}}
             <section class="ring-ink/5 mt-6 rounded-4xl bg-white p-6 shadow-sm ring-1 sm:p-8">
                 <h2 class="text-ink font-serif text-xl font-medium">Mot de passe</h2>
                 <p class="text-ink-soft mt-1 text-sm">Choisissez un mot de passe long et unique pour sécuriser votre compte.</p>

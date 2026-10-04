@@ -34,7 +34,6 @@
             </div>
         </div>
 
-        {{-- Programme --}}
         <div class="mt-12 space-y-5">
             @foreach ($course->modules as $module)
                 <div class="ring-ink/5 overflow-hidden rounded-3xl bg-white ring-1">

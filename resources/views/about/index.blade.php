@@ -36,7 +36,6 @@
 
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
-            {{-- Portrait centré en ouverture --}}
             <div class="mx-auto w-full max-w-xs sm:max-w-sm">
                 <div class="relative">
                     <div class="via-cream-100 to-rose-soft/40 absolute inset-0 -z-10 rounded-full bg-linear-to-br from-teal-100/60 blur-2xl"></div>
@@ -119,7 +118,6 @@
 
                     <x-health-disclaimer class="mt-12" />
 
-                    {{-- CTA --}}
                     <div class="mt-12 rounded-3xl bg-teal-700 p-8 text-center shadow-lg shadow-teal-700/20 sm:p-10">
                         <h2 class="font-serif text-2xl font-medium text-white sm:text-3xl">Et si on en parlait&nbsp;?</h2>
                         <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-teal-50 sm:text-base">

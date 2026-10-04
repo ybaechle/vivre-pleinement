@@ -4,7 +4,6 @@
 ])
 
 <details {{ $attributes->class(['accordion-item group block']) }} @if($open) open @endif>
-    {{-- Question --}}
     <summary class="flex cursor-pointer list-none justify-end">
         <div class="relative w-fit max-w-prose rounded-3xl rounded-br-md bg-teal-700 px-5 py-3 text-white shadow-md shadow-teal-700/20 transition group-hover:bg-teal-800">
             <div class="flex items-start gap-3">
@@ -18,7 +17,6 @@
         </div>
     </summary>
 
-    {{-- Réponse --}}
     <div class="accordion-content">
         <div class="accordion-inner">
             <div class="mt-2 flex w-fit max-w-prose items-end gap-3 pb-1">

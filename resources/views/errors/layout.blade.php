@@ -41,7 +41,6 @@
                     </x-button>
                 </div>
 
-                {{-- Quelques liens utiles --}}
                 <div class="mt-12 pt-2">
                     <p class="text-ink-soft text-sm font-medium">Vous cherchiez peut-être&nbsp;:</p>
                     <ul class="text-ink-soft mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm">

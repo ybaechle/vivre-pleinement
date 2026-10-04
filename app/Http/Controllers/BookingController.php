@@ -28,7 +28,7 @@ class BookingController extends Controller
             'upcomingSlots' => $primaryService
                 ? $slots->nextAvailableSlots($primaryService, 3)
                 : collect(),
-            'faq' => BookingFaq::all(),
+            'faq' => BookingFaq::all($primaryService->price_cents ?? 0),
         ]);
     }
 

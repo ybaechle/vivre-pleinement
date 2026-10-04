@@ -282,3 +282,12 @@ it('rejects a slot that was just booked by someone else', function () {
 
     expect(Appointment::query()->count())->toBe(1);
 });
+
+it('quotes the real price of the service in the booking FAQ', function () {
+    bookableService(['price_cents' => 6500]);
+
+    $this->get(route('booking.index'))
+        ->assertOk()
+        ->assertSee('régler le montant de 65 €', false)
+        ->assertDontSee('montant de 50 €', false);
+});

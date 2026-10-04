@@ -6,12 +6,10 @@
      * poids visuel qu'une formation payante.
      */
     /**
-     * Sans formation publiée, « Formations » et la connexion élève mènent à un
-     * espace vide : on les retire du menu plutôt que d'offrir des impasses.
-     * Elles reviennent d'elles-mêmes dès la première publication.
+     * $hasCourses (view composer) : sans formation publiée, « Formations » et
+     * la connexion élève mènent à un espace vide, on les retire du menu. Elles
+     * reviennent d'elles-mêmes dès la première publication.
      */
-    $hasCourses = \App\Models\Course::hasPublished();
-
     $offerLinks = array_values(array_filter([
         ['label' => 'Accompagnement', 'href' => route('booking.index'),  'active' => request()->routeIs('booking.*')],
         $hasCourses

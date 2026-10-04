@@ -12,7 +12,7 @@
          * règle que le menu, pour ne pas renvoyer vers une page vide.
          */
         'Ressources' => array_values(array_filter([
-            \App\Models\Course::hasPublished() ? ['Les formations', route('courses.index')] : null,
+            $hasCourses ? ['Les formations', route('courses.index')] : null,
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],

@@ -53,6 +53,11 @@ class WeeklySchedule extends Page
      */
     public array $data = [];
 
+    /**
+     * @var array<int, AppointmentService|null>
+     */
+    private array $referenceServices = [];
+
     public function mount(): void
     {
         $this->form->fill([
@@ -496,15 +501,17 @@ class WeeklySchedule extends Page
             $this->data['appointment_service_id'] ?? null
         );
 
-        if ($serviceId !== null) {
-            return AppointmentService::query()->find($serviceId);
-        }
-
-        return AppointmentService::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->first();
+        /**
+         * Appelée pour chaque jour et chaque plage à chaque rendu : la
+         * prestation est mémorisée pour la requête, par identifiant choisi.
+         */
+        return $this->referenceServices[$serviceId ?? 0] ??= $serviceId !== null
+            ? AppointmentService::query()->find($serviceId)
+            : AppointmentService::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->first();
     }
 
     private function normalizeServiceId(mixed $state): ?int

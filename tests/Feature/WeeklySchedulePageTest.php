@@ -6,6 +6,7 @@ use App\Models\Availability;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -163,4 +164,19 @@ it('applies a preset schedule to the selected days', function () {
 
     expect(Availability::query()->count())->toBe(4)
         ->and(Availability::query()->where('day_of_week', 1)->count())->toBe(2);
+});
+
+it('loads the reference service once per render', function () {
+    AppointmentService::factory()->create();
+    $queries = 0;
+    DB::listen(function ($query) use (&$queries) {
+        $queries += str_contains($query->sql, 'from `appointment_services`') ? 1 : 0;
+    });
+
+    Livewire::test(WeeklySchedule::class)->fillForm(scheduleFormState([
+        1 => [['start_time' => '09:00', 'end_time' => '12:00'], ['start_time' => '14:00', 'end_time' => '18:00']],
+        2 => [['start_time' => '09:00', 'end_time' => '12:00']],
+    ]));
+
+    expect($queries)->toBeLessThanOrEqual(4);
 });

@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     $isCategory = $kind === 'category';
@@ -18,9 +18,7 @@
 
 @section('robots', $posts->currentPage() > 1 ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
@@ -70,6 +68,4 @@
         </div>
     </section>
     </main>
-
-    @include('home.sections.footer')
 @endsection

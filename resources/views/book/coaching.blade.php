@@ -1,13 +1,11 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', 'Réserver votre heure de coaching · Vivre Pleinement')
 
 @section('robots', 'noindex,nofollow')
 @section('description', 'Choisissez le créneau de l\'heure de coaching incluse dans votre commande.')
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <div class="max-w-3xl">
@@ -26,11 +24,9 @@
         </div>
     </header>
 
-    <main class="bg-cream-50 py-12 sm:py-16 lg:py-20">
+    <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10">
             @livewire('booking-calendar', ['service' => $service, 'bookOrderToken' => $order->token])
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     use App\Support\AffiliateLinks;
@@ -81,9 +81,7 @@
     @endif
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
     <article class="bg-cream-50">
         <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
@@ -366,6 +364,4 @@
         </section>
     @endif
     </main>
-
-    @include('home.sections.footer')
 @endsection

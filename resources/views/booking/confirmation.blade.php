@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @php
     use App\Enums\AppointmentChannel;
@@ -44,10 +44,8 @@
     @endif
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="to-cream-50 bg-linear-to-b from-teal-100 via-teal-50/60 pt-32 pb-20 sm:pt-36">
+@section('content')
+    <main id="main" class="to-cream-50 bg-linear-to-b from-teal-100 via-teal-50/60 pt-32 pb-20 sm:pt-36">
         <div class="mx-auto w-full max-w-4xl px-4 text-center sm:px-6">
             <span @class([
                 'flex size-16 items-center justify-center rounded-full shadow-lg mx-auto',

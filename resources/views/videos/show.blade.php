@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     use App\Support\Duration;
@@ -72,9 +72,7 @@
     <x-json-ld :data="$videoLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     <article class="bg-cream-50">
@@ -269,6 +267,4 @@
         </section>
     @endif
     </main>
-
-    @include('home.sections.footer')
 @endsection

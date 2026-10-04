@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', "Pensées intrusives & TOC : le livre | Laura Baechlé")
 @section('description', "Pensées intrusives violentes, phobie d'impulsion, TOC : un guide pratique de 77 pages avec 12 fiches pour vous libérer, sans médicaments. Écrit par Laura Baechlé.")
@@ -92,9 +92,7 @@
     <x-json-ld :data="$breadcrumbLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     @include('book.sections.hero')
@@ -108,6 +106,4 @@
     @include('book.sections.faq')
     @include('book.sections.final-cta')
     </main>
-
-    @include('home.sections.footer')
 @endsection

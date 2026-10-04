@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @php
     use App\Enums\BookOrderStatus;
@@ -19,10 +19,8 @@
     @endif
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="bg-cream-50 pt-32 pb-20 sm:pt-36">
+@section('content')
+    <main id="main" class="bg-cream-50 pt-32 pb-20 sm:pt-36">
         <div class="mx-auto max-w-xl px-4 sm:px-6">
             <div class="ring-ink/5 rounded-4xl bg-white p-8 text-center shadow-xs ring-1 sm:p-10">
                 @if ($isRefunded)

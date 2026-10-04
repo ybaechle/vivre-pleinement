@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @push('head')
     @php
@@ -53,9 +53,7 @@
     <x-json-ld :data="$jsonLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
     <div class="parallax-scene to-cream-50 text-ink relative flex h-svh min-h-160 flex-col overflow-hidden bg-linear-to-b from-teal-200 from-0% via-teal-100 via-30% to-85%">
 
@@ -156,6 +154,4 @@
     </div>
     </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

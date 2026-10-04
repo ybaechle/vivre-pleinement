@@ -1,16 +1,10 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', 'Formations en ligne · Laura Baechlé')
 @section('description', "Des formations en ligne pour apprendre, à votre rythme, à apaiser l'anxiété et retrouver une vie sereine. Accès à vie, vidéos et ressources pratiques.")
 @section('canonical', route('courses.index'))
 
-@section('body')
-    <a href="#main" class="focus:bg-ink sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white">
-        Aller au contenu
-    </a>
-
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -56,6 +50,4 @@
             @endif
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

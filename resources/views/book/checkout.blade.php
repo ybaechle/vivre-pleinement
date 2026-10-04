@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @php
     use Illuminate\Support\Number;
@@ -12,10 +12,8 @@
 @section('robots', 'noindex,nofollow')
 @section('description', 'Finalisez votre commande du livre en quelques secondes.')
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="bg-cream-50 pt-32 pb-20 sm:pt-36">
+@section('content')
+    <main id="main" class="bg-cream-50 pt-32 pb-20 sm:pt-36">
         <div class="mx-auto max-w-xl px-4 sm:px-6">
             <h1 class="text-ink text-center font-serif text-3xl font-medium tracking-tight sm:text-4xl">
                 Votre commande

@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', 'Prendre rendez-vous · Accompagnement ACT | Laura Baechlé')
 @section('description', "Accompagnement individuel en thérapie d'acceptation et d'engagement (ACT) pour vous libérer de vos troubles anxieux. Par téléphone ou en visio, avec Laura Baechlé.")
@@ -57,9 +57,7 @@
     <x-json-ld :data="$faqLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
 
     {{-- ════════ HERO : point de départ du parcours ════════ --}}
@@ -344,6 +342,4 @@
             @endforeach
         </div>
     </x-section>
-
-    @include('home.sections.footer')
 @endsection

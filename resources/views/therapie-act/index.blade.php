@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     $faq = [
@@ -57,9 +57,7 @@
     <x-json-ld :data="$faqLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -199,6 +197,4 @@
     </div>
 
     </main>
-
-    @include('home.sections.footer')
 @endsection

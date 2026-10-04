@@ -78,3 +78,13 @@ it('refuse la suppression du compte avec un mot de passe faux', function () {
 
     expect($student->fresh()->isAnonymized())->toBeFalse();
 });
+
+it('confirme la suppression du compte sur la page des formations', function () {
+    $student = Student::factory()->create(['password' => Hash::make('motdepasse-actuel')]);
+
+    $this->actingAs($student, 'student')
+        ->followingRedirects()
+        ->delete(route('student.account.destroy'), ['current_password' => 'motdepasse-actuel'])
+        ->assertOk()
+        ->assertSee('Votre compte a été supprimé.');
+});

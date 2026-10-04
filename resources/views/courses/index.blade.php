@@ -34,6 +34,10 @@
 
     <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="site-container">
+            @if (session('status'))
+                <p class="mb-8 rounded-2xl bg-teal-50 px-4 py-3 text-sm text-teal-800 ring-1 ring-teal-200">{{ session('status') }}</p>
+            @endif
+
             @if ($courses->isEmpty())
                 <div class="ring-ink/5 mx-auto max-w-xl rounded-4xl bg-white p-10 text-center shadow-sm ring-1">
                     <h2 class="text-ink font-serif text-2xl font-medium">Bientôt disponible</h2>

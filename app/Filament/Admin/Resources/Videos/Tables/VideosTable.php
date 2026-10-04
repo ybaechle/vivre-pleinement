@@ -161,7 +161,7 @@ class VideosTable
             ->recordActions([
                 Action::make('view_on_site')
                     ->label('Voir')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->color('gray')
                     ->url(fn (Video $record) => route('videos.show', $record))
                     ->openUrlInNewTab()
@@ -169,7 +169,7 @@ class VideosTable
 
                 Action::make('open_youtube')
                     ->label('YouTube')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                     ->color('gray')
                     ->url(fn (Video $record) => $record->youtubeUrl())
                     ->openUrlInNewTab(),
@@ -180,7 +180,7 @@ class VideosTable
                 BulkActionGroup::make([
                     BulkAction::make('publish')
                         ->label('Publier')
-                        ->icon('heroicon-o-eye')
+                        ->icon(Heroicon::OutlinedEye)
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
@@ -194,7 +194,7 @@ class VideosTable
 
                     BulkAction::make('unpublish')
                         ->label('Masquer')
-                        ->icon('heroicon-o-eye-slash')
+                        ->icon(Heroicon::OutlinedEyeSlash)
                         ->color('warning')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
@@ -208,7 +208,7 @@ class VideosTable
 
                     BulkAction::make('lock_content')
                         ->label('Verrouiller titre/description')
-                        ->icon('heroicon-o-lock-closed')
+                        ->icon(Heroicon::OutlinedLockClosed)
                         ->color('gray')
                         ->requiresConfirmation()
                         ->modalDescription('Protège le titre, la description et la miniature contre la prochaine synchronisation YouTube. Utile après une réécriture manuelle.')

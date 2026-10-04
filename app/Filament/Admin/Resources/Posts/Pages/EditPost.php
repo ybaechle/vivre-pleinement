@@ -12,6 +12,7 @@ use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Icons\Heroicon;
 
 class EditPost extends EditRecord
 {
@@ -28,14 +29,14 @@ class EditPost extends EditRecord
         return [
             Action::make('view_on_site')
                 ->label('Voir sur le site')
-                ->icon('heroicon-o-arrow-top-right-on-square')
+                ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                 ->color('gray')
                 ->url(fn () => route('blog.show', $this->record))
                 ->openUrlInNewTab()
                 ->visible(fn () => $this->record->status === PostStatus::Published),
             Action::make('preview_draft')
                 ->label('Prévisualiser')
-                ->icon('heroicon-o-eye')
+                ->icon(Heroicon::OutlinedEye)
                 ->color('gray')
                 ->url(fn () => $this->record->previewUrl())
                 ->openUrlInNewTab()

@@ -72,7 +72,7 @@ class CommentsTable
             ->recordActions([
                 Action::make('approve')
                     ->label('Approuver')
-                    ->icon('heroicon-o-check-circle')
+                    ->icon(Heroicon::OutlinedCheckCircle)
                     ->color('success')
                     ->visible(fn (Comment $record) => $record->status !== CommentStatus::Approved)
                     ->action(function (Comment $record): void {
@@ -89,7 +89,7 @@ class CommentsTable
                         ->label('Lire en entier'),
                     Action::make('spam')
                         ->label('Marquer comme spam')
-                        ->icon('heroicon-o-no-symbol')
+                        ->icon(Heroicon::OutlinedNoSymbol)
                         ->color('danger')
                         ->visible(fn (Comment $record) => $record->status !== CommentStatus::Spam)
                         ->requiresConfirmation()
@@ -108,7 +108,7 @@ class CommentsTable
                 BulkActionGroup::make([
                     BulkAction::make('approveAll')
                         ->label('Approuver')
-                        ->icon('heroicon-o-check-circle')
+                        ->icon(Heroicon::OutlinedCheckCircle)
                         ->color('success')
                         ->requiresConfirmation()
                         ->modalDescription('Les commentaires sélectionnés '

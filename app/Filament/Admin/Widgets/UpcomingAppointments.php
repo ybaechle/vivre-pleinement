@@ -53,7 +53,7 @@ class UpcomingAppointments extends TableWidget
             ->recordActions([
                 Action::make('confirm')
                     ->label('Confirmer')
-                    ->icon('heroicon-o-check-circle')
+                    ->icon(Heroicon::OutlinedCheckCircle)
                     ->color('success')
                     ->button()
                     ->visible(fn (Appointment $record) => $record->status === AppointmentStatus::Pending)
@@ -68,7 +68,7 @@ class UpcomingAppointments extends TableWidget
 
                 Action::make('open')
                     ->label('Ouvrir')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                     ->color('gray')
                     ->url(fn (Appointment $record) => AppointmentResource::getUrl('edit', ['record' => $record])),
             ]);

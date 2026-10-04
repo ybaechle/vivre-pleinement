@@ -84,7 +84,7 @@ class BookOrdersTable
             ->recordActions([
                 Action::make('resendConfirmation')
                     ->label('Renvoyer le lien')
-                    ->icon('heroicon-o-envelope')
+                    ->icon(Heroicon::OutlinedEnvelope)
                     ->visible(fn (BookOrder $record): bool => $record->isPaid())
                     ->requiresConfirmation()
                     ->modalHeading('Renvoyer le lien de téléchargement')
@@ -98,7 +98,7 @@ class BookOrdersTable
 
                 Action::make('markRefunded')
                     ->label('Marquer remboursée')
-                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
                     ->color('danger')
                     ->visible(fn (BookOrder $record): bool => $record->isPaid())
                     ->requiresConfirmation()

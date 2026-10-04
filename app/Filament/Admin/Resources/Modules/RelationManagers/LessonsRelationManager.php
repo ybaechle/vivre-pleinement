@@ -14,6 +14,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -42,7 +43,7 @@ class LessonsRelationManager extends RelationManager
                     ->label('Vidéo')
                     ->placeholder('Collez le lien YouTube ou Vimeo')
                     ->helperText('Collez l\'adresse complète de la vidéo : la plateforme est détectée automatiquement.')
-                    ->prefixIcon('heroicon-o-play')
+                    ->prefixIcon(Heroicon::OutlinedPlay)
                     ->maxLength(500)
                     ->live(onBlur: true)
                     ->afterStateUpdated(function (?string $state, callable $set): void {
@@ -84,7 +85,7 @@ class LessonsRelationManager extends RelationManager
             ->reorderRecordsTriggerAction(fn ($action) => $action->label('Réorganiser')->button())
             ->emptyStateHeading('Aucune leçon')
             ->emptyStateDescription('Ajoutez votre première leçon pour ce module.')
-            ->emptyStateIcon('heroicon-o-play-circle')
+            ->emptyStateIcon(Heroicon::OutlinedPlayCircle)
             ->columns([
                 TextColumn::make('position')
                     ->label('#')
@@ -107,7 +108,7 @@ class LessonsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Ajouter une leçon')
-                    ->icon('heroicon-o-plus')
+                    ->icon(Heroicon::OutlinedPlus)
                     ->modalHeading('Nouvelle leçon')
                     ->modalWidth(Width::TwoExtraLarge),
             ])

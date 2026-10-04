@@ -99,7 +99,7 @@ class EnrollmentsTable
 
                 Action::make('markRefunded')
                     ->label('Marquer remboursé')
-                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
                     ->color('danger')
                     ->visible(fn (Enrollment $record) => $record->status === EnrollmentStatus::Active)
                     ->requiresConfirmation()

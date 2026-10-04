@@ -109,14 +109,14 @@ class PostsTable
                     EditAction::make(),
                     Action::make('view_on_site')
                         ->label('Voir sur le site')
-                        ->icon('heroicon-o-arrow-top-right-on-square')
+                        ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                         ->color('gray')
                         ->url(fn (Post $record) => route('blog.show', $record))
                         ->openUrlInNewTab()
                         ->visible(fn (Post $record) => $record->status === PostStatus::Published),
                     Action::make('preview_draft')
                         ->label('Prévisualiser le brouillon')
-                        ->icon('heroicon-o-eye')
+                        ->icon(Heroicon::OutlinedEye)
                         ->color('gray')
                         ->url(fn (Post $record) => $record->previewUrl())
                         ->openUrlInNewTab()
@@ -128,7 +128,7 @@ class PostsTable
                 BulkActionGroup::make([
                     BulkAction::make('publish')
                         ->label('Publier')
-                        ->icon('heroicon-o-eye')
+                        ->icon(Heroicon::OutlinedEye)
                         ->color('success')
                         ->requiresConfirmation()
                         ->modalDescription('Les articles sélectionnés '
@@ -142,7 +142,7 @@ class PostsTable
 
                     BulkAction::make('unpublish')
                         ->label('Repasser en brouillon')
-                        ->icon('heroicon-o-eye-slash')
+                        ->icon(Heroicon::OutlinedEyeSlash)
                         ->color('warning')
                         ->requiresConfirmation()
                         ->modalDescription('Les articles sélectionnés '

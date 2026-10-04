@@ -19,8 +19,11 @@ trait ChecksSubmissionDelay
     private const MIN_DELAY_SECONDS = 3;
 
     /**
-     * Vérifie le délai minimum après validation des règles.
+     * Sans limite, un horodatage récupéré une fois resterait rejouable
+     * indéfiniment par un robot.
      */
+    private const MAX_AGE_SECONDS = 86400;
+
     public function passedValidation(): void
     {
         $issuedAt = SubmissionStamp::read($this->input('ts'));
@@ -28,6 +31,12 @@ trait ChecksSubmissionDelay
         if ($issuedAt === null || (time() - $issuedAt) < self::MIN_DELAY_SECONDS) {
             throw ValidationException::withMessages([
                 'ts' => 'Envoi trop rapide, veuillez réessayer.',
+            ]);
+        }
+
+        if ((time() - $issuedAt) > self::MAX_AGE_SECONDS) {
+            throw ValidationException::withMessages([
+                'ts' => 'Ce formulaire a expiré : rechargez la page puis renvoyez votre message.',
             ]);
         }
     }

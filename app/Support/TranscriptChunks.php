@@ -10,8 +10,7 @@ use Illuminate\Support\Str;
  */
 class TranscriptChunks
 {
-    /** Balises autorisées dans une transcription reponctuée. */
-    public const ALLOWED_TAGS = '<p><br><em><strong>';
+    private const ALLOWED_TAGS = '<p><br><em><strong>';
 
     /**
      * Découpe un texte en morceaux d'environ $chunkWords mots, sans couper un
@@ -62,13 +61,27 @@ class TranscriptChunks
 
         $clean = [];
         foreach ($chunks as $chunk) {
-            $chunk = trim(strip_tags((string) $chunk, self::ALLOWED_TAGS));
+            $chunk = self::sanitize((string) $chunk);
             if ($chunk !== '') {
                 $clean[] = $chunk;
             }
         }
 
         return Str::of(implode("\n", $clean))->trim()->value();
+    }
+
+    /**
+     * Réduit un HTML produit par l'IA aux balises de mise en forme de base,
+     * sans aucun attribut : il est affiché brut sur le site, un
+     * `<p onmouseover>` y serait exécuté.
+     */
+    public static function sanitize(string $html): string
+    {
+        return trim((string) preg_replace(
+            '/<(\/?)(p|br|em|strong)\b[^>]*>/i',
+            '<$1$2>',
+            strip_tags($html, self::ALLOWED_TAGS),
+        ));
     }
 
     /**

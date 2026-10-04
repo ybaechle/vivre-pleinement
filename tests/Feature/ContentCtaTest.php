@@ -4,9 +4,6 @@ use App\Models\Category;
 use App\Models\Course;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('promotes the flagship course at the end of an anxiety article', function () {
     $course = Course::factory()->create(['title' => 'Apaiser son anxiété au quotidien']);

@@ -1,14 +1,12 @@
 <?php
 
+use App\Filament\Admin\Resources\DateOverrides\Pages\CreateDateOverride;
 use App\Filament\Admin\Resources\DateOverrides\Pages\ListDateOverrides;
 use App\Models\DateOverride;
 use App\Models\User;
 use Carbon\CarbonImmutable;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -80,4 +78,40 @@ it('blocks the current day from the quick action', function () {
     expect(DateOverride::query()
         ->whereDate('date', CarbonImmutable::now()->toDateString())
         ->exists())->toBeTrue();
+});
+
+it('refuses a partial closure with only one of its two times', function (array $times) {
+    $from = CarbonImmutable::now()->addDays(10)->startOfDay();
+
+    Livewire::test(ListDateOverrides::class)
+        ->callAction('blockPeriod', array_merge([
+            'from' => $from->toDateString(),
+            'to' => $from->toDateString(),
+        ], $times))
+        ->assertHasFormErrors();
+
+    expect(DateOverride::query()->count())->toBe(0);
+})->with([
+    'start only' => [['start_time' => '09:00']],
+    'end only' => [['end_time' => '12:00']],
+]);
+
+it('refuses a single blocking with only one of its two times', function (array $times) {
+    Livewire::test(CreateDateOverride::class)
+        ->fillForm(array_merge(['date' => CarbonImmutable::now()->addDays(10)->toDateString()], $times))
+        ->call('create')
+        ->assertHasFormErrors();
+
+    expect(DateOverride::query()->count())->toBe(0);
+})->with([
+    'start only' => [['start_time' => '09:00']],
+    'end only' => [['end_time' => '12:00']],
+]);
+
+it('labels a full-day blocking and does not flag today as past', function () {
+    DateOverride::factory()->create(['date' => today(), 'start_time' => null, 'end_time' => null]);
+
+    Livewire::test(ListDateOverrides::class)
+        ->assertSee('Journée entière')
+        ->assertDontSee('Passé');
 });

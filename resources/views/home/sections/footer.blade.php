@@ -12,7 +12,7 @@
          * règle que le menu, pour ne pas renvoyer vers une page vide.
          */
         'Ressources' => array_values(array_filter([
-            \App\Models\Course::hasPublished() ? ['Les formations', route('courses.index')] : null,
+            $hasCourses ? ['Les formations', route('courses.index')] : null,
             ['Le blog', route('blog.index')],
             ['Les vidéos', route('videos.index')],
             ['Vidéo offerte', $home.'#capture'],
@@ -37,7 +37,7 @@
     <div class="site-container relative pt-6 pb-5 lg:pt-12 lg:pb-10">
         <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
             <div class="lg:col-span-4">
-                <a href="/" class="inline-flex items-center" aria-label="Accueil">
+                <a href="{{ $home }}" class="inline-flex items-center" aria-label="Accueil">
                     <img
                         src="{{ asset('images/logo@2x.webp') }}"
                         alt="Laura Baechlé"

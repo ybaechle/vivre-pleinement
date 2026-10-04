@@ -4,9 +4,6 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Video;
 use App\Support\VideoArticleMatcher;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 function categorizedVideo(Category $c, array $attrs = []): Video
 {
@@ -55,9 +52,17 @@ it('prefers the explicit related post over a category match', function () {
     categorizedPost($c, ['title' => 'La cardiophobie en détail']);
 
     $video = categorizedVideo($c, ['title' => 'Vaincre la cardiophobie', 'related_post_id' => $explicitPost->id]);
-    $video->load('relatedPost');
 
     expect(VideoArticleMatcher::postForVideo($video)?->id)->toBe($explicitPost->id);
+});
+
+it('ignores an explicit related post that is not published', function () {
+    $c = Category::factory()->create();
+    $draft = categorizedPost($c, ['title' => 'Brouillon', 'status' => 'draft']);
+
+    $video = categorizedVideo($c, ['title' => 'Vaincre la cardiophobie', 'related_post_id' => $draft->id]);
+
+    expect(VideoArticleMatcher::postForVideo($video))->toBeNull();
 });
 
 it('matches a post to a video in the reverse direction', function () {

@@ -11,10 +11,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class DateOverrideFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
-     * Defaults to a full-day closure (no start/end time), the most common
-     * case exercised by the appointment slot tests.
+     * Par défaut, une fermeture d'une journée entière (sans heures) : le cas
+     * le plus courant dans les tests de créneaux.
      *
      * @return array<string, mixed>
      */

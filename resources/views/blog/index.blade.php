@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     $page = (int) request('page', 1);
@@ -24,15 +24,12 @@
 
 @section('robots', ($hasFilters || $page > 1) ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1')
 
+@section('og_title', $metaTitle)
+@section('og_description', $metaDesc)
+@section('og_image', $ogImage)
+
 @push('head')
     <link rel="alternate" type="application/rss+xml" title="Vivre Pleinement - Blog" href="{{ route('blog.rss') }}">
-
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ $metaTitle }}">
-    <meta property="og:description" content="{{ $metaDesc }}">
-    <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ $ogImage }}">
-    <meta name="twitter:card" content="summary_large_image">
 
     @if (! $hasFilters && $page === 1)
         @php
@@ -59,18 +56,14 @@
                     ->all(),
             ];
         @endphp
-        <script type="application/ld+json">{!! json_encode($blogLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
-        <script type="application/ld+json">{!! json_encode($itemListLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+        <x-json-ld :data="$blogLd" />
+        @if ($previewPosts->isNotEmpty())
+            <x-json-ld :data="$itemListLd" />
+        @endif
     @endif
 @endpush
 
-@section('body')
-    <a href="#main" class="focus:bg-ink sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white">
-        Aller au contenu
-    </a>
-
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -102,7 +95,6 @@
         </div>
     </main>
 
-    {{-- Drawer filtres mobile --}}
     <div id="filters-drawer" data-drawer class="invisible fixed inset-0 z-50 overflow-hidden opacity-0 transition-opacity duration-300 ease-out lg:hidden">
         <button type="button" data-drawer-close class="bg-ink/40 absolute inset-0 backdrop-blur-xs" aria-label="Fermer les filtres"></button>
         <div class="bg-cream-50 absolute inset-y-0 right-0 w-full max-w-sm translate-x-full overflow-y-auto shadow-2xl transition-[translate] duration-300 ease-out motion-reduce:transition-none" data-drawer-panel>
@@ -117,6 +109,4 @@
             </div>
         </div>
     </div>
-
-    @include('home.sections.footer')
 @endsection

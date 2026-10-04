@@ -3,9 +3,8 @@
 namespace App\Filament\Admin\Resources\Posts\Schemas;
 
 use App\Enums\PostStatus;
-use App\Models\Category;
 use App\Models\Post;
-use App\Models\Tag;
+use App\Support\SlugFromTitle;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -21,6 +20,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -42,11 +42,7 @@ class PostForm
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function (string $state, callable $set, $record) {
-                                    if (! $record) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
+                                ->afterStateUpdated(SlugFromTitle::onCreate())
                                 ->extraAttributes(['class' => 'text-xl'])
                                 ->columnSpanFull(),
 
@@ -105,16 +101,15 @@ class PostForm
 
                             Select::make('categories')
                                 ->label('Catégories')
-                                ->relationship('categories', 'name')
+                                ->relationship('categories', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
-                                ->native(false)
-                                ->options(fn () => Category::orderBy('name')->pluck('name', 'id')),
+                                ->native(false),
 
                             Select::make('tags')
                                 ->label('Étiquettes')
-                                ->relationship('tags', 'name')
+                                ->relationship('tags', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->multiple()
                                 ->preload()
                                 ->searchable()
@@ -122,8 +117,7 @@ class PostForm
                                 ->createOptionForm([
                                     TextInput::make('name')->required(),
                                     TextInput::make('slug')->required(),
-                                ])
-                                ->options(fn () => Tag::orderBy('name')->pluck('name', 'id')),
+                                ]),
 
                             Toggle::make('comments_enabled')
                                 ->label('Commentaires ouverts')
@@ -165,13 +159,6 @@ class PostForm
                                     'Vide, Google choisit lui-même un extrait de l\'article.',
                                 ))
                                 ->live(debounce: 500)
-                                ->columnSpanFull(),
-
-                            TextInput::make('seo_canonical')
-                                ->label('URL canonique')
-                                ->url()
-                                ->placeholder('https://...')
-                                ->helperText('À renseigner uniquement si cet article est une copie d\'un autre.')
                                 ->columnSpanFull(),
 
                             Select::make('seo_robots')
@@ -221,11 +208,11 @@ class PostForm
             : 'Ajoutez une description SEO pour maîtriser l\'extrait affiché '
                 .'sous le titre.';
 
-        $url = config('app.url').'/blog/'.($get('slug') ?: 'mon-article');
+        $url = route('blog.show', $get('slug') ?: 'mon-article');
 
         return new HtmlString(sprintf(
-            '<div style="border:1px solid rgb(var(--gray-200));border-radius:.5rem;'
-                .'padding:.9rem 1rem;background:rgb(var(--gray-50))">'
+            '<div style="border:1px solid var(--gray-200);border-radius:.5rem;'
+                .'padding:.9rem 1rem;background:var(--gray-50)">'
                 .'<div style="font-size:.75rem;color:#3c4043">%s</div>'
                 .'<div style="font-size:1.1rem;color:#1a0dab;line-height:1.3;'
                 .'margin:.15rem 0 .2rem">%s</div>'

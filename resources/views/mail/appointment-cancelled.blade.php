@@ -2,7 +2,7 @@
 # Rendez-vous annulé
 
 @if ($forAdmin)
-Le rendez-vous suivant a été annulé par le client.
+Le rendez-vous suivant a été annulé.
 
 **Client :** {{ $appointment->customer_full_name }}\
 **Email :** [{{ $appointment->customer_email }}](mailto:{{ $appointment->customer_email }})

@@ -6,6 +6,7 @@ use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\CoursePaymentService;
+use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
@@ -16,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class EnrollmentsTable
 {
@@ -45,8 +47,9 @@ class EnrollmentsTable
                     ->money('eur', divideBy: 100)
                     ->sortable()
                     ->summarize(
-                        Sum::make()
+                        Sum::make('total')
                             ->label('Total encaissé')
+                            ->query(fn (QueryBuilder $query): QueryBuilder => $query->where('status', EnrollmentStatus::Active))
                             ->money('eur', divideBy: 100)
                     ),
                 TextColumn::make('purchased_at')
@@ -56,10 +59,8 @@ class EnrollmentsTable
                     ->placeholder('–'),
                 TextColumn::make('stripe_payment_intent_id')
                     ->label('Paiement')
-                    ->formatStateUsing(fn (?string $state): string => $state ? 'Ouvrir dans Stripe' : '–')
-                    ->url(fn ($record): ?string => $record->stripe_payment_intent_id
-                        ? 'https://dashboard.stripe.com/payments/'.$record->stripe_payment_intent_id
-                        : null, shouldOpenInNewTab: true)
+                    ->formatStateUsing(fn (): string => 'Ouvrir dans Stripe')
+                    ->url(fn (?string $state): ?string => StripePaymentIntents::dashboardUrl($state), shouldOpenInNewTab: true)
                     ->color('primary'),
             ])
             ->filters([
@@ -98,7 +99,7 @@ class EnrollmentsTable
 
                 Action::make('markRefunded')
                     ->label('Marquer remboursé')
-                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
                     ->color('danger')
                     ->visible(fn (Enrollment $record) => $record->status === EnrollmentStatus::Active)
                     ->requiresConfirmation()

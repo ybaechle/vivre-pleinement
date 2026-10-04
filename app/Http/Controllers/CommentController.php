@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\CommentStatus;
+use App\Filament\Admin\Resources\Comments\CommentResource;
 use App\Http\Requests\CommentFormRequest;
 use App\Mail\NewCommentNotification;
 use App\Models\Comment;
@@ -56,7 +57,7 @@ class CommentController extends Controller
             return;
         }
 
-        $moderationUrl = route('filament.admin.resources.comments.index');
+        $moderationUrl = CommentResource::getUrl();
 
         Mail::to($to)->send(new NewCommentNotification($comment, $moderationUrl));
     }

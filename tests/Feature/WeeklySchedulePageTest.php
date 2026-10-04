@@ -6,10 +6,8 @@ use App\Models\Availability;
 use App\Models\User;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     $this->actingAs(User::factory()->create());
@@ -139,6 +137,22 @@ it('copies the ranges of one day onto the days that were picked', function () {
         ->and(Availability::query()->where('day_of_week', 3)->count())->toBe(1);
 });
 
+it('keeps a copied day closed when the source day is closed', function () {
+    Livewire::test(WeeklySchedule::class)
+        ->fillForm(scheduleFormState([
+            1 => [['start_time' => '09:00', 'end_time' => '12:00']],
+        ]))
+        ->set('data.days.day_1.is_open', false)
+        ->callAction(
+            TestAction::make('copy_day_1')->schemaComponent(),
+            ['targets' => [2]],
+        )
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(Availability::query()->where('day_of_week', 2)->sole()->is_active)->toBeFalse();
+});
+
 it('applies a preset schedule to the selected days', function () {
     Livewire::test(WeeklySchedule::class)
         ->fillForm(scheduleFormState([]))
@@ -150,4 +164,23 @@ it('applies a preset schedule to the selected days', function () {
 
     expect(Availability::query()->count())->toBe(4)
         ->and(Availability::query()->where('day_of_week', 1)->count())->toBe(2);
+});
+
+it('loads the reference service once per render', function () {
+    AppointmentService::factory()->create();
+    $queries = 0;
+    DB::listen(function ($query) use (&$queries) {
+        $queries += str_contains($query->sql, 'from `appointment_services`') ? 1 : 0;
+    });
+
+    Livewire::test(WeeklySchedule::class)->fillForm(scheduleFormState([
+        1 => [['start_time' => '09:00', 'end_time' => '12:00'], ['start_time' => '14:00', 'end_time' => '18:00']],
+        2 => [['start_time' => '09:00', 'end_time' => '12:00']],
+    ]));
+
+    expect($queries)->toBeLessThanOrEqual(4);
+});
+
+it('leaves the weekly schedule page as the only screen editing availabilities', function () {
+    $this->get('/espace-pro/availabilities')->assertNotFound();
 });

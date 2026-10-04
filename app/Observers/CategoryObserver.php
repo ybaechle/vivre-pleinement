@@ -10,18 +10,18 @@ class CategoryObserver
 {
     public function saved(Category $category): void
     {
-        $this->flushCaches($category);
+        $this->flushCaches();
     }
 
     public function deleted(Category $category): void
     {
-        $this->flushCaches($category);
+        $this->flushCaches();
     }
 
-    private function flushCaches(Category $category): void
+    private function flushCaches(): void
     {
         Cache::forget('sitemap.urls');
 
-        InternalLinking::flushCategory($category);
+        InternalLinking::flush();
     }
 }

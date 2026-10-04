@@ -5,6 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
 
 enum AppointmentStatus: string implements HasColor, HasIcon, HasLabel
 {
@@ -36,14 +37,14 @@ enum AppointmentStatus: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function getIcon(): string
+    public function getIcon(): Heroicon
     {
         return match ($this) {
-            self::Pending => 'heroicon-o-clock',
-            self::Confirmed => 'heroicon-o-check-circle',
-            self::Cancelled => 'heroicon-o-x-circle',
-            self::Completed => 'heroicon-o-check-badge',
-            self::NoShow => 'heroicon-o-user-minus',
+            self::Pending => Heroicon::OutlinedClock,
+            self::Confirmed => Heroicon::OutlinedCheckCircle,
+            self::Cancelled => Heroicon::OutlinedXCircle,
+            self::Completed => Heroicon::OutlinedCheckBadge,
+            self::NoShow => Heroicon::OutlinedUserMinus,
         };
     }
 

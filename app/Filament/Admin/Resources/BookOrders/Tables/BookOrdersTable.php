@@ -7,6 +7,7 @@ use App\Mail\BookOrderConfirmation;
 use App\Models\BookOrder;
 use App\Models\Product;
 use App\Services\BookPaymentService;
+use App\Services\StripePaymentIntents;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -15,6 +16,7 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Mail;
 
 class BookOrdersTable
@@ -50,8 +52,9 @@ class BookOrdersTable
                     ->money('eur', divideBy: 100)
                     ->sortable()
                     ->summarize(
-                        Sum::make()
+                        Sum::make('total')
                             ->label('Total encaissé')
+                            ->query(fn (QueryBuilder $query): QueryBuilder => $query->where('status', BookOrderStatus::Paid))
                             ->money('eur', divideBy: 100)
                     ),
                 IconColumn::make('coaching_appointment_id')
@@ -66,10 +69,8 @@ class BookOrdersTable
                     ->placeholder('–'),
                 TextColumn::make('stripe_payment_intent_id')
                     ->label('Paiement')
-                    ->formatStateUsing(fn (?string $state): string => $state ? 'Ouvrir dans Stripe' : '–')
-                    ->url(fn (BookOrder $record): ?string => $record->stripe_payment_intent_id
-                        ? 'https://dashboard.stripe.com/payments/'.$record->stripe_payment_intent_id
-                        : null, shouldOpenInNewTab: true)
+                    ->formatStateUsing(fn (): string => 'Ouvrir dans Stripe')
+                    ->url(fn (?string $state): ?string => StripePaymentIntents::dashboardUrl($state), shouldOpenInNewTab: true)
                     ->color('primary'),
             ])
             ->filters([
@@ -83,7 +84,7 @@ class BookOrdersTable
             ->recordActions([
                 Action::make('resendConfirmation')
                     ->label('Renvoyer le lien')
-                    ->icon('heroicon-o-envelope')
+                    ->icon(Heroicon::OutlinedEnvelope)
                     ->visible(fn (BookOrder $record): bool => $record->isPaid())
                     ->requiresConfirmation()
                     ->modalHeading('Renvoyer le lien de téléchargement')
@@ -97,7 +98,7 @@ class BookOrdersTable
 
                 Action::make('markRefunded')
                     ->label('Marquer remboursée')
-                    ->icon('heroicon-o-arrow-uturn-left')
+                    ->icon(Heroicon::OutlinedArrowUturnLeft)
                     ->color('danger')
                     ->visible(fn (BookOrder $record): bool => $record->isPaid())
                     ->requiresConfirmation()

@@ -8,6 +8,7 @@ use App\Jobs\SyncYoutubeVideosJob;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Support\Icons\Heroicon;
 
 class ListVideos extends ListRecords
 {
@@ -25,7 +26,7 @@ class ListVideos extends ListRecords
         return [
             Action::make('sync')
                 ->label('Synchroniser depuis YouTube')
-                ->icon('heroicon-o-arrow-path')
+                ->icon(Heroicon::OutlinedArrowPath)
                 ->color('primary')
                 ->requiresConfirmation()
                 ->modalHeading('Synchroniser les vidéos depuis YouTube')

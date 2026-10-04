@@ -50,11 +50,14 @@ class Enrollment extends Model
     }
 
     /**
+     * Inclut la formation supprimée : un paiement reçu après sa suppression
+     * doit encore aboutir, y compris dans les emails mis en file.
+     *
      * @return BelongsTo<Course, $this>
      */
     public function course(): BelongsTo
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Course::class)->withTrashed();
     }
 
     /**

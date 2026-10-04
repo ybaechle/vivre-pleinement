@@ -4,10 +4,6 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Services\CoursePaymentService;
 use App\Services\StripePaymentIntents;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 function enrollmentWithIntent(?string $intentId, int $priceCents = 14900): Enrollment
 {
@@ -19,16 +15,6 @@ function enrollmentWithIntent(?string $intentId, int $priceCents = 14900): Enrol
     ]);
 }
 
-function fakeIntent(string $id, string $status, int $amount): PaymentIntent
-{
-    return PaymentIntent::constructFrom([
-        'id' => $id,
-        'status' => $status,
-        'amount' => $amount,
-        'client_secret' => $id.'_secret',
-    ]);
-}
-
 it('réutilise le PaymentIntent déjà créé au lieu d\'en générer un second', function () {
     $enrollment = enrollmentWithIntent('pi_existing');
 
@@ -36,7 +22,7 @@ it('réutilise le PaymentIntent déjà créé au lieu d\'en générer un second'
         $mock->shouldReceive('reusable')
             ->once()
             ->with('pi_existing', 14900)
-            ->andReturn(fakeIntent('pi_existing', 'requires_payment_method', 14900));
+            ->andReturn(stripeIntent('pi_existing', 'requires_payment_method', 14900));
         $mock->shouldNotReceive('create');
     });
 
@@ -52,7 +38,7 @@ it('crée un nouvel intent lorsqu\'aucun n\'est réutilisable', function () {
         $mock->shouldReceive('reusable')->once()->andReturn(null);
         $mock->shouldReceive('create')
             ->once()
-            ->andReturn(fakeIntent('pi_nouveau', 'requires_payment_method', 14900));
+            ->andReturn(stripeIntent('pi_nouveau', 'requires_payment_method', 14900));
     });
 
     $service = Mockery::mock(CoursePaymentService::class, [app(StripePaymentIntents::class)])->makePartial();
@@ -71,7 +57,7 @@ it('crée un intent et le mémorise sur l\'inscription au premier passage', func
         $mock->shouldReceive('reusable')->once()->with(null, 14900)->andReturn(null);
         $mock->shouldReceive('create')
             ->once()
-            ->andReturn(fakeIntent('pi_premier', 'requires_payment_method', 14900));
+            ->andReturn(stripeIntent('pi_premier', 'requires_payment_method', 14900));
     });
 
     $service = Mockery::mock(CoursePaymentService::class, [app(StripePaymentIntents::class)])->makePartial();
@@ -89,7 +75,7 @@ it('transmet le prix courant de la formation au calcul de réutilisation', funct
         $mock->shouldReceive('reusable')
             ->once()
             ->with('pi_existing', 19900)
-            ->andReturn(fakeIntent('pi_existing', 'requires_payment_method', 19900));
+            ->andReturn(stripeIntent('pi_existing', 'requires_payment_method', 19900));
     });
 
     expect(app(CoursePaymentService::class)->getOrCreatePaymentIntent($enrollment)->amount)->toBe(19900);

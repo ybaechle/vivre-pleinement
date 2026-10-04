@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @php
     use App\Support\AffiliateLinks;
@@ -21,18 +21,17 @@
 @if ($post->seo_robots)
     @section('robots', $post->seo_robots)
 @endif
+@section('og_type', 'article')
+@section('og_title', $post->seo_title ?: $post->title)
+@section('og_description', $post->seo_description ?: $post->excerpt)
+@if ($cover)
+    @section('og_image', $cover)
+@endif
 
 @push('head')
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="{{ $post->seo_title ?: $post->title }}">
-    <meta property="og:description" content="{{ $post->seo_description ?: $post->excerpt }}">
-    <meta property="og:url" content="{{ route('blog.show', $post->slug) }}">
-    @if ($cover)
-        <meta property="og:image" content="{{ $cover }}">
-    @endif
     <meta property="article:published_time" content="{{ $post->published_at?->toIso8601String() }}">
-    @foreach ($post->categories as $category)
-        <meta property="article:section" content="{{ $category->name }}">
+    @foreach ($post->categories as $postCategory)
+        <meta property="article:section" content="{{ $postCategory->name }}">
     @endforeach
     @foreach ($post->tags as $tag)
         <meta property="article:tag" content="{{ $tag->name }}">
@@ -61,7 +60,7 @@
             'inLanguage' => 'fr-FR',
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$articleLd" />
 
     @if (! empty($post->faq))
         @php
@@ -78,13 +77,11 @@
                 ])->all(),
             ];
         @endphp
-        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+        <x-json-ld :data="$faqLd" />
     @endif
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
     <article class="bg-cream-50">
         <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
@@ -168,7 +165,7 @@
             @endif
 
             <div class="flex flex-col gap-12 lg:flex-row lg:gap-12">
-                <div class="prose prose-lg prose-ink max-w-none lg:w-[52rem] lg:shrink-0">
+                <div class="prose prose-lg max-w-none lg:w-[52rem] lg:shrink-0">
                     {!! $toc['html'] !!}
                 </div>
 
@@ -227,11 +224,9 @@
                             <rect x="9" y="9" width="13" height="13" rx="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                         </svg>
-                        {{-- Coche (état copié) --}}
                         <svg class="hidden size-4 group-data-[copied=true]:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20 6 9 17l-5-5"/>
                         </svg>
-                        {{-- Tooltip --}}
                         <span class="bg-ink pointer-events-none absolute -top-9 left-1/2 -translate-x-1/2 scale-95 rounded-2xl px-2.5 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition group-data-[copied=true]:scale-100 group-data-[copied=true]:opacity-100" role="status" aria-live="polite">
                             Copié&nbsp;!
                         </span>
@@ -369,6 +364,4 @@
         </section>
     @endif
     </main>
-
-    @include('home.sections.footer')
 @endsection

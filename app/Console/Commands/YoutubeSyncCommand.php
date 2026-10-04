@@ -17,6 +17,7 @@ class YoutubeSyncCommand extends Command
         try {
             $result = YoutubeSync::fromConfig()->sync(maxResults: max(1, (int) $this->option('max')));
         } catch (Throwable $e) {
+            report($e);
             $this->error('Échec de la synchronisation : '.$e->getMessage());
 
             return self::FAILURE;

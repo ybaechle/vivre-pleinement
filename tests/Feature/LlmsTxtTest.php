@@ -2,9 +2,6 @@
 
 use App\Models\Category;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('serves llms.txt as plain text with the key pages', function () {
     $this->get('/llms.txt')

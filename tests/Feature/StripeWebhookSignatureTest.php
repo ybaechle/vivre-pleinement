@@ -4,10 +4,7 @@ use App\Enums\EnrollmentStatus;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Log;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Cashier n'attache VerifyWebhookSignature que si cashier.webhook.secret est

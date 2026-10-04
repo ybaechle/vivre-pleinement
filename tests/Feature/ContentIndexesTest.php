@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Les listings publics filtrent `status` et `published_at` ensemble puis

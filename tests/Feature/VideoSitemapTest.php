@@ -3,12 +3,9 @@
 use App\Http\Controllers\SitemapController;
 use App\Models\Post;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-
-uses(LazilyRefreshDatabase::class);
 
 it('does not load the heavy transcript/intro columns for the video sitemap', function () {
     Video::factory()->create([
@@ -103,6 +100,19 @@ it('flushes both sitemap caches when a video is saved', function () {
 
     expect(Cache::has('sitemap.urls'))->toBeFalse()
         ->and(Cache::has(SitemapController::VIDEOS_CACHE_KEY))->toBeFalse();
+});
+
+it('keeps the caches when the hourly sync only refreshes the counters', function () {
+    $video = Video::factory()->create();
+    Cache::put('sitemap.urls', ['cached'], now()->addHour());
+
+    $video->update(['view_count' => 9999, 'like_count' => 42, 'synced_at' => now()]);
+
+    expect(Cache::has('sitemap.urls'))->toBeTrue();
+
+    $video->update(['title' => 'Nouveau titre']);
+
+    expect(Cache::has('sitemap.urls'))->toBeFalse();
 });
 
 it('advertises the youtube publication date rather than the last sync', function () {

@@ -1,6 +1,7 @@
-@extends('layouts.site')
+@extends('layouts.page', ['withFooter' => false])
 
 @php
+    use App\Enums\AppointmentChannel;
     use App\Enums\AppointmentStatus;
     use App\Enums\PaymentStatus;
     use Carbon\CarbonImmutable;
@@ -29,23 +30,22 @@
         'action' => 'TEMPLATE',
         'text' => 'RDV - '.$appointment->service->name,
         'dates' => $gcalStart.'/'.$gcalEnd,
-        'details' => 'Rendez-vous en visioconférence avec Laura Baechlé. Référence : '.$appointment->reference,
+        'details' => 'Rendez-vous '.mb_strtolower($appointment->channel->getLabel()).' avec Laura Baechlé. Référence : '.$appointment->reference,
     ]);
 @endphp
 
 @section('title', 'Rendez-vous confirmé · Vivre Pleinement')
 
+@section('robots', 'noindex,nofollow')
+
 @push('head')
-    <meta name="robots" content="noindex,nofollow">
     @if ($isProcessingPayment)
         <meta http-equiv="refresh" content="6">
     @endif
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="to-cream-50 bg-linear-to-b from-teal-100 via-teal-50/60 pt-32 pb-20 sm:pt-36">
+@section('content')
+    <main id="main" class="to-cream-50 bg-linear-to-b from-teal-100 via-teal-50/60 pt-32 pb-20 sm:pt-36">
         <div class="mx-auto w-full max-w-4xl px-4 text-center sm:px-6">
             <span @class([
                 'flex size-16 items-center justify-center rounded-full shadow-lg mx-auto',
@@ -66,7 +66,6 @@
             <p class="text-ink-soft mx-auto mt-4 max-w-md text-base">{{ $message }}</p>
 
             <div class="mt-8 grid grid-cols-1 gap-6 text-left lg:grid-cols-2 lg:items-stretch">
-            {{-- Récapitulatif --}}
             <div class="ring-ink/5 w-full rounded-3xl bg-white p-6 shadow-xs ring-1 sm:p-8">
                 <div class="flex items-center justify-between gap-4">
                     <p class="text-xs font-medium tracking-wider text-teal-700 uppercase">Votre rendez-vous</p>
@@ -109,7 +108,6 @@
                 </dl>
             </div>
 
-            {{-- Prochaines étapes --}}
             <div class="w-full p-6 sm:p-8">
                 <p class="text-ink-muted text-xs font-medium tracking-wider uppercase">Et maintenant ?</p>
                 <ul class="text-ink-soft mt-4 space-y-4 text-sm">
@@ -119,7 +117,11 @@
                     </li>
                     <li class="flex items-center gap-3">
                         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 font-serif text-lg font-medium text-teal-700">2</span>
-                        Le lien de visioconférence vous est transmis avant le rendez-vous.
+                        @if ($appointment->channel === AppointmentChannel::Phone)
+                            Laura vous appelle au numéro indiqué à l'heure du rendez-vous.
+                        @else
+                            Le lien de visioconférence vous est transmis avant le rendez-vous.
+                        @endif
                     </li>
                     <li class="flex items-center gap-3">
                         <span class="flex size-9 shrink-0 items-center justify-center rounded-full bg-teal-50 font-serif text-lg font-medium text-teal-700">3</span>
@@ -129,7 +131,6 @@
             </div>
             </div>
 
-            {{-- Actions agenda --}}
             <div class="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a href="{{ $gcalUrl }}" target="_blank" rel="noopener"
                    class="inline-flex items-center gap-2 rounded-full bg-teal-700 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-teal-800">
@@ -143,7 +144,6 @@
                 </a>
             </div>
 
-            {{-- Gérer / retour --}}
             <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm">
                 @if ($appointment->token)
                     <a href="{{ route('booking.manage', $appointment->token) }}" class="font-medium text-teal-700 underline-offset-2 hover:underline">

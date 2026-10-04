@@ -2,8 +2,10 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Filament\Admin\Resources\Posts\PostResource;
 use App\Models\Post;
 use Filament\Actions\Action;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -46,8 +48,8 @@ class LatestPosts extends TableWidget
             ->recordActions([
                 Action::make('edit')
                     ->label('Modifier')
-                    ->icon('heroicon-o-pencil-square')
-                    ->url(fn ($record) => route('filament.admin.resources.posts.edit', $record)),
+                    ->icon(Heroicon::OutlinedPencilSquare)
+                    ->url(fn ($record) => PostResource::getUrl('edit', ['record' => $record])),
             ]);
     }
 }

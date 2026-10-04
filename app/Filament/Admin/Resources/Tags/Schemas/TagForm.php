@@ -2,10 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Tags\Schemas;
 
+use App\Support\SlugFromTitle;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Str;
 
 class TagForm
 {
@@ -16,11 +16,7 @@ class TagForm
                 ->label('Nom')
                 ->required()
                 ->live(onBlur: true)
-                ->afterStateUpdated(function (string $state, callable $set, $record) {
-                    if (! $record) {
-                        $set('slug', Str::slug($state));
-                    }
-                }),
+                ->afterStateUpdated(SlugFromTitle::onCreate()),
 
             TextInput::make('slug')
                 ->required()

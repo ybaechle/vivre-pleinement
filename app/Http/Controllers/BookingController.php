@@ -19,7 +19,7 @@ class BookingController extends Controller
 {
     public function index(AppointmentSlotService $slots): View
     {
-        $services = AppointmentService::query()->active()->orderBy('sort_order')->get();
+        $services = AppointmentService::query()->active()->get();
         $primaryService = $services->first();
 
         return view('booking.index', [
@@ -28,7 +28,7 @@ class BookingController extends Controller
             'upcomingSlots' => $primaryService
                 ? $slots->nextAvailableSlots($primaryService, 3)
                 : collect(),
-            'faq' => BookingFaq::all(),
+            'faq' => BookingFaq::all($primaryService->price_cents ?? 0),
         ]);
     }
 
@@ -73,17 +73,6 @@ class BookingController extends Controller
             'clientSecret' => $intent->client_secret,
             'stripeKey' => config('cashier.key'),
         ]);
-    }
-
-    /**
-     * Paiement abandonné : on conserve le rendez-vous (impayé) mais on en
-     * informe le visiteur.
-     */
-    public function paymentCancelled(Appointment $appointment): View
-    {
-        $appointment->load('service');
-
-        return view('booking.payment-cancelled', ['appointment' => $appointment]);
     }
 
     /**

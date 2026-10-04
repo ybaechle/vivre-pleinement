@@ -11,11 +11,8 @@ use App\Models\Availability;
 use App\Services\AppointmentSlotService;
 use App\Support\Settings;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 function bookableService(array $attributes = []): AppointmentService
 {
@@ -26,9 +23,7 @@ function bookableService(array $attributes = []): AppointmentService
         'is_active' => true,
     ], $attributes));
 
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }
@@ -175,6 +170,32 @@ it('serves an ics calendar file for the appointment', function () {
         ->assertSee($appointment->reference, escape: false);
 });
 
+it('describes a phone appointment as such, with its real status, in the ics file', function () {
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => bookableService()->id,
+        'channel' => AppointmentChannel::Phone,
+        'status' => AppointmentStatus::Pending,
+    ]);
+
+    $this->get(route('booking.ics', $appointment->token))
+        ->assertOk()
+        ->assertSee('Rendez-vous par téléphone', escape: false)
+        ->assertDontSee('visioconférence', escape: false)
+        ->assertSee('STATUS:TENTATIVE', escape: false);
+});
+
+it('tells a phone client they will be called on the confirmation page', function () {
+    $appointment = Appointment::factory()->create([
+        'appointment_service_id' => bookableService()->id,
+        'channel' => AppointmentChannel::Phone,
+    ]);
+
+    $this->get(route('booking.confirmation', $appointment->token))
+        ->assertOk()
+        ->assertSee('vous appelle au numéro indiqué', escape: false)
+        ->assertDontSee('Le lien de visioconférence vous est transmis', escape: false);
+});
+
 it('requires consent', function () {
     $service = bookableService();
     $slot = futureSlot();
@@ -203,6 +224,23 @@ it('rejects a non-date selectedSlot as a validation error instead of a 500', fun
         ->assertHasErrors(['selectedSlot' => 'date']);
 
     expect(Appointment::query()->count())->toBe(0);
+});
+
+it('stores the slot in the site timezone whatever offset the client sends', function () {
+    Mail::fake();
+    $service = bookableService(['requires_confirmation' => false]);
+    $slot = futureSlot();
+
+    Livewire::test(BookingCalendar::class, ['service' => $service])
+        ->set('selectedSlot', $slot->utc()->toIso8601String())
+        ->set('firstName', 'Camille')
+        ->set('email', 'camille@gmail.com')
+        ->set('consent', true)
+        ->call('book')
+        ->assertRedirect();
+
+    expect(Appointment::query()->firstOrFail()->starts_at->format('Y-m-d H:i'))
+        ->toBe($slot->format('Y-m-d H:i'));
 });
 
 it('rejects an unavailable slot', function () {
@@ -243,4 +281,13 @@ it('rejects a slot that was just booked by someone else', function () {
         ->assertHasErrors(['selectedSlot']);
 
     expect(Appointment::query()->count())->toBe(1);
+});
+
+it('quotes the real price of the service in the booking FAQ', function () {
+    bookableService(['price_cents' => 6500]);
+
+    $this->get(route('booking.index'))
+        ->assertOk()
+        ->assertSee('régler le montant de 65 €', false)
+        ->assertDontSee('montant de 50 €', false);
 });

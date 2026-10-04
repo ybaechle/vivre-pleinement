@@ -4,11 +4,8 @@ use App\Mail\ContactMessage;
 use App\Models\Post;
 use App\Support\SubmissionStamp;
 use Illuminate\Encryption\Encrypter;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();
@@ -49,6 +46,27 @@ it('rejette une soumission instantanée', function () {
         ->assertSessionHasErrors('ts');
 
     Mail::assertNothingQueued();
+});
+
+it('rejette un horodatage trop ancien pour être rejoué et l\'explique au visiteur', function () {
+    $this->from(route('contact'))
+        ->post(route('contact.send'), stampedContactPayload(['ts' => submissionStamp(secondsAgo: 2 * 86400)]));
+
+    Mail::assertNothingQueued();
+
+    $this->get(route('contact'))->assertSee('Ce formulaire a expiré');
+});
+
+it('explique au visiteur un envoi refusé par la limitation', function () {
+    foreach (range(1, 3) as $attempt) {
+        $this->post(route('contact.send'), stampedContactPayload());
+    }
+
+    $this->from(route('contact'))->post(route('contact.send'), stampedContactPayload());
+
+    $html = $this->get(route('contact'))->assertSee("Trop d'envois")->getContent();
+
+    expect(substr_count($html, 'Trop d&#039;envois'))->toBe(1);
 });
 
 it('protège aussi le formulaire de commentaires', function () {

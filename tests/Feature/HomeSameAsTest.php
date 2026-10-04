@@ -1,9 +1,6 @@
 <?php
 
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('adds sameAs to the Person schema when social links are configured', function () {
     Settings::setMany([

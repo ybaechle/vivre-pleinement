@@ -37,13 +37,16 @@
             field.style.left = '-9999px';
             document.body.appendChild(field);
             field.select();
+            let copied = false;
             try {
-                document.execCommand('copy');
-            } catch {
-                document.body.removeChild(field);
-                return;
+                copied = document.execCommand('copy');
+            } catch (error) {
+                console.error(error);
             }
             document.body.removeChild(field);
+
+            // execCommand signale l'échec par false, sans exception.
+            if (!copied) return;
         }
 
         markCopied(button);

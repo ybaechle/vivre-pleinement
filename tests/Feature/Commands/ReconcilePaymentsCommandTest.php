@@ -12,12 +12,10 @@ use App\Models\Student;
 use App\Services\BookPaymentService;
 use App\Services\StripePaymentIntents;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Stripe\Exception\ApiConnectionException;
 use Stripe\PaymentIntent;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();
@@ -213,4 +211,37 @@ it('poursuit les autres lignes quand une finalisation échoue', function () {
 
     Log::shouldHaveReceived('error')
         ->withArgs(fn (string $message) => str_contains($message, 'Rattrapage impossible'));
+});
+
+it('signale une panne Stripe au lieu de sauter la ligne en silence', function () {
+    $order = BookOrder::factory()->create([
+        'stripe_payment_intent_id' => 'pi_panne',
+        'created_at' => CarbonImmutable::now()->subHour(),
+    ]);
+
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldReceive('retrieve')->andThrow(new ApiConnectionException('Stripe injoignable'));
+    });
+
+    Log::spy();
+
+    $this->artisan('payments:reconcile')->assertSuccessful();
+
+    expect($order->fresh()->status)->toBe(BookOrderStatus::Pending);
+    Log::shouldHaveReceived('error')
+        ->withArgs(fn (string $message, array $context) => str_contains($message, 'Rattrapage impossible')
+            && $context['payment_intent_id'] === 'pi_panne');
+});
+
+it('n\'interroge plus Stripe pour un panier abandonné depuis plus d\'une semaine', function () {
+    BookOrder::factory()->create([
+        'stripe_payment_intent_id' => 'pi_ancien',
+        'created_at' => CarbonImmutable::now()->subDays(8),
+    ]);
+
+    $this->mock(StripePaymentIntents::class, function ($mock) {
+        $mock->shouldNotReceive('retrieve');
+    });
+
+    $this->artisan('payments:reconcile')->assertSuccessful();
 });

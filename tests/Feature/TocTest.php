@@ -23,10 +23,17 @@ it('disambiguates duplicate headings', function () {
     expect(collect($result['items'])->pluck('id')->all())->toBe(['titre', 'titre-2']);
 });
 
-it('keeps an existing id untouched', function () {
+it('keeps an existing id and points the table of contents to it', function () {
     $result = Toc::build('<h2 id="custom">Titre</h2>');
 
     expect($result['html'])->toContain('id="custom"')
+        ->and($result['items'][0]['id'])->toBe('custom');
+});
+
+it('does not mistake a data-id attribute for an id', function () {
+    $result = Toc::build('<h2 data-id="x">Titre</h2>');
+
+    expect($result['html'])->toContain('id="titre"')
         ->and($result['items'][0]['id'])->toBe('titre');
 });
 

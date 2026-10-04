@@ -48,7 +48,7 @@ class PostObserver
         Cache::forget('sitemap.urls');
         Cache::forget(PostController::RSS_CACHE_KEY);
 
-        InternalLinking::flushCluster($post);
+        InternalLinking::flush();
         VideoArticleMatcher::flush();
     }
 }

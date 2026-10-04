@@ -5,10 +5,7 @@ use App\Models\User;
 use App\Support\Settings;
 use App\Support\SiteContact;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 it('falls back to the config email when no contact email is set', function () {
     expect(SiteContact::email())->toBe(config('mail.contact_to'));

@@ -3,15 +3,13 @@
 use App\Enums\EnrollmentStatus;
 use App\Mail\CourseAccessGranted;
 use App\Mail\CoursePurchaseNotification;
+use App\Models\Appointment;
 use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Student;
 use App\Services\StripePaymentIntents;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
-
-uses(LazilyRefreshDatabase::class);
 
 function pendingEnrollment(): Enrollment
 {
@@ -91,12 +89,21 @@ it('active l\'inscription même si le cours a été supprimé entre le paiement 
     Mail::assertQueued(CourseAccessGranted::class);
 });
 
+it('rend les emails mis en file même si le cours a été supprimé entre-temps', function () {
+    $enrollment = pendingEnrollment();
+    $enrollment->course->delete();
+
+    $queued = unserialize(serialize(new CourseAccessGranted($enrollment->fresh())));
+
+    expect($queued->render())->toContain($enrollment->course->title);
+});
+
 it('rembourse automatiquement un second paiement arrivé sur une inscription déjà active', function () {
     Mail::fake();
     $enrollment = pendingEnrollment();
     courseWebhook($enrollment->id, 'pi_premier');
 
-    $this->mock(StripePaymentIntents::class, function ($mock) {
+    $this->partialMock(StripePaymentIntents::class, function ($mock) {
         $mock->shouldReceive('refundQuietly')->once()->with('pi_second')->andReturnTrue();
     });
 
@@ -122,12 +129,13 @@ it('ignore un webhook d\'un autre type', function () {
 it('ne touche pas aux inscriptions lorsqu\'un webhook concerne un rendez-vous', function () {
     Mail::fake();
     $enrollment = pendingEnrollment();
+    $appointment = Appointment::factory()->create();
 
     event(new WebhookReceived([
         'type' => 'payment_intent.succeeded',
         'data' => ['object' => [
             'id' => 'pi_appointment',
-            'metadata' => ['appointment_id' => 999999],
+            'metadata' => ['appointment_id' => $appointment->id],
         ]],
     ]));
 

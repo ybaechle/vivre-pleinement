@@ -53,6 +53,11 @@ class WeeklySchedule extends Page
      */
     public array $data = [];
 
+    /**
+     * @var array<int, AppointmentService|null>
+     */
+    private array $referenceServices = [];
+
     public function mount(): void
     {
         $this->form->fill([
@@ -277,12 +282,12 @@ class WeeklySchedule extends Page
                     ->required(),
             ])
             ->action(function (array $data) use ($key): void {
-                $ranges = $this->data['days'][$key]['ranges'] ?? [];
+                $source = $this->data['days'][$key] ?? [];
 
                 foreach ($data['targets'] as $target) {
                     $this->data['days'][self::dayKey((int) $target)] = [
-                        'is_open' => true,
-                        'ranges' => self::rekey($ranges),
+                        'is_open' => (bool) ($source['is_open'] ?? false),
+                        'ranges' => self::rekey($source['ranges'] ?? []),
                     ];
                 }
 
@@ -399,7 +404,7 @@ class WeeklySchedule extends Page
     /**
      * @return Builder<Availability>
      */
-    private function scopedQuery(?int $serviceId)
+    private function scopedQuery(?int $serviceId): Builder
     {
         return Availability::query()->when(
             $serviceId === null,
@@ -496,15 +501,17 @@ class WeeklySchedule extends Page
             $this->data['appointment_service_id'] ?? null
         );
 
-        if ($serviceId !== null) {
-            return AppointmentService::query()->find($serviceId);
-        }
-
-        return AppointmentService::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->orderBy('name')
-            ->first();
+        /**
+         * Appelée pour chaque jour et chaque plage à chaque rendu : la
+         * prestation est mémorisée pour la requête, par identifiant choisi.
+         */
+        return $this->referenceServices[$serviceId ?? 0] ??= $serviceId !== null
+            ? AppointmentService::query()->find($serviceId)
+            : AppointmentService::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->orderBy('name')
+                ->first();
     }
 
     private function normalizeServiceId(mixed $state): ?int

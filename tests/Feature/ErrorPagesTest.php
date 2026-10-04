@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Course;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Exceptions;
+
 use function Pest\Laravel\get;
 
 it('rend une page 404 personnalisée pour une URL inconnue', function () {
@@ -23,3 +27,19 @@ it('rend les vues d\'erreur courantes avec le layout partagé', function (string
     ['500', 'Une erreur est survenue'],
     ['503', 'Site en maintenance'],
 ]);
+
+it('still renders the error page when the courses cannot be loaded', function () {
+    Exceptions::fake();
+    Course::addGlobalScope('panne', fn () => throw new RuntimeException('Base indisponible'));
+
+    try {
+        $this->get('/page-qui-n-existe-pas')
+            ->assertNotFound()
+            ->assertSee('Le blog')
+            ->assertDontSee('Les formations');
+    } finally {
+        Model::clearBootedModels();
+    }
+
+    Exceptions::assertReported(RuntimeException::class);
+});

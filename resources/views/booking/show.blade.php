@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', $service->name.' · Prendre rendez-vous - Vivre Pleinement')
 
@@ -6,15 +6,11 @@
     use Illuminate\Support\Number;
 @endphp
 
-@push('head')
-    <meta name="description" content="Réservez « {{ $service->name }} » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.">
-    <link rel="canonical" href="{{ route('booking.show', $service->slug) }}">
-    <meta name="robots" content="noindex,follow">
-@endpush
+@section('robots', 'noindex,follow')
+@section('description', 'Réservez « '.$service->name.' » avec Laura Baechlé : choisissez votre créneau en ligne, en visioconférence.')
+@section('canonical', route('booking.show', $service->slug))
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <header class="to-cream-50 relative overflow-hidden bg-linear-to-b from-teal-100 via-teal-50/70 pt-32 pb-12 sm:pt-36 sm:pb-16">
         <div class="site-container">
             <x-breadcrumb :items="[
@@ -38,11 +34,9 @@
         </div>
     </header>
 
-    <main class="bg-cream-50 py-12 sm:py-16 lg:py-20">
+    <main id="main" class="bg-cream-50 py-12 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-10">
             @livewire('booking-calendar', ['service' => $service])
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

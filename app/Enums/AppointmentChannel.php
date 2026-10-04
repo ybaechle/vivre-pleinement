@@ -5,6 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
 
 enum AppointmentChannel: string implements HasColor, HasIcon, HasLabel
 {
@@ -27,11 +28,11 @@ enum AppointmentChannel: string implements HasColor, HasIcon, HasLabel
         };
     }
 
-    public function getIcon(): string
+    public function getIcon(): Heroicon
     {
         return match ($this) {
-            self::Phone => 'heroicon-o-phone',
-            self::Video => 'heroicon-o-video-camera',
+            self::Phone => Heroicon::OutlinedPhone,
+            self::Video => Heroicon::OutlinedVideoCamera,
         };
     }
 }

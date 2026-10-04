@@ -48,8 +48,7 @@ class EnrollmentsRelationManager extends RelationManager
             ])
             ->headerActions([
                 $this->grantAccessAction(),
-            ])
-            ->filters([]);
+            ]);
     }
 
     public function isReadOnly(): bool
@@ -66,6 +65,7 @@ class EnrollmentsRelationManager extends RelationManager
     {
         return Action::make('grantAccess')
             ->label('Offrir une formation')
+            ->hidden(fn (): bool => $this->getOwnerRecord()->isAnonymized())
             ->icon(Heroicon::OutlinedGift)
             ->modalHeading('Offrir l\'accès à une formation')
             ->modalDescription('L\'élève accède immédiatement à la formation. '
@@ -90,14 +90,21 @@ class EnrollmentsRelationManager extends RelationManager
                 /** @var Student $student */
                 $student = $this->getOwnerRecord();
 
-                $enrollment = Enrollment::create([
-                    'student_id' => $student->id,
-                    'course_id' => $data['course_id'],
-                    'status' => EnrollmentStatus::Active,
-                    'amount_paid_cents' => 0,
-                    'currency' => 'EUR',
-                    'purchased_at' => now(),
-                ]);
+                /**
+                 * Une inscription remboursée ou en attente existe peut-être
+                 * déjà : l'index unique impose de la réactiver plutôt que d'en
+                 * créer une seconde, en la détachant de son ancien paiement.
+                 */
+                $enrollment = Enrollment::updateOrCreate(
+                    ['student_id' => $student->id, 'course_id' => $data['course_id']],
+                    [
+                        'status' => EnrollmentStatus::Active,
+                        'amount_paid_cents' => 0,
+                        'currency' => 'EUR',
+                        'stripe_payment_intent_id' => null,
+                        'purchased_at' => now(),
+                    ],
+                );
 
                 if ($data['notify'] ?? false) {
                     Mail::to($student->email)->send(
@@ -122,7 +129,7 @@ class EnrollmentsRelationManager extends RelationManager
         $student = $this->getOwnerRecord();
 
         $alreadyActive = $student->enrollments()
-            ->where('status', EnrollmentStatus::Active)
+            ->active()
             ->pluck('course_id');
 
         return Course::query()

@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Courses\Schemas;
 
 use App\Enums\CourseStatus;
+use App\Support\SlugFromTitle;
 use App\Support\VideoEmbed;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
@@ -16,7 +17,6 @@ use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Str;
 
 class CourseForm
 {
@@ -35,11 +35,7 @@ class CourseForm
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function (string $state, callable $set, $record): void {
-                                    if (! $record) {
-                                        $set('slug', Str::slug($state));
-                                    }
-                                })
+                                ->afterStateUpdated(SlugFromTitle::onCreate())
                                 ->columnSpanFull(),
 
                             TextInput::make('slug')
@@ -92,7 +88,7 @@ class CourseForm
                                 ->label('Prix')
                                 ->numeric()
                                 ->step(0.01)
-                                ->minValue(0)
+                                ->minValue(0.5)
                                 ->suffix('€')
                                 ->required(),
 

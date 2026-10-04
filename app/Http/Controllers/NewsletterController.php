@@ -7,8 +7,6 @@ use App\Jobs\SubscribeToNewsletterJob;
 use App\Support\SubmissionThrottle;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
-use RuntimeException;
 
 class NewsletterController extends Controller
 {
@@ -22,17 +20,11 @@ class NewsletterController extends Controller
 
         $data = $request->validated();
 
-        try {
-            dispatch(new SubscribeToNewsletterJob(
-                email: $data['email'],
-                firstName: $data['first_name'],
-                redirectionUrl: route('newsletter.confirmed'),
-            ));
-        } catch (RuntimeException $e) {
-            Log::warning('Échec inscription newsletter Brevo.', ['message' => $e->getMessage()]);
-
-            return $this->failure($request, "L'inscription a échoué. Réessayez dans un instant.");
-        }
+        /**
+         * L'appel à Brevo part en file : un échec y est retenté puis journalisé
+         * par le job, il ne peut pas être signalé au visiteur ici.
+         */
+        SubscribeToNewsletterJob::dispatch($data['email'], $data['first_name'], route('newsletter.confirmed'));
 
         if ($request->wantsJson()) {
             return response()->json(['status' => 'pending']);

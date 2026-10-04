@@ -76,11 +76,14 @@ class BookOrder extends Model
     }
 
     /**
+     * Inclut le produit supprimé : un acheteur garde son téléchargement et ses
+     * emails même si l'offre a été retirée du catalogue depuis.
+     *
      * @return BelongsTo<Product, $this>
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class)->withTrashed();
     }
 
     /**

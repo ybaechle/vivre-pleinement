@@ -2,10 +2,7 @@
 
 use App\Http\Controllers\PostController;
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Cache;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Le cache doit contenir du XML, jamais des modèles : une chaîne

@@ -1,9 +1,6 @@
 <?php
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Vite;
-
-uses(LazilyRefreshDatabase::class);
 
 it('sends a content security policy on every response', function () {
     $policy = $this->get('/')->assertOk()->headers->get('Content-Security-Policy');

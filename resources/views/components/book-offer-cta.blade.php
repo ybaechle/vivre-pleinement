@@ -15,7 +15,7 @@
 --}}
 @if ($available)
     <a href="{{ route('book.checkout', $slug) }}" class="group {{ $class }}">
-        {!! $label !!}
+        {{ $label }}
         <span class="transition group-hover:translate-x-0.5" aria-hidden="true">→</span>
     </a>
 @else

@@ -41,7 +41,7 @@ class CoursePaymentService
 
         $intent = $this->intents->create([
             'amount' => $enrollment->course->price_cents,
-            'currency' => strtolower($enrollment->course->currency ?? config('cashier.currency', 'eur')),
+            'currency' => strtolower($enrollment->course->currency),
             'customer' => $this->resolveStripeCustomerId($enrollment->student),
             'description' => 'Formation : '.$enrollment->course->title,
             'receipt_email' => $enrollment->student->email,
@@ -71,9 +71,7 @@ class CoursePaymentService
      * empêcher deux workers de traiter le même webhook en double (deux mails de
      * bienvenue). Le montant et la devise enregistrés viennent du payload
      * Stripe : c'est ce qui a réellement été payé, pas le prix courant du
-     * cours. Le cours est chargé withTrashed : un cours supprimé entre le
-     * paiement et le webhook ne doit pas faire échouer le job, l'élève ayant
-     * déjà payé.
+     * cours.
      *
      * Seules la vérification et la mise à jour du statut sont verrouillées :
      * l'appel réseau Stripe (remboursement) et l'envoi des mails se font après
@@ -94,7 +92,7 @@ class CoursePaymentService
                 return ['duplicate', $locked];
             }
 
-            $locked->loadMissing(['student', 'course' => fn ($query) => $query->withTrashed()]);
+            $locked->loadMissing(['student', 'course']);
 
             $locked->update([
                 'status' => EnrollmentStatus::Active,
@@ -108,46 +106,16 @@ class CoursePaymentService
         });
 
         match ($outcome) {
-            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'duplicate' => $this->intents->refundDuplicate($locked, $paymentIntentId, 'une inscription déjà active'),
             'fulfilled' => $this->sendAccessGranted($locked),
         };
     }
 
     private function sendAccessGranted(Enrollment $enrollment): void
     {
-        $fresh = $enrollment->fresh(['student']);
-        $fresh->setRelation('course', $enrollment->course);
-
-        Mail::to($enrollment->student->email)->send(new CourseAccessGranted($fresh));
+        Mail::to($enrollment->student->email)->send(new CourseAccessGranted($enrollment));
         Mail::to(SiteContact::notifyEmail())
-            ->send(new CoursePurchaseNotification($fresh));
-    }
-
-    /**
-     * Un paiement réussi arrive pour une inscription déjà active via un intent
-     * différent : l'élève a payé deux fois (deux onglets avant la réutilisation
-     * d'intent, ou course entre webhooks). On rembourse le second débit.
-     */
-    private function refundDuplicatePayment(Enrollment $enrollment, ?string $paymentIntentId): void
-    {
-        if ($paymentIntentId === null || $paymentIntentId === $enrollment->stripe_payment_intent_id) {
-            return;
-        }
-
-        if ($this->intents->refundQuietly($paymentIntentId)) {
-            Log::warning('Second paiement détecté pour une inscription déjà active : remboursé automatiquement.', [
-                'enrollment_id' => $enrollment->id,
-                'kept_payment_intent_id' => $enrollment->stripe_payment_intent_id,
-                'refunded_payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        Log::error('Second paiement détecté pour une inscription déjà active mais remboursement impossible.', [
-            'enrollment_id' => $enrollment->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
+            ->send(new CoursePurchaseNotification($enrollment));
     }
 
     /**

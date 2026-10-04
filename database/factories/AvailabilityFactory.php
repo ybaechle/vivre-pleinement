@@ -12,8 +12,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class AvailabilityFactory extends Factory
 {
     /**
-     * Define the model's default state.
-     *
      * @return array<string, mixed>
      */
     public function definition(): array
@@ -35,10 +33,5 @@ class AvailabilityFactory extends Factory
     public function forService(AppointmentService $service): static
     {
         return $this->state(fn () => ['appointment_service_id' => $service->id]);
-    }
-
-    public function inactive(): static
-    {
-        return $this->state(fn () => ['is_active' => false]);
     }
 }

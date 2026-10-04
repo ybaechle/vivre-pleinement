@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
-
 it('serves the ACT cornerstone page with its SEO essentials', function () {
     $html = $this->get('/therapie-act')->assertOk()->getContent();
 

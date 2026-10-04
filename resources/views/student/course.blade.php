@@ -26,15 +26,14 @@
                     </div>
                 </div>
 
-                @if ($firstLesson)
-                    <x-button :href="route('student.lesson', [$course, $firstLesson])" class="mt-8" arrow>
+                @if ($resumeLesson)
+                    <x-button :href="route('student.lesson', [$course, $resumeLesson])" class="mt-8" arrow>
                         {{ $progress > 0 ? 'Reprendre la formation' : 'Commencer la formation' }}
                     </x-button>
                 @endif
             </div>
         </div>
 
-        {{-- Programme --}}
         <div class="mt-12 space-y-5">
             @foreach ($course->modules as $module)
                 <div class="ring-ink/5 overflow-hidden rounded-3xl bg-white ring-1">
@@ -55,7 +54,7 @@
                                     @endif
                                     <span class="text-ink-soft flex-1 text-sm">{{ $lesson->title }}</span>
                                     @if ($lesson->duration_seconds)
-                                        <span class="text-ink-muted text-xs">{{ gmdate('i:s', $lesson->duration_seconds) }}</span>
+                                        <span class="text-ink-muted text-xs">{{ $lesson->durationFormatted() }}</span>
                                     @endif
                                 </a>
                             </li>

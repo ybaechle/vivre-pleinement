@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Videos\Tables;
 
+use App\Enums\VideoEditorialState;
 use App\Enums\VideoStatus;
 use App\Models\Video;
 use Filament\Actions\Action;
@@ -85,22 +86,7 @@ class VideosTable
                 TextColumn::make('editorial')
                     ->label('Éditorial')
                     ->badge()
-                    ->getStateUsing(fn (Video $record) => match (true) {
-                        $record->isEnriched() && $record->hasTranscript() => 'Complet',
-                        $record->isEnriched() => 'Sans transcription',
-                        $record->hasTranscript() => 'À enrichir',
-                        default => 'À traiter',
-                    })
-                    ->icon(fn (Video $record) => match (true) {
-                        $record->isEnriched() && $record->hasTranscript() => Heroicon::CheckCircle,
-                        $record->isEnriched() || $record->hasTranscript() => Heroicon::PencilSquare,
-                        default => Heroicon::ExclamationTriangle,
-                    })
-                    ->color(fn (Video $record) => match (true) {
-                        $record->isEnriched() && $record->hasTranscript() => 'success',
-                        $record->isEnriched() || $record->hasTranscript() => 'warning',
-                        default => 'danger',
-                    })
+                    ->state(fn (Video $record): VideoEditorialState => $record->editorialState())
                     ->tooltip(fn (Video $record) => sprintf(
                         'Intro : %s · Résumé : %s · Transcription : %s',
                         filled($record->intro) ? 'oui' : 'non',
@@ -157,19 +143,11 @@ class VideosTable
                         'no_transcript' => 'Sans transcription',
                         'complete' => 'Complètes',
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return match ($data['value'] ?? null) {
-                            'to_enrich' => $query->where(fn (Builder $q) => $q
-                                ->whereNull('intro')->orWhere('intro', '')
-                                ->orWhereNull('summary')->orWhere('summary', '')),
-                            'no_transcript' => $query->where(fn (Builder $q) => $q
-                                ->whereNull('transcript')->orWhere('transcript', '')),
-                            'complete' => $query
-                                ->whereNotNull('intro')->where('intro', '!=', '')
-                                ->whereNotNull('summary')->where('summary', '!=', '')
-                                ->whereNotNull('transcript')->where('transcript', '!=', ''),
-                            default => $query,
-                        };
+                    ->query(fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
+                        'to_enrich' => $query->enriched(false),
+                        'no_transcript' => $query->withTranscript(false),
+                        'complete' => $query->enriched()->withTranscript(),
+                        default => $query,
                     }),
 
                 SelectFilter::make('categories')
@@ -183,7 +161,7 @@ class VideosTable
             ->recordActions([
                 Action::make('view_on_site')
                     ->label('Voir')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->color('gray')
                     ->url(fn (Video $record) => route('videos.show', $record))
                     ->openUrlInNewTab()
@@ -191,7 +169,7 @@ class VideosTable
 
                 Action::make('open_youtube')
                     ->label('YouTube')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->icon(Heroicon::OutlinedArrowTopRightOnSquare)
                     ->color('gray')
                     ->url(fn (Video $record) => $record->youtubeUrl())
                     ->openUrlInNewTab(),
@@ -202,7 +180,7 @@ class VideosTable
                 BulkActionGroup::make([
                     BulkAction::make('publish')
                         ->label('Publier')
-                        ->icon('heroicon-o-eye')
+                        ->icon(Heroicon::OutlinedEye)
                         ->color('success')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
@@ -216,7 +194,7 @@ class VideosTable
 
                     BulkAction::make('unpublish')
                         ->label('Masquer')
-                        ->icon('heroicon-o-eye-slash')
+                        ->icon(Heroicon::OutlinedEyeSlash)
                         ->color('warning')
                         ->requiresConfirmation()
                         ->action(function (Collection $records): void {
@@ -230,7 +208,7 @@ class VideosTable
 
                     BulkAction::make('lock_content')
                         ->label('Verrouiller titre/description')
-                        ->icon('heroicon-o-lock-closed')
+                        ->icon(Heroicon::OutlinedLockClosed)
                         ->color('gray')
                         ->requiresConfirmation()
                         ->modalDescription('Protège le titre, la description et la miniature contre la prochaine synchronisation YouTube. Utile après une réécriture manuelle.')

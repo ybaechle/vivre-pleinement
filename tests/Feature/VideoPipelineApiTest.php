@@ -3,9 +3,6 @@
 use App\Models\Category;
 use App\Models\Video;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     config(['services.automation.token' => 'secret-token']);
@@ -30,7 +27,7 @@ function decodePayload(string $payload): array
 function enrichmentBody(array $overrides = []): array
 {
     return array_merge([
-        'intro' => '<p>Une intro.</p><script>alert(1)</script>',
+        'intro' => '<p onmouseover="alert(1)">Une intro.</p><script>alert(1)</script>',
         'summary' => 'Un résumé.',
         'seo_description' => 'Une description SEO.',
         'key_takeaways' => [
@@ -94,6 +91,18 @@ it('stores a formatted transcript and marks it as formatted', function () {
 
     expect($video->transcript)->toContain('<p>Quatre, cinq, six.</p>')
         ->and($video->transcript_formatted_at)->not->toBeNull();
+});
+
+it('strips every attribute from the formatted transcript', function () {
+    $video = Video::factory()->create([
+        'transcript' => '<p>un deux trois</p>',
+    ]);
+
+    $this->putJson(route('automation.videos.transcript.store', $video), [
+        'chunks' => ['<p onmouseover="alert(1)">Un, <strong style="x">deux,</strong> trois.</p>'],
+    ], automation())->assertSuccessful();
+
+    expect($video->fresh()->transcript)->toBe('<p>Un, <strong>deux,</strong> trois.</p>');
 });
 
 it('rejects a formatted transcript that lost words', function () {

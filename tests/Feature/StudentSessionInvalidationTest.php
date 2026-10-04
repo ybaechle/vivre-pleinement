@@ -1,11 +1,8 @@
 <?php
 
 use App\Models\Student;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Une session volée doit mourir avec le mot de passe qu'elle a servi à ouvrir :
@@ -75,6 +72,26 @@ it('déconnecte les autres sessions après une réinitialisation de mot de passe
     $this->session($stolenSession);
 
     $this->get(route('student.account.edit'))->assertRedirect(route('student.login'));
+});
+
+it('refuse un cookie « Se souvenir de moi » émis avant le changement de mot de passe', function () {
+    $student = Student::factory()->create(['password' => Hash::make('ancien-mot-de-passe')]);
+    $recallerName = auth('student')->getRecallerName();
+
+    $stolenCookie = $this->post(route('student.login.store'), [
+        'email' => $student->email,
+        'password' => 'ancien-mot-de-passe',
+        'remember' => '1',
+    ])->getCookie($recallerName)->getValue();
+
+    $student->update(['password' => 'nouveau-mot-de-passe-solide']);
+
+    auth('student')->forgetUser();
+    $this->flushSession();
+
+    $this->withCookie($recallerName, $stolenCookie)
+        ->get(route('student.account.edit'))
+        ->assertRedirect(route('student.login'));
 });
 
 it('ne perturbe pas un visiteur non connecté', function () {

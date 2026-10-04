@@ -15,6 +15,6 @@ class CreatePost extends CreateRecord
         return Notification::make()
             ->success()
             ->title('Article créé')
-            ->body('Ton nouvel article a bien été enregistré.');
+            ->body('Votre nouvel article a bien été enregistré.');
     }
 }

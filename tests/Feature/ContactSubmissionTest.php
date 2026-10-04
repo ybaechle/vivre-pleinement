@@ -3,11 +3,8 @@
 use App\Mail\ContactMessage;
 use App\Models\Course;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-
-uses(LazilyRefreshDatabase::class);
 
 beforeEach(function () {
     Mail::fake();

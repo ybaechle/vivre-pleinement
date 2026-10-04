@@ -21,7 +21,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
     'price',
     'price_cents',
     'currency',
-    'stripe_payment_link',
     'is_active',
     'seo_title',
     'seo_description',

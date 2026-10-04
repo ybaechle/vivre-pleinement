@@ -1,15 +1,11 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @section('title', 'Inscription confirmée · Vivre Pleinement')
 
-@push('head')
-    <meta name="robots" content="noindex, follow">
-@endpush
+@section('robots', 'noindex, follow')
 
-@section('body')
-    @include('layouts.partials.navbar')
-
-    <main class="to-cream-50 flex min-h-svh items-center justify-center bg-linear-to-b from-teal-100 via-teal-50/70 px-4 py-32 sm:px-6 lg:px-10">
+@section('content')
+    <main id="main" class="to-cream-50 flex min-h-svh items-center justify-center bg-linear-to-b from-teal-100 via-teal-50/70 px-4 py-32 sm:px-6 lg:px-10">
         <div class="mx-auto max-w-2xl text-center">
             <div class="mx-auto flex size-16 items-center justify-center rounded-full bg-white text-teal-700 shadow-lg ring-1 ring-teal-200">
                 <svg class="size-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -37,6 +33,4 @@
             </div>
         </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

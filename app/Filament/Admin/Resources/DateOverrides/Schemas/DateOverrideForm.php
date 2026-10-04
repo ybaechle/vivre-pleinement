@@ -22,12 +22,14 @@ class DateOverrideForm
                 TimePicker::make('start_time')
                     ->label('Heure de début')
                     ->seconds(false)
+                    ->requiredWith('end_time')
                     ->helperText('Laissez vide pour bloquer toute la journée.'),
 
                 TimePicker::make('end_time')
                     ->label('Heure de fin')
                     ->seconds(false)
                     ->after('start_time')
+                    ->requiredWith('start_time')
                     ->helperText('Laissez vide pour bloquer toute la journée.'),
 
                 TextInput::make('reason')

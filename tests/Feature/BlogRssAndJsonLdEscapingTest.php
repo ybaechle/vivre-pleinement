@@ -1,9 +1,6 @@
 <?php
 
 use App\Models\Post;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('escapes closing script tags inside JSON-LD so admin-editable content cannot break out of the script block', function () {
     $post = Post::factory()->create([

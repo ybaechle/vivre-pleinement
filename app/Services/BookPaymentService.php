@@ -92,7 +92,7 @@ class BookPaymentService
         });
 
         match ($outcome) {
-            'duplicate' => $this->refundDuplicatePayment($locked, $paymentIntentId),
+            'duplicate' => $this->intents->refundDuplicate($locked, $paymentIntentId, 'une commande livre déjà payée'),
             'fulfilled' => $this->sendConfirmation($locked),
         };
     }
@@ -103,33 +103,6 @@ class BookPaymentService
 
         Mail::to($order->customer_email)->send(new BookOrderConfirmation($fresh));
         Mail::to(SiteContact::notifyEmail())->send(new BookOrderNotification($fresh));
-    }
-
-    /**
-     * Un paiement réussi arrive pour une commande déjà payée via un intent
-     * différent : le client a payé deux fois (deux onglets avant la
-     * réutilisation d'intent). On rembourse le second débit.
-     */
-    private function refundDuplicatePayment(BookOrder $order, ?string $paymentIntentId): void
-    {
-        if ($paymentIntentId === null || $paymentIntentId === $order->stripe_payment_intent_id) {
-            return;
-        }
-
-        if ($this->intents->refundQuietly($paymentIntentId)) {
-            Log::warning('Second paiement détecté pour une commande livre déjà payée : remboursé automatiquement.', [
-                'book_order_id' => $order->id,
-                'kept_payment_intent_id' => $order->stripe_payment_intent_id,
-                'refunded_payment_intent_id' => $paymentIntentId,
-            ]);
-
-            return;
-        }
-
-        Log::error('Second paiement détecté pour une commande livre déjà payée mais remboursement impossible.', [
-            'book_order_id' => $order->id,
-            'payment_intent_id' => $paymentIntentId,
-        ]);
     }
 
     /**

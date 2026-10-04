@@ -1,8 +1,10 @@
 <?php
 
 use App\Jobs\SubscribeToNewsletterJob;
+use App\Support\BrevoNewsletter;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 
@@ -64,27 +66,26 @@ it('returns JSON when subscribing via an AJAX request', function () {
         ->assertJson(['status' => 'pending']);
 });
 
-it('returns JSON errors when an AJAX subscription fails', function () {
-    Http::fake(['api.brevo.com/v3/contacts/doubleOptinConfirmation' => Http::response('', 400)]);
+it('returns JSON errors when an AJAX subscription is throttled', function () {
+    foreach (range(1, 3) as $attempt) {
+        RateLimiter::hit('newsletter:127.0.0.1', 600);
+    }
 
     $this->postJson(route('newsletter.store'), validNewsletterPayload())
         ->assertStatus(422)
         ->assertJsonStructure(['errors' => ['email']]);
 });
 
-it('shows an error when Brevo rejects the subscription', function () {
-    Http::fake(['api.brevo.com/v3/contacts/doubleOptinConfirmation' => Http::response('', 400)]);
+it('fails the queued subscription when Brevo rejects or cannot be reached', function (Closure $response) {
+    Http::fake(['api.brevo.com/*' => $response]);
 
-    $this->post(route('newsletter.store'), validNewsletterPayload())
-        ->assertSessionHasErrors('email');
-});
+    $job = new SubscribeToNewsletterJob('camille@gmail.com', 'Camille', route('newsletter.confirmed'));
 
-it('shows an error when Brevo is unreachable', function () {
-    Http::fake(fn () => throw new ConnectionException('timeout'));
-
-    $this->post(route('newsletter.store'), validNewsletterPayload())
-        ->assertSessionHasErrors('email');
-});
+    expect(fn () => $job->handle(app(BrevoNewsletter::class)))->toThrow(RuntimeException::class);
+})->with([
+    'rejected' => fn () => fn () => Http::response('', 400),
+    'unreachable' => fn () => fn () => throw new ConnectionException('timeout'),
+]);
 
 it('rejects a submission caught by the honeypot', function () {
     Http::fake();
@@ -117,4 +118,15 @@ it('renders the confirmation page', function () {
     $this->get(route('newsletter.confirmed'))
         ->assertOk()
         ->assertSee('Inscription confirmée');
+});
+
+it('logs a definitive Brevo failure without the visitor email', function () {
+    Log::spy();
+
+    (new SubscribeToNewsletterJob('camille@gmail.com', 'Camille', 'https://example.com'))
+        ->failed(new RuntimeException('Brevo indisponible'));
+
+    Log::shouldHaveReceived('error')->once()->withArgs(
+        fn (string $message, array $context) => ! str_contains(json_encode($context), 'camille@gmail.com'),
+    );
 });

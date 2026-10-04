@@ -101,7 +101,7 @@ class VideoArticleMatcher
             return null;
         }
 
-        return Post::query()->with(['categories', 'media'])->find($postId);
+        return Post::query()->published()->with(['categories', 'media'])->find($postId);
     }
 
     /**
@@ -146,7 +146,7 @@ class VideoArticleMatcher
 
     private static function computePostIdForVideo(Video $video): ?int
     {
-        if ($video->related_post_id && $video->relatedPost && $video->relatedPost->published_at) {
+        if ($video->related_post_id && Post::query()->published()->whereKey($video->related_post_id)->exists()) {
             return $video->related_post_id;
         }
 

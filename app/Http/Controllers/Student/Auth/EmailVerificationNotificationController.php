@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class EmailVerificationNotificationController extends Controller
 {
-    /**
-     * Renvoie le lien de vérification à l'élève connecté.
-     */
     public function store(Request $request): RedirectResponse
     {
         if ($request->user('student')->hasVerifiedEmail()) {

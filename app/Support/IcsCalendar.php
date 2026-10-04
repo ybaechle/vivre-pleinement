@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use Carbon\CarbonInterface;
 
@@ -16,7 +17,7 @@ class IcsCalendar
     public static function forAppointment(Appointment $appointment): string
     {
         $title = 'RDV – '.$appointment->service->name;
-        $description = 'Rendez-vous en visioconférence avec Laura Baechlé. Référence : '.$appointment->reference;
+        $description = 'Rendez-vous '.mb_strtolower($appointment->channel->getLabel()).' avec Laura Baechlé. Référence : '.$appointment->reference;
         $host = parse_url(config('app.url'), PHP_URL_HOST);
 
         $lines = [
@@ -32,7 +33,11 @@ class IcsCalendar
             'DTEND:'.self::formatDate($appointment->ends_at),
             'SUMMARY:'.self::escape($title),
             'DESCRIPTION:'.self::escape($description),
-            'STATUS:CONFIRMED',
+            'STATUS:'.match ($appointment->status) {
+                AppointmentStatus::Pending => 'TENTATIVE',
+                AppointmentStatus::Cancelled => 'CANCELLED',
+                default => 'CONFIRMED',
+            },
             'END:VEVENT',
             'END:VCALENDAR',
         ];

@@ -1,5 +1,4 @@
 <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-    {{-- Bouton drawer mobile --}}
     <div class="mb-2 lg:hidden">
         <button type="button" data-drawer-open
                 class="text-ink-soft ring-ink/5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium ring-1 transition hover:text-teal-700">
@@ -11,7 +10,6 @@
     {{-- Sidebar : recherche live + catégories/tags (liens indexables) --}}
     <aside class="hidden lg:col-span-3 lg:block">
         <div class="sticky top-28 space-y-8">
-            {{-- Recherche live --}}
             <div role="search">
                 <label for="post-search" class="text-ink-muted block text-xs font-medium tracking-wider uppercase">Rechercher</label>
                 <div class="relative mt-2">
@@ -43,7 +41,6 @@
         </div>
     </aside>
 
-    {{-- Contenu --}}
     <div class="lg:col-span-9">
         {{-- Recherche live mobile (la sidebar desktop a son propre champ) --}}
         <div class="mb-6 lg:hidden" role="search">
@@ -82,7 +79,6 @@
             </section>
         @endif
 
-        {{-- Compteur + tri --}}
         <div class="flex items-center justify-between gap-3">
             <p class="text-ink-soft text-sm" aria-live="polite">
                 {{ $posts->total() }} {{ \Illuminate\Support\Str::plural('article', $posts->total()) }}
@@ -97,7 +93,6 @@
             </div>
         </div>
 
-        {{-- Chips des filtres actifs --}}
         @if (count($chips) > 0)
             <div class="mt-3 flex flex-wrap items-center gap-2 lg:mt-4">
                 <span class="text-ink-muted text-xs font-medium tracking-wider uppercase">Filtres :</span>
@@ -114,7 +109,6 @@
             </div>
         @endif
 
-        {{-- Grille --}}
         @if ($posts->isNotEmpty())
             <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 @foreach ($posts as $post)

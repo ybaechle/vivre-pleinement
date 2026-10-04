@@ -11,6 +11,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
  */
 class VideoStatsOverview extends StatsOverviewWidget
 {
+    protected static bool $isDiscovered = false;
+
     protected ?string $heading = 'État des vidéos';
 
     protected ?string $pollingInterval = null;
@@ -20,13 +22,8 @@ class VideoStatsOverview extends StatsOverviewWidget
         $base = Video::query()->published();
 
         $total = (clone $base)->count();
-        $enriched = (clone $base)
-            ->whereNotNull('intro')->where('intro', '!=', '')
-            ->whereNotNull('summary')->where('summary', '!=', '')
-            ->count();
-        $withTranscript = (clone $base)
-            ->whereNotNull('transcript')->where('transcript', '!=', '')
-            ->count();
+        $enriched = (clone $base)->enriched()->count();
+        $withTranscript = (clone $base)->withTranscript()->count();
         $totalViews = (int) (clone $base)->sum('view_count');
 
         $pct = fn (int $n) => $total > 0 ? (int) round($n / $total * 100) : 0;

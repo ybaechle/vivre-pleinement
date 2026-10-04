@@ -3,24 +3,26 @@
 namespace App\Filament\Admin\Resources\Videos\Schemas;
 
 use App\Enums\VideoStatus;
-use App\Models\Category;
 use App\Models\Video;
+use App\Support\Duration;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\IconSize;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Illuminate\View\ComponentAttributeBag;
 
@@ -47,9 +49,9 @@ class VideoForm
                     Tab::make('Contenu')
                         ->icon(Heroicon::OutlinedPencilSquare)
                         ->schema([
-                            Placeholder::make('preview')
+                            TextEntry::make('preview')
                                 ->label('Sur YouTube')
-                                ->content(fn ($record): HtmlString => $record
+                                ->state(fn ($record): HtmlString => $record
                                     ? new HtmlString(sprintf(
                                         '<div class="flex items-center gap-4">'
                                         .'<img src="%s" alt="" class="h-20 w-32 rounded-lg object-cover ring-1 ring-gray-200">'
@@ -99,22 +101,12 @@ class VideoForm
 
                     Tab::make('SEO & Contenu éditorial')
                         ->icon(Heroicon::OutlinedSparkles)
-                        ->badge(fn ($record) => match (true) {
-                            $record === null => null,
-                            $record->isEnriched() && $record->hasTranscript() => 'Complet',
-                            $record->isEnriched() || $record->hasTranscript() => 'Partiel',
-                            default => 'À faire',
-                        })
-                        ->badgeColor(fn ($record) => match (true) {
-                            $record === null => 'gray',
-                            $record->isEnriched() && $record->hasTranscript() => 'success',
-                            $record->isEnriched() || $record->hasTranscript() => 'warning',
-                            default => 'danger',
-                        })
+                        ->badge(fn (?Video $record): ?string => $record?->editorialState()->getLabel())
+                        ->badgeColor(fn (?Video $record): string => $record?->editorialState()->getColor() ?? 'gray')
                         ->schema([
-                            Placeholder::make('seo_help')
+                            TextEntry::make('seo_help')
                                 ->hiddenLabel()
-                                ->content(fn ($record) => new HtmlString(self::editorialChecklist($record)))
+                                ->state(fn ($record) => new HtmlString(self::editorialChecklist($record)))
                                 ->columnSpanFull(),
 
                             TextInput::make('seo_description')
@@ -184,12 +176,18 @@ class VideoForm
                                 ])
                                 ->columns(2)
                                 ->itemLabel(fn (array $state): ?string => isset($state['start_seconds'], $state['title'])
-                                    ? sprintf('%s – %s', self::formatSeconds((int) $state['start_seconds']), $state['title'])
+                                    ? sprintf('%s – %s', Duration::clock((int) $state['start_seconds']), $state['title'])
                                     : null)
                                 ->collapsible()
                                 ->collapsed()
                                 ->reorderableWithButtons()
-                                ->orderColumn('start_seconds')
+                                ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                                    $starts = array_map(fn (array $chapter): int => (int) ($chapter['start_seconds'] ?? 0), $value ?? []);
+
+                                    if ($starts !== [] && min($starts) !== 0) {
+                                        $fail('Le premier chapitre doit commencer à 0 seconde.');
+                                    }
+                                })
                                 ->addActionLabel('Ajouter un chapitre')
                                 ->defaultItems(0)
                                 ->columnSpanFull(),
@@ -224,18 +222,17 @@ class VideoForm
                                 ->native(false)
                                 ->helperText('Date à laquelle la vidéo apparaît sur le site.'),
 
-                            Placeholder::make('youtube_published_at_display')
+                            TextEntry::make('youtube_published_at_display')
                                 ->label('Publiée sur YouTube le')
-                                ->content(fn ($record) => $record?->youtube_published_at?->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
+                                ->state(fn ($record) => $record?->youtube_published_at?->isoFormat('D MMMM YYYY [à] HH:mm') ?? '–'),
 
-                            Placeholder::make('synced_at_display')
+                            TextEntry::make('synced_at_display')
                                 ->label('Dernière synchronisation')
-                                ->content(fn ($record) => $record?->synced_at?->diffForHumans() ?? 'Jamais synchronisée'),
+                                ->state(fn ($record) => $record?->synced_at?->diffForHumans() ?? 'Jamais synchronisée'),
 
                             CheckboxList::make('categories')
                                 ->label('Catégories')
-                                ->relationship('categories', 'name')
-                                ->options(fn () => Category::orderBy('name')->pluck('name', 'id'))
+                                ->relationship('categories', 'name', fn (Builder $query) => $query->orderBy('name'))
                                 ->columns(2)
                                 ->columnSpanFull(),
 
@@ -257,25 +254,25 @@ class VideoForm
                     Tab::make('Statistiques')
                         ->icon(Heroicon::OutlinedChartBar)
                         ->schema([
-                            Placeholder::make('view_count_display')
+                            TextEntry::make('view_count_display')
                                 ->label('Vues')
-                                ->content(fn ($record) => $record?->view_count
+                                ->state(fn ($record) => $record?->view_count
                                     ? number_format($record->view_count, 0, ',', ' ')
                                     : '–'),
 
-                            Placeholder::make('like_count_display')
+                            TextEntry::make('like_count_display')
                                 ->label('Likes')
-                                ->content(fn ($record) => $record?->like_count
+                                ->state(fn ($record) => $record?->like_count
                                     ? number_format($record->like_count, 0, ',', ' ')
                                     : '–'),
 
-                            Placeholder::make('duration_display')
+                            TextEntry::make('duration_display')
                                 ->label('Durée')
-                                ->content(fn ($record) => $record?->durationFormatted() ?? '–'),
+                                ->state(fn ($record) => $record?->durationFormatted() ?? '–'),
 
-                            Placeholder::make('locked_fields_display')
+                            TextEntry::make('locked_fields_display')
                                 ->label('Champs verrouillés contre la sync')
-                                ->content(function ($record) {
+                                ->state(function ($record) {
                                     $locked = $record?->sync_locked_fields ?? [];
 
                                     return empty($locked)
@@ -325,9 +322,6 @@ class VideoForm
             .'</div>';
     }
 
-    /**
-     * Action de verrouillage pour les champs sync-sensibles.
-     */
     private static function lockToggleAction(string $field): Action
     {
         return Action::make('lock_'.$field)
@@ -349,16 +343,5 @@ class VideoForm
                 }
                 $record->update(['sync_locked_fields' => $locked]);
             });
-    }
-
-    private static function formatSeconds(int $seconds): string
-    {
-        $h = intdiv($seconds, 3600);
-        $m = intdiv($seconds % 3600, 60);
-        $s = $seconds % 60;
-
-        return $h > 0
-            ? sprintf('%d:%02d:%02d', $h, $m, $s)
-            : sprintf('%d:%02d', $m, $s);
     }
 }

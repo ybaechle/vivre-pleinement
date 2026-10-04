@@ -4,12 +4,9 @@ use App\Models\Student;
 use App\Notifications\StudentVerifyEmail;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
-
-uses(LazilyRefreshDatabase::class);
 
 it('met en file d\'attente la notification de vérification d\'e-mail', function () {
     expect(new StudentVerifyEmail)->toBeInstanceOf(ShouldQueue::class);
@@ -44,10 +41,28 @@ it('vérifie l\'e-mail via le lien signé', function () {
 
     $this->actingAs($student, 'student')
         ->get($url)
-        ->assertRedirect();
+        ->assertRedirect(route('student.dashboard'));
 
     expect($student->refresh()->hasVerifiedEmail())->toBeTrue();
     Event::assertDispatched(Verified::class);
+
+    $this->get(route('student.dashboard'))->assertSee('Votre adresse e-mail a bien été confirmée.');
+});
+
+it('refuse de vérifier l\'adresse d\'un autre élève que celui connecté', function () {
+    $other = Student::factory()->unverified()->create();
+
+    $url = URL::temporarySignedRoute(
+        'student.verification.verify',
+        now()->addMinutes(60),
+        ['id' => $other->id, 'hash' => sha1($other->getEmailForVerification())],
+    );
+
+    $this->actingAs(Student::factory()->unverified()->create(), 'student')
+        ->get($url)
+        ->assertForbidden();
+
+    expect($other->refresh()->hasVerifiedEmail())->toBeFalse();
 });
 
 it('rejette un lien de vérification au hash invalide', function () {

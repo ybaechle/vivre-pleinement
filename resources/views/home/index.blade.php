@@ -1,4 +1,4 @@
-@extends('layouts.site')
+@extends('layouts.page')
 
 @push('head')
     @php
@@ -50,17 +50,14 @@
             ],
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$jsonLd" />
 @endpush
 
-@section('body')
-    @include('layouts.partials.navbar')
-
+@section('content')
     <main id="main">
     <div class="parallax-scene to-cream-50 text-ink relative flex h-svh min-h-160 flex-col overflow-hidden bg-linear-to-b from-teal-200 from-0% via-teal-100 via-30% to-85%">
 
         <section class="relative isolate flex min-h-0 flex-1">
-            {{-- Soleil --}}
             <div class="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
                 <div data-parallax="0.02" class="absolute -top-56 -right-40 size-150 rounded-full bg-amber-100/45 blur-3xl will-change-transform"></div>
                 <div data-parallax="0.02" class="absolute -top-24 -right-24 size-56 rounded-full bg-linear-to-br from-white via-amber-50 to-amber-100/70 blur-xl will-change-transform sm:size-72"></div>
@@ -131,7 +128,6 @@
                         @csrf
                         <input type="hidden" name="ts" value="{{ \App\Support\SubmissionStamp::issue() }}">
 
-                        {{-- Honeypot anti-spam --}}
                         <div aria-hidden="true" class="absolute -left-[9999px] top-auto size-px overflow-hidden">
                             <label for="nl_website">Site web (ne pas remplir)</label>
                             <input type="text" id="nl_website" name="website" tabindex="-1" autocomplete="off">
@@ -142,7 +138,7 @@
                         <label for="nl_email" class="sr-only">Votre email</label>
                         <input type="email" id="nl_email" name="email" value="{{ old('email') }}" required placeholder="Votre adresse email" autocomplete="email" class="bg-cream-100/70 text-ink placeholder:text-ink-muted w-full rounded-2xl border-0 px-5 py-3.5 text-sm focus:bg-white focus:ring-2 focus:ring-teal-500 focus:outline-hidden">
                         @error('first_name')<p class="text-xs text-rose-700">{{ $message }}</p>@enderror
-                        <p data-newsletter-error role="alert" aria-live="polite" class="text-xs text-rose-700" @unless ($errors->has('email')) hidden @endunless>@error('email'){{ $message }}@enderror</p>
+                        <p data-newsletter-error role="alert" aria-live="polite" class="text-xs text-rose-700" @unless ($errors->hasAny(['email', 'ts'])) hidden @endunless>{{ $errors->first('email') ?: $errors->first('ts') }}</p>
                         <button type="submit" class="group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-700 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-teal-700/20 transition hover:bg-teal-800 disabled:opacity-60">
                             Recevoir la vidéo
                         </button>
@@ -158,6 +154,4 @@
     </div>
     </div>
     </main>
-
-    @include('home.sections.footer')
 @endsection

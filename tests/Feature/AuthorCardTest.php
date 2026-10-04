@@ -3,9 +3,6 @@
 use App\Models\Post;
 use App\Models\Video;
 use App\Support\Settings;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
-
-uses(LazilyRefreshDatabase::class);
 
 it('shows the author card under an article with a link to the bio page', function () {
     $post = Post::factory()->create(['status' => 'published']);

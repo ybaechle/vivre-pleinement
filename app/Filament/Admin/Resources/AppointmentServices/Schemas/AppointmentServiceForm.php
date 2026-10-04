@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\AppointmentServices\Schemas;
 
+use App\Support\SlugFromTitle;
+use Closure;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -9,7 +11,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Illuminate\Support\Str;
 
 class AppointmentServiceForm
 {
@@ -24,11 +25,7 @@ class AppointmentServiceForm
                         ->label('Nom')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(function (string $state, callable $set, $record) {
-                            if (! $record) {
-                                $set('slug', Str::slug($state));
-                            }
-                        })
+                        ->afterStateUpdated(SlugFromTitle::onCreate())
                         ->columnSpanFull(),
 
                     TextInput::make('slug')
@@ -71,6 +68,11 @@ class AppointmentServiceForm
                         ->numeric()
                         ->step(0.01)
                         ->minValue(0)
+                        ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
+                            if ($value > 0 && $value < 0.5) {
+                                $fail('Stripe n\'accepte pas de paiement sous 0,50 € : indiquez 0 € pour une prestation gratuite.');
+                            }
+                        })
                         ->suffix('€')
                         ->default(0)
                         ->required()

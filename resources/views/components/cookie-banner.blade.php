@@ -25,7 +25,6 @@
                 </div>
             </div>
 
-            {{-- Personnalisation par catégorie --}}
             <div data-cookie-view="customize" hidden>
                 <p class="text-ink font-serif text-xl font-medium">Personnaliser mes cookies</p>
                 <p class="text-ink-soft mt-2 text-sm">Choisissez les catégories que vous acceptez.</p>

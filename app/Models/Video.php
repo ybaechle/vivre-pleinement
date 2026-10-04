@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Enums\VideoEditorialState;
 use App\Enums\VideoStatus;
 use App\Observers\VideoObserver;
+use App\Support\Duration;
 use Database\Factories\VideoFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -49,7 +51,6 @@ class Video extends Model
     use SoftDeletes;
 
     /** Champs qui peuvent être verrouillés contre la sync */
-    public const LOCKABLE_FIELDS = ['title', 'description', 'thumbnail_url', 'slug'];
 
     /**
      * Seuil au-dessus duquel une vidéo n'est plus considérée comme un Short
@@ -191,14 +192,6 @@ class Video extends Model
         return Str::limit(trim(strip_tags($source)), $limit);
     }
 
-    public function hasEditorialContent(): bool
-    {
-        return filled($this->summary)
-            || filled($this->intro)
-            || filled($this->transcript)
-            || ! empty($this->key_takeaways);
-    }
-
     /**
      * La vidéo a-t-elle son contenu éditorial principal (intro + résumé) ?
      * Sert d'indicateur « page indexable » dans l'admin.
@@ -213,6 +206,40 @@ class Video extends Model
         return filled($this->transcript);
     }
 
+    public function editorialState(): VideoEditorialState
+    {
+        return match (true) {
+            $this->isEnriched() && $this->hasTranscript() => VideoEditorialState::Complete,
+            $this->isEnriched() => VideoEditorialState::MissingTranscript,
+            $this->hasTranscript() => VideoEditorialState::ToEnrich,
+            default => VideoEditorialState::ToDo,
+        };
+    }
+
+    /**
+     * Pendant SQL de isEnriched().
+     *
+     * @param  Builder<Video>  $query
+     */
+    public function scopeEnriched(Builder $query, bool $enriched = true): void
+    {
+        $enriched
+            ? $query->whereNotNull('intro')->where('intro', '!=', '')->whereNotNull('summary')->where('summary', '!=', '')
+            : $query->where(fn (Builder $q) => $q->whereNull('intro')->orWhere('intro', '')->orWhereNull('summary')->orWhere('summary', ''));
+    }
+
+    /**
+     * Pendant SQL de hasTranscript().
+     *
+     * @param  Builder<Video>  $query
+     */
+    public function scopeWithTranscript(Builder $query, bool $withTranscript = true): void
+    {
+        $withTranscript
+            ? $query->whereNotNull('transcript')->where('transcript', '!=', '')
+            : $query->where(fn (Builder $q) => $q->whereNull('transcript')->orWhere('transcript', ''));
+    }
+
     /**
      * Chapitres formatés pour schema.org Clip[].
      *
@@ -225,7 +252,10 @@ class Video extends Model
      */
     public function chaptersForSchema(): array
     {
-        $chapters = $this->chapters ?? [];
+        $chapters = collect($this->chapters ?? [])
+            ->sortBy(fn (array $chapter): int => (int) ($chapter['start_seconds'] ?? 0))
+            ->values()
+            ->all();
         if (empty($chapters)) {
             return [];
         }
@@ -266,13 +296,13 @@ class Video extends Model
         return 'https://www.youtube-nocookie.com/embed/'.$this->youtube_id;
     }
 
-    public function thumbnail(string $size = 'maxres'): string
+    public function thumbnail(): string
     {
         if ($this->thumbnail_url) {
             return $this->thumbnail_url;
         }
 
-        return "https://i.ytimg.com/vi/{$this->youtube_id}/{$size}default.jpg";
+        return "https://i.ytimg.com/vi/{$this->youtube_id}/maxresdefault.jpg";
     }
 
     public function durationFormatted(): ?string
@@ -281,12 +311,6 @@ class Video extends Model
             return null;
         }
 
-        $h = intdiv($this->duration_seconds, 3600);
-        $m = intdiv($this->duration_seconds % 3600, 60);
-        $s = $this->duration_seconds % 60;
-
-        return $h > 0
-            ? sprintf('%d:%02d:%02d', $h, $m, $s)
-            : sprintf('%d:%02d', $m, $s);
+        return Duration::clock($this->duration_seconds);
     }
 }

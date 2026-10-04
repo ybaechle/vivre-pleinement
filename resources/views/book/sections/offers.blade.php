@@ -16,7 +16,7 @@
             <p class="mt-3 text-sm text-teal-50 sm:text-base">Le livre, et une heure avec moi par téléphone ou en visio. Parce que l'information seule ne suffit pas : il vous faut un encadrement pour vous investir.</p>
 
             <div class="mt-6 flex items-baseline gap-2">
-                <span class="font-serif text-5xl font-medium">{!! $offerPrice($offerCoaching) !!}</span>
+                <span class="font-serif text-5xl font-medium">{{ $offerPrice($offerCoaching) }}</span>
                 <span class="text-sm text-teal-100">TTC · paiement unique</span>
             </div>
 
@@ -53,7 +53,7 @@
             <p class="text-ink-soft mt-3 text-sm sm:text-base">Le guide complet, 77 pages, 12 fiches pratiques. Pour avancer à votre rythme, en autonomie.</p>
 
             <div class="mt-6 flex items-baseline gap-2">
-                <span class="text-ink font-serif text-5xl font-medium">{!! $offerPrice($offerSolo) !!}</span>
+                <span class="text-ink font-serif text-5xl font-medium">{{ $offerPrice($offerSolo) }}</span>
                 <span class="text-ink-muted text-sm">TTC · paiement unique</span>
             </div>
 

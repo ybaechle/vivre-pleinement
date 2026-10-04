@@ -5,14 +5,11 @@ use App\Enums\PaymentStatus;
 use App\Livewire\BookingCalendar;
 use App\Models\Appointment;
 use App\Models\AppointmentService;
-use App\Models\Availability;
 use App\Models\BookOrder;
+use App\Services\AppointmentLifecycleService;
 use Carbon\CarbonImmutable;
-use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-
-uses(LazilyRefreshDatabase::class);
 
 /**
  * Prestation payante ouverte tous les jours, pour que le calendrier propose
@@ -27,9 +24,7 @@ function coachingService(): AppointmentService
         'requires_confirmation' => false,
     ]);
 
-    foreach (range(0, 6) as $dow) {
-        Availability::factory()->dayOfWeek($dow)->create();
-    }
+    openEveryDay();
 
     return $service;
 }
@@ -121,6 +116,38 @@ it('rend le lien de coaching inutilisable une fois consommé', function () {
 
     $this->get(route('book.coaching', $order->token))
         ->assertRedirect(route('booking.confirmation', $order->coachingAppointment->token));
+});
+
+it('refuse un lien de coaching déjà consommé au lieu de basculer vers un rendez-vous payant', function () {
+    Mail::fake();
+    $service = coachingService();
+    $order = BookOrder::factory()->withCoaching()->paid()->create();
+
+    $calendar = Livewire::test(BookingCalendar::class, [
+        'service' => $service,
+        'bookOrderToken' => $order->token,
+    ]);
+
+    $order->update(['coaching_appointment_id' => Appointment::factory()->create()->id]);
+
+    $calendar->set('selectedSlot', firstBookableSlot())
+        ->set('consent', true)
+        ->call('book')
+        ->assertHasErrors(['selectedSlot'])
+        ->assertNoRedirect();
+
+    expect(Appointment::query()->count())->toBe(1);
+});
+
+it('rouvre le lien de coaching quand la séance offerte est annulée', function () {
+    $order = BookOrder::factory()->withCoaching()->paid()->create();
+    $appointment = Appointment::factory()->create();
+    $order->update(['coaching_appointment_id' => $appointment->id]);
+
+    app(AppointmentLifecycleService::class)->cancel($appointment);
+
+    expect($order->fresh()->canBookCoaching())->toBeTrue();
+    $this->get(route('book.coaching', $order->token))->assertOk();
 });
 
 it('facture normalement un visiteur sans jeton de commande', function () {

@@ -27,7 +27,7 @@ class DateOverridesTable
                     ->label('Date')
                     ->date('D d/m/Y')
                     ->description(fn (DateOverride $record) => $record->date
-                        ->isPast() ? 'Passé' : null)
+                        ->isBefore(today()) ? 'Passé' : null)
                     ->sortable(),
 
                 TextColumn::make('start_time')
@@ -36,7 +36,7 @@ class DateOverridesTable
                     ->color(fn (DateOverride $record) => $record->isFullDay()
                         ? 'danger'
                         : 'warning')
-                    ->formatStateUsing(function (DateOverride $record) {
+                    ->state(function (DateOverride $record): string {
                         if ($record->isFullDay()) {
                             return 'Journée entière';
                         }

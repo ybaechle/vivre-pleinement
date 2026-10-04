@@ -33,7 +33,13 @@
             date: new Date().toISOString(),
             choices,
         };
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        // Stockage bloqué (navigation privée stricte) : le choix vaut pour la
+        // visite en cours, le bandeau doit quand même se fermer.
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        } catch (error) {
+            console.warn('Choix de cookies non mémorisé :', error);
+        }
         applyChoices(choices);
         window.dispatchEvent(new CustomEvent('cookies:consent', { detail: payload }));
     };

@@ -5,9 +5,8 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* ════════════════════════════════════════════════════════════
+/*
    Design tokens - identité Vivre Pleinement
-   ════════════════════════════════════════════════════════════
 
    Conventions à tenir, faute de quoi l'interface se délite sans
    qu'aucun écran ne paraisse fautif isolément :
@@ -28,7 +27,7 @@
    Accent
      teal, sur tout le site. rose-soft reste réservé aux ponctuations
      décoratives sur fond teal, jamais comme second accent.
-   ════════════════════════════════════════════════════════════ */
+*/
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
@@ -70,7 +69,7 @@
     --site-max-width: 90rem;
 }
 
-/* ─── Conteneur centré du site (remplace mx-auto max-w-* px-*) ─── */
+/* Conteneur centré du site (remplace mx-auto max-w-* px-*) */
 @utility site-container {
     width: 100%;
     max-width: var(--site-max-width);
@@ -81,9 +80,7 @@
 }
 
 @layer utilities {
-    /* ════════════════════════════════════════════════════════════
-       Délais partagés (départs désynchronisés des animations en boucle)
-       ════════════════════════════════════════════════════════════ */
+    /* Délais partagés (départs désynchronisés des animations en boucle) */
     .delay-n2  { animation-delay:  -2s; }
     .delay-n3  { animation-delay:  -3s; }
     .delay-n5  { animation-delay:  -5s; }
@@ -92,9 +89,7 @@
     .delay-n70 { animation-delay: -70s; }
     .delay-n90 { animation-delay: -90s; }
 
-    /* ════════════════════════════════════════════════════════════
-       Nuages - dérive horizontale + balancement
-       ════════════════════════════════════════════════════════════ */
+    /* Nuages - dérive horizontale + balancement */
     @keyframes cloud-drift-left  { to { transform: translateX(-115vw); } }
     @keyframes cloud-drift-right { to { transform: translateX(115vw); } }
     @keyframes cloud-sway {
@@ -120,9 +115,7 @@
     .cloud-s-15 { animation-duration: 15s; }
     .cloud-s-17 { animation-duration: 17s; }
 
-    /* ════════════════════════════════════════════════════════════
-       Oiseaux origami (SVG) - trajectoire + battement d'ailes
-       ════════════════════════════════════════════════════════════ */
+    /* Oiseaux origami (SVG) - trajectoire + battement d'ailes */
     @keyframes bird-path-up-right {
         0%, 100% { transform: translate(0, 0); }
         25%      { transform: translate(18px, -22px); }
@@ -148,10 +141,10 @@
 
     .bird-f-34 { animation-duration: 3.4s; }
 
-    /* ════════════════════════════════════════════════════════════
-       Oiseaux sprite - .bird-fly traverse le ciel, .bird bat des ailes
-       (10 poses côte à côte dans birds-sprite.svg, défilées en steps(10))
-       ════════════════════════════════════════════════════════════ */
+    /*
+     * Oiseaux sprite - .bird-fly traverse le ciel, .bird bat des ailes
+     * (10 poses côte à côte dans birds-sprite.svg, défilées en steps(10))
+     */
     .bird {
         width: 88px;
         height: 125px;
@@ -202,18 +195,14 @@
         100% { transform: translateY(0)      translateX(110vw) scale(0.45); }
     }
 
-    /* ════════════════════════════════════════════════════════════
-       Indice de scroll - chevron qui respire
-       ════════════════════════════════════════════════════════════ */
+    /* Indice de scroll - chevron qui respire */
     @keyframes scroll-hint {
         0%, 100% { transform: translateY(0);   opacity: 0.5; }
         50%      { transform: translateY(6px); opacity: 1; }
     }
     .scroll-hint { animation: scroll-hint 2.4s ease-in-out infinite; }
 
-    /* ════════════════════════════════════════════════════════════
-       Accordéon - hauteur animée via grid-template-rows
-       ════════════════════════════════════════════════════════════ */
+    /* Accordéon - hauteur animée via grid-template-rows */
     .accordion-item > .accordion-content {
         display: grid;
         grid-template-rows: 0fr;
@@ -230,9 +219,7 @@
     .accordion-item summary::-webkit-details-marker { display: none; }
     .accordion-item summary::marker { content: ''; }
 
-    /* ════════════════════════════════════════════════════════════
-       Apparition au scroll - éléments marqués [data-reveal]
-       ════════════════════════════════════════════════════════════ */
+    /* Apparition au scroll - éléments marqués [data-reveal] */
     [data-reveal] {
         opacity: 0;
         transform: translateY(1.25rem);
@@ -244,9 +231,7 @@
         transform: none;
     }
 
-    /* ════════════════════════════════════════════════════════════
-       Frise « méthode » - ligne verticale qui se trace au scroll
-       ════════════════════════════════════════════════════════════ */
+    /* Frise « méthode » - ligne verticale qui se trace au scroll */
     .timeline-line {
         transform-origin: top;
         transform: scaleY(0);
@@ -262,9 +247,7 @@
     }
     .timeline-step.is-revealed .timeline-dot { opacity: 1; transform: scale(1); }
 
-    /* ════════════════════════════════════════════════════════════
-       Pissenlit - graines qui dérivent doucement dans le vent
-       ════════════════════════════════════════════════════════════ */
+    /* Pissenlit - graines qui dérivent doucement dans le vent */
     @keyframes dandelion-drift {
         0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
         25%  { transform: translate3d(14px, -10px, 0) rotate(6deg); }
@@ -293,9 +276,7 @@
         will-change: transform;
     }
 
-    /* ════════════════════════════════════════════════════════════
-       Préférence « moins d'animation »
-       ════════════════════════════════════════════════════════════ */
+    /* Préférence « moins d'animation » */
     @media (prefers-reduced-motion: reduce) {
         .cloud-l, .cloud-r, .cloud-sway,
         .bird-up-r, .bird-flap-rm10,
@@ -317,13 +298,13 @@
     }
 }
 
-/* ════════════════════════════════════════════════════════════
-   Images dans le corps des articles (.prose)
-   Plafond de largeur ET de hauteur (pour les images portrait) + centrage,
-   pour les images migrées de WordPress souvent en pleine résolution.
-   Pas de !important : une image redimensionnée à la main dans l'éditeur
-   (style inline) reste prioritaire.
-   ════════════════════════════════════════════════════════════ */
+/*
+ * Images dans le corps des articles (.prose)
+ * Plafond de largeur ET de hauteur (pour les images portrait) + centrage,
+ * pour les images migrées de WordPress souvent en pleine résolution.
+ * Pas de !important : une image redimensionnée à la main dans l'éditeur
+ * (style inline) reste prioritaire.
+ */
 .prose :where(img):not([style*="width"]):not([style*="height"]) {
     max-width: min(100%, 37.5rem);
     max-height: 28rem;
@@ -332,11 +313,11 @@
     margin-inline: auto;
 }
 
-/* ════════════════════════════════════════════════════════════
-   Encart « définition rapide » en ouverture d'article (.prose)
-   Réponse auto-suffisante visant le featured snippet : volontairement
-   SANS data-nosnippet, c'est le passage que Google doit citer.
-   ════════════════════════════════════════════════════════════ */
+/*
+ * Encart « définition rapide » en ouverture d'article (.prose)
+ * Réponse auto-suffisante visant le featured snippet : volontairement
+ * SANS data-nosnippet, c'est le passage que Google doit citer.
+ */
 .prose .key-answer {
     border-radius: var(--radius-3xl);
     background-color: white;

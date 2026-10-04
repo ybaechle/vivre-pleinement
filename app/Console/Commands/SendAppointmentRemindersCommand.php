@@ -19,6 +19,13 @@ use Illuminate\Support\Facades\Mail;
 #[Description('Envoie les rappels (24h, 1h) et messages de suivi des rendez-vous confirmés.')]
 class SendAppointmentRemindersCommand extends Command
 {
+    /**
+     * Le suivi remercie pour la séance : il attend une journée pour laisser
+     * le temps de marquer un client absent, qui recevra alors le mail « On
+     * vous a manqué » à la place.
+     */
+    private const FOLLOW_UP_DELAY_HOURS = 24;
+
     public function handle(): int
     {
         $now = CarbonImmutable::now();
@@ -120,7 +127,7 @@ class SendAppointmentRemindersCommand extends Command
             ->with('service')
             ->where('status', AppointmentStatus::Confirmed)
             ->whereNull('followed_up_at')
-            ->where('ends_at', '<=', $now)
+            ->where('ends_at', '<=', $now->subHours(self::FOLLOW_UP_DELAY_HOURS))
             ->get()
             ->each(function (Appointment $appointment) use (&$count) {
                 $claimed = Appointment::query()

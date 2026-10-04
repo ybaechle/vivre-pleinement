@@ -73,9 +73,30 @@ it('respects the disabled toggle', function () {
     Mail::assertNotQueued(AppointmentReminder::class);
 });
 
-it('sends a follow-up and marks completed after the appointment', function () {
+it('waits a day before thanking the client, leaving time to mark a no-show', function () {
     Mail::fake();
     $past = CarbonImmutable::now()->subHours(2);
+    $appointment = appointmentAt($past->subMinutes(30), ['starts_at' => $past->subMinutes(30), 'ends_at' => $past]);
+
+    $this->artisan('appointments:send-reminders');
+
+    Mail::assertNotQueued(AppointmentFollowUp::class);
+    expect($appointment->fresh()->status)->toBe(AppointmentStatus::Confirmed);
+});
+
+it('never thanks a client marked absent', function () {
+    Mail::fake();
+    $past = CarbonImmutable::now()->subHours(25);
+    appointmentAt($past->subMinutes(30), ['starts_at' => $past->subMinutes(30), 'ends_at' => $past, 'status' => AppointmentStatus::NoShow]);
+
+    $this->artisan('appointments:send-reminders');
+
+    Mail::assertNotQueued(AppointmentFollowUp::class);
+});
+
+it('sends a follow-up and marks completed a day after the appointment', function () {
+    Mail::fake();
+    $past = CarbonImmutable::now()->subHours(25);
     $appointment = appointmentAt($past->subMinutes(30), ['starts_at' => $past->subMinutes(30), 'ends_at' => $past]);
 
     $this->artisan('appointments:send-reminders');
@@ -87,7 +108,7 @@ it('sends a follow-up and marks completed after the appointment', function () {
 
 it('follow-up run is idempotent — a second run sends nothing new', function () {
     Mail::fake();
-    $past = CarbonImmutable::now()->subHours(2);
+    $past = CarbonImmutable::now()->subHours(25);
     appointmentAt($past->subMinutes(30), ['starts_at' => $past->subMinutes(30), 'ends_at' => $past]);
 
     $this->artisan('appointments:send-reminders');

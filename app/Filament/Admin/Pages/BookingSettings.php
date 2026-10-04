@@ -85,6 +85,7 @@ class BookingSettings extends Page
                             ->onColor('success'),
                         Toggle::make('followup_enabled')
                             ->label('Message de suivi après le rendez-vous')
+                            ->helperText('Envoyé 24 h après la séance. Un client marqué absent d\'ici là reçoit à la place le message « On vous a manqué ».')
                             ->onColor('success'),
                     ]),
             ]);

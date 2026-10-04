@@ -48,7 +48,7 @@ worker Supervisor traite la file (`scripts/supervisor/vivre-pleinement-worker.co
 
 | Tâche | Fréquence |
 |---|---|
-| `appointments:send-reminders` : rappels, suivis, paniers abandonnés | 15 min |
+| `appointments:send-reminders` : rappels, suivi 24 h après la séance, paniers abandonnés | 15 min |
 | `payments:reconcile` : rattrapage des paiements dont le webhook s'est perdu | 15 min |
 | `youtube:sync` : synchronisation des vidéos de la chaîne | toutes les heures |
 | `youtube:fetch-transcripts --since=14` : récupération des sous-titres | toutes les heures |

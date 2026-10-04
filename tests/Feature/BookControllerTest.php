@@ -145,3 +145,12 @@ it('rejette une soumission piégée par le champ honeypot', function () {
 
     expect(BookOrder::query()->count())->toBe(0);
 });
+
+it('affiche les centimes d\'un prix non rond sans les tronquer', function () {
+    $this->solo->update(['price_cents' => 1990]);
+
+    $this->get(route('book.show'))
+        ->assertOk()
+        ->assertSee("19,90\u{00A0}€", false)
+        ->assertDontSee("19,9\u{00A0}€", false);
+});

@@ -20,7 +20,7 @@
         $offerSolo = ($offers['livre'] ?? null)?->price ?? 37;
         $offerCoaching = ($offers['livre-coaching'] ?? null)?->price ?? 70;
 
-        $offerPrice = fn (float $amount): string => rtrim(rtrim(number_format($amount, 2, ',', "\u{202f}"), '0'), ',').'&nbsp;€';
+        $offerPrice = fn (float $amount): string => number_format($amount, fmod($amount, 1.0) === 0.0 ? 0 : 2, ',', "\u{202f}")."\u{00A0}€";
 
         /**
          * Une offre dont le fichier manque n'est pas achetable : les boutons

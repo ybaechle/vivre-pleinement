@@ -55,8 +55,6 @@ return [
         'events' => [
             'payment_intent.succeeded',
             'charge.refunded',
-            'customer.updated',
-            'customer.deleted',
         ],
     ],
 

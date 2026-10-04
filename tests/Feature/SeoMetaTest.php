@@ -80,7 +80,7 @@ it('falls back to the title with a brand suffix when seo_title is empty', functi
 });
 
 it('emits a single, query-string-free canonical on an article', function () {
-    Post::factory()->create(['slug' => 'burn-out', 'status' => 'published', 'seo_canonical' => null]);
+    Post::factory()->create(['slug' => 'burn-out', 'status' => 'published']);
 
     $html = $this->get('/blog/burn-out?utm_source=newsletter')->assertOk()->getContent();
 
@@ -194,39 +194,6 @@ it('renders a single meta robots tag on a post with a custom seo_robots', functi
 
     expect(substr_count($html, '<meta name="robots"'))->toBe(1)
         ->and($html)->toContain('noindex, follow');
-});
-
-it('ignores a stale migrated seo_canonical and points to the new blog URL', function () {
-    Post::factory()->create([
-        'slug' => 'ergophobie-peur-du-travail',
-        'status' => 'published',
-        'seo_canonical' => 'https://vivre-pleinement.fr/ergophobie-peur-du-travail/',
-    ]);
-
-    $this->get('/blog/ergophobie-peur-du-travail')
-        ->assertOk()
-        ->assertSee('<link rel="canonical" href="'.route('blog.show', 'ergophobie-peur-du-travail').'"', false)
-        ->assertDontSee('vivre-pleinement.fr/ergophobie-peur-du-travail/', false);
-});
-
-it('ignores a stale migrated seo_schema_json and renders a clean Article schema', function () {
-    Post::factory()->create([
-        'slug' => 'schema-obsolete',
-        'status' => 'published',
-        'title' => 'Article test',
-        'seo_schema_json' => [
-            '@context' => 'https://schema.org',
-            '@type' => 'Article',
-            'author' => ['name' => 'Laura B.'],
-            'mainEntityOfPage' => ['@id' => 'https://vivre-pleinement.fr/schema-obsolete/'],
-        ],
-    ]);
-
-    $html = $this->get('/blog/schema-obsolete')->assertOk()->getContent();
-
-    expect($html)->toContain('"name":"Laura Baechlé"')
-        ->and($html)->not->toContain('"name":"Laura B."')
-        ->and($html)->toContain('"@id":"'.route('blog.show', 'schema-obsolete').'"');
 });
 
 it('lists the latest articles in the blog ItemList, and omits it when nothing is previewed', function () {

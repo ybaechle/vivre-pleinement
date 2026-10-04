@@ -79,13 +79,6 @@ class ProductForm
                                 ->helperText('Désactivé = produit caché du site public.')
                                 ->inline(false)
                                 ->columnSpan(2),
-
-                            TextInput::make('stripe_payment_link')
-                                ->label('Lien Stripe Payment')
-                                ->url()
-                                ->placeholder('https://buy.stripe.com/...')
-                                ->helperText('Collez ici votre lien Stripe Payment Link.')
-                                ->columnSpan(2),
                         ])
                         ->columns(2),
 

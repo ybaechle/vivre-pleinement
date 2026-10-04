@@ -161,13 +161,6 @@ class PostForm
                                 ->live(debounce: 500)
                                 ->columnSpanFull(),
 
-                            TextInput::make('seo_canonical')
-                                ->label('URL canonique')
-                                ->url()
-                                ->placeholder('https://...')
-                                ->helperText('À renseigner uniquement si cet article est une copie d\'un autre.')
-                                ->columnSpanFull(),
-
                             Select::make('seo_robots')
                                 ->label('Visibilité dans les moteurs')
                                 ->options(fn (?Post $record) => self::robotsOptions($record))

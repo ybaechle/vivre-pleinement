@@ -98,7 +98,7 @@ le reste du flux (confirmation, emails, remboursement) ne change pas.
 
 1. Dans le Dashboard Stripe (**mode Live**), crée un endpoint webhook :
    - URL : `https://TON-DOMAINE/stripe/webhook`
-   - Événements : `payment_intent.succeeded`, `charge.refunded`, `customer.updated`, `customer.deleted`
+   - Événements : `payment_intent.succeeded`, `charge.refunded`
    - (ou via `php artisan cashier:webhook`, qui crée l'endpoint avec ces événements, lus dans `config/cashier.php`)
 2. Copie le **signing secret** de cet endpoint dans le `.env` de prod (`STRIPE_WEBHOOK_SECRET`).
 3. Mets les clés **Live** (`pk_live_`, `sk_live_`).

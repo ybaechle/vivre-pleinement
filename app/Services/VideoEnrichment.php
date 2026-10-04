@@ -11,9 +11,9 @@ use Illuminate\Support\Arr;
  * Applique à une vidéo le contenu éditorial produit par l'étape IA :
  * catégories, intro, résumé, description SEO, points clés et chapitres.
  *
- * Un champ vide n'écrase jamais la valeur existante. Avec $onlyMissing,
- * seuls les champs encore vides de la vidéo sont remplis, et les
- * catégories ne sont posées que si elle n'en a aucune.
+ * Seuls les champs encore vides de la vidéo sont remplis, et les catégories
+ * ne sont posées que si elle n'en a aucune : une retouche faite dans l'admin
+ * n'est jamais écrasée.
  */
 class VideoEnrichment
 {
@@ -25,27 +25,19 @@ class VideoEnrichment
      *     unknown_categories: list<string>,
      * }
      */
-    public function apply(
-        Video $video,
-        array $row,
-        bool $dryRun = false,
-        bool $onlyMissing = false,
-    ): array {
-        $attributes = $this->attributes($row);
+    public function apply(Video $video, array $row): array
+    {
+        $attributes = array_filter(
+            $this->attributes($row),
+            fn (string $field): bool => blank($video->{$field}),
+            ARRAY_FILTER_USE_KEY,
+        );
 
-        if ($onlyMissing) {
-            $attributes = array_filter(
-                $attributes,
-                fn (string $field): bool => blank($video->{$field}),
-                ARRAY_FILTER_USE_KEY,
-            );
-        }
-
-        if ($attributes !== [] && ! $dryRun) {
+        if ($attributes !== []) {
             $video->update($attributes);
         }
 
-        $slugs = $onlyMissing && $video->categories()->exists()
+        $slugs = $video->categories()->exists()
             ? []
             : array_values(array_filter(
                 (array) ($row['category_slugs'] ?? []),
@@ -56,7 +48,7 @@ class VideoEnrichment
             ->whereIn('slug', $slugs)
             ->pluck('id', 'slug');
 
-        if ($ids->isNotEmpty() && ! $dryRun) {
+        if ($ids->isNotEmpty()) {
             $video->categories()->sync($ids->values()->all());
         }
 

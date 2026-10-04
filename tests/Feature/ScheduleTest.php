@@ -13,6 +13,6 @@ it('purges the expired student password reset tokens every day', function () {
 it('runs every scheduled task once, in production only', function () {
     $events = collect(app(Schedule::class)->events());
 
-    expect($events)->toHaveCount(5)
+    expect($events)->toHaveCount(6)
         ->each(fn ($event) => $event->withoutOverlapping->toBeTrue()->onOneServer->toBeTrue()->environments->toBe(['production']));
 });

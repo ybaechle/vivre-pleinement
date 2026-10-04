@@ -54,7 +54,7 @@
         <li><strong>Données collectées</strong> : pseudonyme, email (non publié), contenu du commentaire, adresse IP (à des fins de modération).</li>
         <li><strong>Finalité</strong> : permettre l'expression des lecteurs, modérer les contenus.</li>
         <li><strong>Base légale</strong> : intérêt légitime à modérer les contenus publiés sur le site.</li>
-        <li><strong>Durée de conservation</strong> : tant que l'article est en ligne, ou jusqu'à demande de suppression.</li>
+        <li><strong>Durée de conservation</strong> : tant que l'article est en ligne, ou jusqu'à demande de suppression. L'adresse IP est effacée un an après la publication du commentaire.</li>
     </ul>
 
     <h3>2.4 Données de navigation</h3>

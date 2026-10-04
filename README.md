@@ -53,6 +53,7 @@ worker Supervisor traite la file (`scripts/supervisor/vivre-pleinement-worker.co
 | `youtube:sync` : synchronisation des vidéos de la chaîne | toutes les heures |
 | `youtube:fetch-transcripts --since=14` : récupération des sous-titres | toutes les heures |
 | `auth:clear-resets students` : purge des jetons de réinitialisation expirés | quotidienne |
+| `comments:purge-ips` : effacement des adresses IP des commentaires de plus d'un an | quotidienne |
 
 ## Vidéos et transcriptions
 

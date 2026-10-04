@@ -31,4 +31,5 @@ Schedule::withoutOverlapping()->onOneServer()->environments(['production'])->gro
      * expiration.
      */
     Schedule::command('auth:clear-resets students')->daily();
+    Schedule::command('comments:purge-ips')->daily();
 });

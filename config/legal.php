@@ -56,6 +56,6 @@ return [
         'complaint_url' => 'https://www.cnil.fr/fr/plaintes',
     ],
 
-    'last_updated' => '2026-05-25',
+    'last_updated' => '2026-10-04',
 
 ];

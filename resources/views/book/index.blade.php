@@ -77,7 +77,7 @@
             ],
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($productLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$productLd" />
 
     @php
         $breadcrumbLd = [
@@ -89,7 +89,7 @@
             ],
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($breadcrumbLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$breadcrumbLd" />
 @endpush
 
 @section('body')

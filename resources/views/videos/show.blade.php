@@ -69,7 +69,7 @@
 
         $videoLd = array_filter($videoLd, fn ($value) => $value !== null && $value !== '');
     @endphp
-    <script type="application/ld+json">{!! json_encode($videoLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$videoLd" />
 @endpush
 
 @section('body')

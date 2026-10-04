@@ -37,7 +37,7 @@
 
         $courseLd['hasCourseInstance'] = array_filter($courseLd['hasCourseInstance']);
     @endphp
-    <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$courseLd" />
 @endpush
 
 @php

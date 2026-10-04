@@ -52,7 +52,7 @@
             ])->all(),
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$faqLd" />
 @endpush
 
 <x-section id="faq" bg="bg-cream-50" title="Foire aux questions (FAQ)" lead="Vous avez d'autres questions qui n'apparaissent pas ici ? Laissez-moi un message.">

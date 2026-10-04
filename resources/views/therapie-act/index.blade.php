@@ -54,7 +54,7 @@
 @section('og_description', "Définition, principes et efficacité de la thérapie d'acceptation et d'engagement (ACT) sur les troubles anxieux.")
 
 @push('head')
-    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$faqLd" />
 @endpush
 
 @section('body')

@@ -53,8 +53,8 @@
             ])->all(),
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($bookingLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
-    <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$bookingLd" />
+    <x-json-ld :data="$faqLd" />
 @endpush
 
 @section('body')

@@ -56,9 +56,9 @@
                     ->all(),
             ];
         @endphp
-        <script type="application/ld+json">{!! json_encode($blogLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+        <x-json-ld :data="$blogLd" />
         @if ($previewPosts->isNotEmpty())
-            <script type="application/ld+json">{!! json_encode($itemListLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+            <x-json-ld :data="$itemListLd" />
         @endif
     @endif
 @endpush

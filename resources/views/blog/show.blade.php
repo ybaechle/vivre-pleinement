@@ -60,7 +60,7 @@
             'inLanguage' => 'fr-FR',
         ];
     @endphp
-    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+    <x-json-ld :data="$articleLd" />
 
     @if (! empty($post->faq))
         @php
@@ -77,7 +77,7 @@
                 ])->all(),
             ];
         @endphp
-        <script type="application/ld+json">{!! json_encode($faqLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+        <x-json-ld :data="$faqLd" />
     @endif
 @endpush
 

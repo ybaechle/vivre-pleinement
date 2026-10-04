@@ -180,3 +180,7 @@ it('loads the reference service once per render', function () {
 
     expect($queries)->toBeLessThanOrEqual(4);
 });
+
+it('leaves the weekly schedule page as the only screen editing availabilities', function () {
+    $this->get('/espace-pro/availabilities')->assertNotFound();
+});

@@ -211,7 +211,6 @@ it('opens every admin screen without an error', function (string $route) {
     'filament.admin.resources.appointments.index',
     'filament.admin.resources.appointment-services.index',
     'filament.admin.resources.date-overrides.index',
-    'filament.admin.resources.availabilities.index',
     'filament.admin.resources.posts.index',
     'filament.admin.resources.videos.index',
     'filament.admin.resources.comments.index',
